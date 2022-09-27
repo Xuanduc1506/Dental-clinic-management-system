@@ -1,0 +1,31 @@
+package com.example.dentalclinicmanagementsystem.entity;
+
+import lombok.Data;
+
+import javax.persistence.*;
+
+@Entity
+@Data
+@Table(name = "service")
+public class Service {
+    @Id
+    @Column(name = "service_id")
+    private Long serviceId;
+
+    @Column(name = "service_name")
+    private String serviceName;
+
+    @Column(name = "unit")
+    private String unit;
+
+    @Column(name = "market_price")
+    private Integer marketPrice;
+
+    @Column(name = "price")
+    private Integer price;
+
+    @Column(name = "category_service_id")
+    private Long categoryServiceId;
+
+
+}
