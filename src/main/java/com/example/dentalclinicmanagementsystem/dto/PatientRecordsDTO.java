@@ -37,4 +37,6 @@ public class PatientRecordsDTO {
 
     private String prescription;
 
+    private Long preRecordId;
+
 }

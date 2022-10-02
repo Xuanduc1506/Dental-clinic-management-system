@@ -51,10 +51,10 @@ public class PatientRecords {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "service_id")
-    private Long serviceId;
-
     @Column(name = "prescription")
     private String prescription;
+
+    @Column(name = "pre_record_id")
+    private Long preRecordId;
 
 }
