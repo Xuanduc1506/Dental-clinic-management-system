@@ -3,12 +3,15 @@ package com.example.dentalclinicmanagementsystem.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Data
 @Table(name = "patient_records")
-public class PatientRecords {
+public class PatientRecord {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "patient_record_id")
     private Long patientRecordId;
 
@@ -22,7 +25,7 @@ public class PatientRecords {
     private String causal;
 
     @Column(name = "date")
-    private java.sql.Date date;
+    private Date date;
 
     @Column(name = "treatment")
     private String treatment;

@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "user_permission_map")
 public class UserPermissionMap {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_permission_map_id")
     private Long userPermissionMapId;
 

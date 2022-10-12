@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "category_service")
 public class CategoryService {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_service_id")
     private Long categoryServiceId;
 

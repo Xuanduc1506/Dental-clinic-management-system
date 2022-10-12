@@ -1,11 +1,40 @@
 package com.example.dentalclinicmanagementsystem.repository;
 
-import com.example.dentalclinicmanagementsystem.entity.Users;
+import com.example.dentalclinicmanagementsystem.dto.UserDTO;
+import com.example.dentalclinicmanagementsystem.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface UserRepository extends JpaRepository<Users, Long> {
+import java.util.List;
 
-    Users findUsersByUserName(String username);
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    User findUsersByUserName(String username);
+
+    @Query(value = "select new com.example.dentalclinicmanagementsystem.dto.UserDTO(u.userId, u.fullName, u.userName, " +
+            "u.birthdate, u.phone, u.roleId, r.roleName)" +
+            "from User u left join Role r on u.roleId = r.roleId " +
+            "where u.enable = true " +
+            "AND (:username is null or u.userName like %:username%) " +
+            "AND (:phone is null or u.phone like %:phone%) " +
+            "AND (:roleName is null or r.roleName like %:roleName%)",
+            countQuery = "select count(u.userId)" +
+                    "from User u left join Role r on u.roleId = r.roleId " +
+                    "where u.enable = true " +
+                    "AND (:username is null or u.userName like %:username%) " +
+                    "AND (:phone is null or u.phone like %:phone%)" +
+                    "AND (:roleName is null or r.roleName like %:roleName%)")
+    Page<UserDTO> getListUser(@Param("username") String username,
+                              @Param("phone") String phone,
+                              @Param("roleName") String roleName,
+                              Pageable pageable);
+
+    User findByUserIdAndEnable(Long id, Boolean enable);
+
+    List<User> findAllByUserNameContaining(String code);
 }

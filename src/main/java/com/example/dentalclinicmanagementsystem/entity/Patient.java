@@ -7,8 +7,9 @@ import javax.persistence.*;
 @Entity
 @Data
 @Table(name = "patients")
-public class Patients {
+public class Patient {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "patient_code")
     private String patientCode;
 

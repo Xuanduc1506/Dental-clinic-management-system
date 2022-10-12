@@ -6,6 +6,7 @@ import javax.persistence.*;
 @Table(name = "patient_record_service_map")
 public class PatientRecordServiceMap {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "patient_record_service_map_id")
     private Long patientRecordServiceMapId;
 

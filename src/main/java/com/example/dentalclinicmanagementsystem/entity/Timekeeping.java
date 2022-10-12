@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "timekepping")
 public class Timekeeping {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "timekeeping_id")
     private Long timekeepingId;
 

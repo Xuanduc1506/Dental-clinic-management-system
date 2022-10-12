@@ -4,16 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Data
 @Table(name = "users")
-public class Users {
+public class User implements Serializable {
     @Id
     @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column(name = "user_name")
     private String userName;
@@ -22,7 +27,7 @@ public class Users {
     private String password;
 
     @Column(name = "birthdate")
-    private java.sql.Date birthdate;
+    private String birthdate;
 
     @Column(name = "phone")
     private String phone;
@@ -33,6 +38,9 @@ public class Users {
     @Column(name = "role_id")
     private Long roleId;
 
+    @Column(name = "enable")
+    private Boolean enable;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -40,6 +48,6 @@ public class Users {
             joinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "role_id") },
             inverseJoinColumns = { @JoinColumn(name = "permission_id", referencedColumnName = "permission_id") }
     )
-    private Set<Permission> roles = new HashSet<>();
+    private Set<Permission> permissions = new HashSet<>();
 
 }

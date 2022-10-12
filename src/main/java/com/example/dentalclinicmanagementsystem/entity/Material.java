@@ -7,8 +7,10 @@ import javax.persistence.*;
 @Entity
 @Data
 @Table(name = "materials")
-public class Materials {
+public class Material {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "material_id")
     private Long materialId;
 
@@ -23,5 +25,14 @@ public class Materials {
 
     @Column(name = "price")
     private Integer price;
+
+    @Column(name = "enable")
+    private Boolean enable;
+
+    @Column(name = "amount", insertable = false, updatable = false)
+    private String amountTemp;
+
+    @Column(name = "price", insertable = false, updatable = false)
+    private String priceTemp;
 
 }

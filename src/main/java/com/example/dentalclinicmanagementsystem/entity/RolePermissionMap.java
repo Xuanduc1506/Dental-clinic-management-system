@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Table(name = "role_permission_map")
 public class RolePermissionMap {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "role_permission__map_id")
     private Long rolePermissionMapId;
 

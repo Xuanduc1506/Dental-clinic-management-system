@@ -1,7 +1,7 @@
 package com.example.dentalclinicmanagementsystem.security;
 
 import com.example.dentalclinicmanagementsystem.entity.Permission;
-import com.example.dentalclinicmanagementsystem.entity.Users;
+import com.example.dentalclinicmanagementsystem.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,12 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserDetailImpl implements UserDetails {
 
-    Users users;
+    User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        for (Permission permission : users.getRoles()) {
+        for (Permission permission : user.getPermissions()) {
             authorities.add(new SimpleGrantedAuthority(permission.getPermissionName()));
         }
         return authorities;
@@ -29,12 +29,12 @@ public class UserDetailImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return users.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return users.getUserName();
+        return user.getUserName();
     }
 
     @Override
