@@ -3,9 +3,9 @@ package com.example.dentalclinicmanagementsystem.exception;
 import lombok.Data;
 
 @Data
-public class WrongPasswordException extends RuntimeException {
+public class TokenException extends RuntimeException{
 
-    public WrongPasswordException(String message) {
+    public TokenException(String message) {
         super(message);
     }
 }

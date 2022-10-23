@@ -16,7 +16,7 @@ public abstract class AbstractService {
 
     public String setUsername(String code, List<String> usernames){
 
-        int maxUser = 0;
+        int maxUser = 1;
         for(String name : usernames){
             try {
                 int number = Integer.parseInt(name.substring(code.length()));

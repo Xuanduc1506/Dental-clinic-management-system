@@ -47,7 +47,7 @@ public class MaterialImportService {
     public MaterialImportDTO importMaterial(MaterialImportDTO materialImportDTO) {
 
         materialImportDTO.setMaterialImportId(null);
-        Material material = materialRepository.findByMaterialIdAndEnable(materialImportDTO.getMaterialId(), Boolean.TRUE);
+        Material material = materialRepository.findByMaterialId(materialImportDTO.getMaterialId());
         if (Objects.isNull(material)) {
             throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
                     EntityName.Material.MATERIAL_NAME);
@@ -71,7 +71,7 @@ public class MaterialImportService {
                     EntityName.MaterialImport.MATERIAL_IMPORT_ID, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
         }
 
-        Material newMaterial = materialRepository.findByMaterialIdAndEnable(materialImportDTO.getMaterialId(), Boolean.TRUE);
+        Material newMaterial = materialRepository.findByMaterialId(materialImportDTO.getMaterialId());
         if (Objects.isNull(newMaterial)) {
             throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
                     EntityName.Material.MATERIAL_NAME);
@@ -82,7 +82,7 @@ public class MaterialImportService {
             materialRepository.save(newMaterial);
         } else {
 
-            Material oldMaterial = materialRepository.findByMaterialIdAndEnable(oldMaterialImport.getMaterialId(), Boolean.TRUE);
+            Material oldMaterial = materialRepository.findByMaterialId(oldMaterialImport.getMaterialId());
             oldMaterial.setAmount(oldMaterial.getAmount() - oldMaterialImport.getAmount());
             materialRepository.save(oldMaterial);
 
@@ -102,7 +102,7 @@ public class MaterialImportService {
                     EntityName.MaterialImport.MATERIAL_IMPORT_ID, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
         }
 
-        Material material = materialRepository.findByMaterialIdAndEnable(materialImport.getMaterialId(), Boolean.TRUE);
+        Material material = materialRepository.findByMaterialId(materialImport.getMaterialId());
         if (Objects.isNull(material)) {
             throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
                     EntityName.Material.MATERIAL_NAME);

@@ -18,8 +18,10 @@ public class UserDTO {
     @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})
     private String fullName;
 
+    @NotNull(groups = {UserDTO.Login.class})
     private String userName;
 
+    @NotNull(groups = {UserDTO.Login.class})
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -53,5 +55,8 @@ public class UserDTO {
     }
 
     public interface Update {
+    }
+
+    public interface Login {
     }
 }

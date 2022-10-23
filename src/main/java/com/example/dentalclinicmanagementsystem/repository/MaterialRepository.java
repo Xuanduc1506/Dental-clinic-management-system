@@ -11,8 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, Long> {
 
-    @Query("SELECT m FROM Material m WHERE m.enable = true " +
-            "AND (:name is null or m.materialName like %:name%)" +
+    @Query("SELECT m FROM Material m WHERE (:name is null or m.materialName like %:name%)" +
             "AND (:unit is null or m.unit like %:unit%)" +
             "AND (:price is null or m.priceTemp like %:price%)" +
             "AND (:amount is null or m.amountTemp like %:amount%)")
@@ -23,8 +22,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
                                               Pageable pageable);
 
     Material findByMaterialId(Long id);
-
-    Material findByMaterialIdAndEnable(Long id, Boolean enable);
 
     Material findByMaterialName(String name);
 }

@@ -4,6 +4,7 @@ import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
+import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
@@ -34,7 +35,7 @@ public class MaterialService {
     }
 
     public MaterialDTO getDetailMaterial(Long id) {
-        Material material = materialRepository.findByMaterialIdAndEnable(id, Boolean.TRUE);
+        Material material = materialRepository.findByMaterialId(id);
 
         if(Objects.isNull(material)){
             throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
@@ -47,18 +48,18 @@ public class MaterialService {
     public MaterialDTO addMaterial(MaterialDTO materialDTO) {
         Material materialDb = materialRepository.findByMaterialName(materialDTO.getMaterialName());
         if(Objects.nonNull(materialDb)) {
-            throw new RuntimeException();
+            throw new DuplicateNameException(MessageConstant.Material.MATERIAL_NAME_ALREADY_EXIST,
+                    EntityName.Material.MATERIAL_NAME);
         }
 
         materialDTO.setMaterialId(null);
-        materialDTO.setEnable(Boolean.TRUE);
         Material material = materialMapper.toEntity(materialDTO);
         return materialMapper.toDto(materialRepository.save(material));
     }
 
     public MaterialDTO updateMaterial(Long id, MaterialDTO materialDTO) {
         materialDTO.setMaterialId(id);
-        Material materialDb = materialRepository.findByMaterialIdAndEnable(id, Boolean.TRUE);
+        Material materialDb = materialRepository.findByMaterialId(id);
 
         if(Objects.isNull(materialDb)){
             throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
@@ -67,24 +68,22 @@ public class MaterialService {
         if(!Objects.equals(materialDTO.getMaterialName(), materialDb.getMaterialName())){
             Material materialHasName = materialRepository.findByMaterialName(materialDTO.getMaterialName());
             if(Objects.nonNull(materialHasName)){
-                throw new RuntimeException();
+                throw new DuplicateNameException(MessageConstant.Material.MATERIAL_NAME_ALREADY_EXIST,
+                        EntityName.Material.MATERIAL_NAME);
             }
         }
 
         Material material = materialMapper.toEntity(materialDTO);
-        material.setEnable(Boolean.TRUE);
         return materialMapper.toDto(materialRepository.save(material));
     }
 
     public void deleteMaterial(Long id) {
-        Material materialDb = materialRepository.findByMaterialIdAndEnable(id, Boolean.TRUE);
+        Material materialDb = materialRepository.findByMaterialId(id);
 
         if(Objects.isNull(materialDb)){
             throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
                     EntityName.Material.MATERIAL_ID);
         }
-        materialDb.setEnable(Boolean.FALSE);
-
-        materialRepository.save(materialDb);
+        materialRepository.delete(materialDb);
     }
 }

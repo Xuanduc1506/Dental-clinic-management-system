@@ -25,4 +25,22 @@ public class EntityName {
         public static final String MATERIAL_IMPORT = "materialImport";
         public static final String MATERIAL_IMPORT_ID = "materialImportId";
     }
+
+    public static class CategoryService {
+        private CategoryService(){}
+
+        public static final String CATEGORY = "category";
+        public static final String CATEGORY_ID = "categoryId";
+        public static final String CATEGORY_NAME = "categoryName";
+
+    }
+
+    public static class Service {
+
+        private Service(){}
+
+        public static final String SERVICE = "service";
+        public static final String SERVICE_ID = "serviceId";
+        public static final String SERVICE_NAME = "serviceName";
+    }
 }

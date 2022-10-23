@@ -26,9 +26,6 @@ public class Material {
     @Column(name = "price")
     private Integer price;
 
-    @Column(name = "enable")
-    private Boolean enable;
-
     @Column(name = "amount", insertable = false, updatable = false)
     private String amountTemp;
 

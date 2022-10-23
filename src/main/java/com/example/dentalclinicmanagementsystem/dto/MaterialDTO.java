@@ -24,8 +24,6 @@ public class MaterialDTO {
     @NotNull(groups = {MaterialDTO.Create.class, MaterialDTO.Update.class})
     private Integer price;
 
-    private Boolean enable;
-
     public interface Create {
     }
 

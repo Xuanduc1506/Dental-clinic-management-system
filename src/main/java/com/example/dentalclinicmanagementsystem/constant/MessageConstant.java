@@ -25,4 +25,21 @@ public class MessageConstant {
         public static final String MATERIAL_IMPORT_NOT_FOUND = "material import not found";
     }
 
+    public static class CategoryService{
+        private CategoryService(){}
+
+        public static final String CATEGORY_NOT_FOUND = "category not found";
+        public static final String CATEGORY_NAME_ALREADY_EXIST = "category name already exist";
+        public static final String CATEGORY_HAVE_BEEN_USED = "category have been use";
+    }
+
+    public static class Service {
+
+        private Service(){}
+
+        public static final String SERVICE_NOT_FOUND = "service not found";
+        public static final String SERVICE_NAME_ALREADY_EXIST = "service name already exist";
+
+    }
+
 }

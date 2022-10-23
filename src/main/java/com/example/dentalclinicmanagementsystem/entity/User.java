@@ -42,7 +42,7 @@ public class User implements Serializable {
     private Boolean enable;
 
     @JsonIgnore
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "role_permission_map",
             joinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "role_id") },

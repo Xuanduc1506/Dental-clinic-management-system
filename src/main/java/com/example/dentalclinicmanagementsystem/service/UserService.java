@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UserService extends AbstractService implements UserDetailsService {
+public class UserService extends AbstractService {
 
     @Autowired
     private UserRepository userRepository;
@@ -37,16 +37,16 @@ public class UserService extends AbstractService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        User user = userRepository.findUsersByUserName(username);
-        if (user == null) {
-            throw new RuntimeException("user not found");
-        }
-
-        return new UserDetailImpl(user);
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//
+//        User user = userRepository.findUsersByUserName(username);
+//        if (user == null) {
+//            throw new RuntimeException("user not found");
+//        }
+//
+//        return new UserDetailImpl(user);
+//    }
 
     public Page<UserDTO> getListUsers(String username,
                                       String phone,
@@ -83,7 +83,15 @@ public class UserService extends AbstractService implements UserDetailsService {
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(userDb.getPassword());
 
-        return saveUser(userDTO);
+        if(Objects.equals(userDb.getFullName(), userDTO.getFullName())){
+            userDTO.setEnable(Boolean.TRUE);
+
+            User user = userMapper.toEntity(userDTO);
+            user.setPermissions(null);
+            return userMapper.toDto(userRepository.save(user));
+        } else {
+            return saveUser(userDTO);
+        }
     }
 
     private UserDTO saveUser(UserDTO userDTO) {
