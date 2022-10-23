@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.controller;
 
+import com.example.dentalclinicmanagementsystem.constant.PermissionConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialDTO;
 import com.example.dentalclinicmanagementsystem.service.MaterialService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class MaterialController {
     @Autowired
     private MaterialService materialService;
 
-    @PreAuthorize("hasAuthority(\"" + "material_read" + "\") or hasAnyAuthority(\"" + "material_write"+ "\")")
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.MATERIAL_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.MATERIAL_WRITE + "\")")
     @GetMapping("get_list_materials")
     public ResponseEntity<Page<MaterialDTO>> getListMaterials(@RequestParam(required = false, defaultValue = "") String name,
                                                               @RequestParam(required = false, defaultValue = "") String unit,
@@ -31,29 +32,29 @@ public class MaterialController {
         return ResponseEntity.ok().body(materialService.getListMaterials(name, unit, price, amount, pageable));
     }
 
-    @PreAuthorize("hasAuthority(\"" + "material_read" + "\") or hasAnyAuthority(\"" + "material_write"+ "\")")
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.MATERIAL_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.MATERIAL_WRITE + "\")")
     @GetMapping("/{id}")
     public ResponseEntity<MaterialDTO> getDetailMaterial(@NotNull @PathVariable Long id) {
         return ResponseEntity.ok().body(materialService.getDetailMaterial(id));
     }
 
-    @PreAuthorize("hasAnyAuthority(\"" + "material_write"+ "\")")
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.MATERIAL_WRITE + "\")")
     @PostMapping()
     public ResponseEntity<MaterialDTO> addMaterial(
             @Validated(MaterialDTO.Create.class) @RequestBody MaterialDTO materialDTO) {
         return ResponseEntity.ok().body(materialService.addMaterial(materialDTO));
     }
 
-    @PreAuthorize("hasAnyAuthority(\"" + "material_write"+ "\")")
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.MATERIAL_WRITE + "\")")
     @PutMapping("/{id}")
     public ResponseEntity<MaterialDTO> updateMaterial(@NotNull @PathVariable Long id,
                                                       @Validated(MaterialDTO.Update.class) @RequestBody MaterialDTO materialDTO) {
         return ResponseEntity.ok().body(materialService.updateMaterial(id, materialDTO));
     }
 
-    @PreAuthorize("hasAnyAuthority(\"" + "material_write"+ "\")")
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.MATERIAL_WRITE + "\")")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMaterial(@NotNull @PathVariable Long id){
+    public ResponseEntity<Void> deleteMaterial(@NotNull @PathVariable Long id) {
 
         materialService.deleteMaterial(id);
         return ResponseEntity.ok().build();

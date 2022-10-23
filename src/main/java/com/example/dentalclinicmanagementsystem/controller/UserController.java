@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.controller;
 
+import com.example.dentalclinicmanagementsystem.constant.PermissionConstant;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
 import com.example.dentalclinicmanagementsystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasAuthority(\"" + "user_read" + "\") or hasAnyAuthority(\"" + "user_write" + "\")")
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.USER_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.USER_WRITE + "\")")
     @GetMapping("get_list_users")
     public ResponseEntity<Page<UserDTO>> getListUsers(@RequestParam(required = false, defaultValue = "") String username,
                                                       @RequestParam(required = false, defaultValue = "") String phone,
@@ -29,26 +30,26 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getListUsers(username, phone, roleName, pageable));
     }
 
-    @PreAuthorize("hasAuthority(\"" + "user_read" + "\") or hasAnyAuthority(\"" + "user_write" + "\")")
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.USER_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.USER_WRITE + "\")")
     @GetMapping("{id}")
     public ResponseEntity<UserDTO> getDetailUser(@NotNull @PathVariable Long id) {
         return ResponseEntity.ok().body(userService.getDetailUser(id));
     }
 
-    @PreAuthorize("hasAnyAuthority(\"" + "user_write" + "\")")
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.USER_WRITE + "\")")
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@Validated(UserDTO.Create.class) @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok().body(userService.registerUser(userDTO));
     }
 
-    @PreAuthorize("hasAuthority(\"" + "user_read" + "\") or hasAnyAuthority(\"" + "user_write" + "\")")
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.USER_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.USER_WRITE + "\")")
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@NotNull @PathVariable Long id,
                                               @Validated(UserDTO.Update.class) @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok().body(userService.updateUser(id, userDTO));
     }
 
-    @PreAuthorize("hasAnyAuthority(\"" + "user_write" + "\")")
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.USER_WRITE + "\")")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@NotNull @PathVariable Long id) {
 
