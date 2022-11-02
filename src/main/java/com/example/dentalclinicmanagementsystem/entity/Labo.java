@@ -8,6 +8,7 @@ import javax.persistence.*;
 @Data
 @Table(name = "labos")
 public class Labo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "labo_id")
@@ -18,5 +19,8 @@ public class Labo {
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
 }

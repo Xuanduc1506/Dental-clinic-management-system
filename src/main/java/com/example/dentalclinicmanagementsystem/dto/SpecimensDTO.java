@@ -2,15 +2,17 @@ package com.example.dentalclinicmanagementsystem.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class SpecimensDTO {
     private Long specimenId;
 
     private String specimenName;
 
-    private java.sql.Date receiveDate;
+    private LocalDate receiveDate;
 
-    private java.sql.Date deliveryDate;
+    private LocalDate deliveryDate;
 
     private Integer amount;
 

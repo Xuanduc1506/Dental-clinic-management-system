@@ -3,7 +3,7 @@ package com.example.dentalclinicmanagementsystem.dto;
 import lombok.Data;
 
 @Data
-public class RolesDTO {
+public class RoleDTO {
 
     private Long roleId;
 

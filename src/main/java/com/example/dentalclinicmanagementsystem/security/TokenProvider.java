@@ -3,8 +3,10 @@ package com.example.dentalclinicmanagementsystem.security;
 import com.example.dentalclinicmanagementsystem.dto.TokenDTO;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
 import com.example.dentalclinicmanagementsystem.entity.Role;
+import com.example.dentalclinicmanagementsystem.entity.User;
 import com.example.dentalclinicmanagementsystem.exception.TokenException;
 import com.example.dentalclinicmanagementsystem.repository.RoleRepository;
+import com.example.dentalclinicmanagementsystem.repository.UserRepository;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +26,19 @@ public class TokenProvider {
     @Autowired
     private RoleRepository roleRepository;
 
-    public TokenDTO createToken(Authentication authentication, UserDTO userDTO){
+    @Autowired
+    private UserRepository userRepository;
+
+    public TokenDTO createToken(Authentication authentication){
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
-        Role role = roleRepository.findRoleNameByUser(userDTO.getUserName());
+        Role role = roleRepository.findRoleNameByUser(authentication.getName());
 
+        User user = userRepository.findUsersByUserName(authentication.getName());
         TokenDTO tokenDTO = new TokenDTO();
-        tokenDTO.setJwt(Jwts.builder().setSubject(authentication.getName()).setIssuedAt(now)
+        tokenDTO.setJwt(Jwts.builder().setSubject(authentication.getName()).setId(user.getUserId().toString()).setIssuedAt(now)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret).setExpiration(expiryDate)
                 .compact());
         tokenDTO.setRole(role.getRoleName());

@@ -43,4 +43,29 @@ public class EntityName {
         public static final String SERVICE_ID = "serviceId";
         public static final String SERVICE_NAME = "serviceName";
     }
+
+    public static class Patient {
+
+        private Patient(){}
+
+        public static final String PATIENT = "patient";
+        public static final String PATIENT_ID = "patientId";
+    }
+
+    public static class PatientRecord {
+
+        private PatientRecord(){}
+
+        public static final String PATIENT_RECORD = "patientRecord";
+        public static final String PATIENT_RECORD_ID = "patientRecordId";
+
+        public static final String PRE_RECORD = "preRecord";
+    }
+
+    public static class Labo {
+        private Labo(){}
+
+        public static final String LABO = "labo";
+        public static final String LABO_ID = "laboId";
+    }
 }

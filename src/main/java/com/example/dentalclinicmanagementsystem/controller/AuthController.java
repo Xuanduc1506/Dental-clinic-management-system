@@ -33,6 +33,6 @@ public class AuthController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return ResponseEntity.ok().body(tokenProvider.createToken(authentication, userDTO));
+        return ResponseEntity.ok().body(tokenProvider.createToken(authentication));
     }
 }

@@ -3,7 +3,7 @@ package com.example.dentalclinicmanagementsystem.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -25,7 +25,7 @@ public class PatientRecord {
     private String causal;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "treatment")
     private String treatment;
@@ -42,14 +42,14 @@ public class PatientRecord {
     @Column(name = "debit")
     private Integer debit;
 
+    @Column(name = "cost_incurred")
+    private Integer costIncurred;
+
     @Column(name = "note")
     private String note;
 
     @Column(name = "patient_id")
-    private String patientId;
-
-    @Column(name = "specimen_id")
-    private Long specimenId;
+    private Long patientId;
 
     @Column(name = "user_id")
     private Long userId;

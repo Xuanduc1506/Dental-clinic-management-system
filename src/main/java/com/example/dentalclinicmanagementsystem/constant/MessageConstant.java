@@ -42,4 +42,29 @@ public class MessageConstant {
 
     }
 
+    public static class Patient {
+
+        private Patient(){}
+
+        public static final String PATIENT_NOT_FOUND = "patient not found";
+        public static final String PATIENT_HAVE_BEEN_USED = "patient have been use";
+
+    }
+
+    public static class PatientRecord {
+
+        private PatientRecord(){}
+
+        public static final String PATIENT_RECORD_NOT_FOUND = "patient record not found";
+        public static final String PATIENT_RECORD_OVER_DATE = "patient record over date";
+
+    }
+
+    public static class Labo {
+        private Labo(){}
+
+        public static final String LABO_NOT_FOUND = "labo not found";
+        public static final String LABO_NAME_ALREADY_EXIST = "labo name already exist";
+    }
+
 }
