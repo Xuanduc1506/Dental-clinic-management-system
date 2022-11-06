@@ -41,7 +41,7 @@ public class UserDTO {
 
     private String roleName;
 
-    public UserDTO(Long userId, String fullName, String userName, String birthdate, String phone, Long roleId, String roleName) {
+    public UserDTO(Long userId, String fullName, String userName, String birthdate, String phone, Long roleId, String roleName,Integer salary) {
         this.userId = userId;
         this.fullName = fullName;
         this.userName = userName;
@@ -49,6 +49,7 @@ public class UserDTO {
         this.phone = phone;
         this.roleId = roleId;
         this.roleName = roleName;
+        this.salary = salary;
     }
 
     public interface Create {
