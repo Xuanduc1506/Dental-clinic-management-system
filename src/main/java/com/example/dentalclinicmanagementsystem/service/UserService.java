@@ -56,12 +56,12 @@ public class UserService extends AbstractService {
     }
 
     public UserDTO getDetailUser(Long id) {
-        User user = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
-        if (Objects.isNull(user)) {
+        UserDTO userDTO = userRepository.getDetailUser(id);
+        if (Objects.isNull(userDTO)) {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
                     EntityName.User.USER, EntityName.User.USER_ID);
         }
-        return userMapper.toDto(user);
+        return userDTO;
     }
 
     public UserDTO registerUser(UserDTO userDTO) {

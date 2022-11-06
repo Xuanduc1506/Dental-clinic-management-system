@@ -36,5 +36,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByUserIdAndEnable(Long id, Boolean enable);
 
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.UserDTO(u.userId, u.fullName, u.userName," +
+            " u.birthdate, u.phone, u.roleId, r.roleName)" +
+            " FROM User u JOIN Role r ON u.roleId = r.roleId WHERE u.userId = :id AND u.enable = TRUE")
+    UserDTO getDetailUser(Long id);
+
     List<User> findAllByUserNameContaining(String code);
 }
