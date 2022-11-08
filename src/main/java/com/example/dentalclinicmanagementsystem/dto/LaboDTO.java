@@ -23,10 +23,11 @@ public class LaboDTO {
 
     private Integer totalMoney;
 
-    public LaboDTO(Long laboId, String laboName, String phone) {
+    public LaboDTO(Long laboId, String laboName, String phone, Integer totalMoney) {
         this.laboId = laboId;
         this.laboName = laboName;
         this.phone = phone;
+        this.totalMoney = totalMoney;
     }
 
     public interface Create {

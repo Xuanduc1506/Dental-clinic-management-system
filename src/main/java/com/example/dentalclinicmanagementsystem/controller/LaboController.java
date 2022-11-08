@@ -48,5 +48,13 @@ public class LaboController {
         return ResponseEntity.ok().body(laboService.updateLabo(id, laboDTO));
     }
 
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteLabo(@NotNull @PathVariable Long id) {
+
+        laboService.deleteLabo(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }

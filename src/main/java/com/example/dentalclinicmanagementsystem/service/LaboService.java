@@ -69,8 +69,8 @@ public class LaboService {
     public LaboDTO addLabo(LaboDTO laboDTO) {
 
         laboDTO.setLaboId(null);
-        Labo laboDb = laboRepository.findByLaboName(laboDTO.getLaboName());
-        if (Objects.isNull(laboDb)) {
+        Labo laboDb = laboRepository.findByLaboNameAndIsDeleted(laboDTO.getLaboName(), Boolean.FALSE);
+        if (Objects.nonNull(laboDb)) {
             throw new DuplicateNameException(MessageConstant.Labo.LABO_NAME_ALREADY_EXIST,
                     EntityName.Labo.LABO);
         }
@@ -90,8 +90,8 @@ public class LaboService {
         }
 
         if (!Objects.equals(labo.getLaboName(), laboDTO.getLaboName())) {
-            Labo laboDb = laboRepository.findByLaboName(laboDTO.getLaboName());
-            if (Objects.isNull(laboDb)) {
+            Labo laboDb = laboRepository.findByLaboNameAndIsDeleted(laboDTO.getLaboName(), Boolean.FALSE);
+            if (Objects.nonNull(laboDb)) {
                 throw new DuplicateNameException(MessageConstant.Labo.LABO_NAME_ALREADY_EXIST,
                         EntityName.Labo.LABO);
             }
@@ -100,5 +100,16 @@ public class LaboService {
         laboDTO.setIsDeleted(Boolean.FALSE);
         Labo laboNew = laboMapper.toEntity(laboDTO);
         return laboMapper.toDto(laboRepository.save(laboNew));
+    }
+
+    public void deleteLabo(Long id) {
+        Labo labo = laboRepository.findByLaboIdAndIsDeleted(id, Boolean.FALSE);
+        if (Objects.isNull(labo)) {
+            throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
+                    EntityName.Labo.LABO, EntityName.Labo.LABO_ID);
+        }
+
+        labo.setIsDeleted(Boolean.TRUE);
+        laboRepository.save(labo);
     }
 }
