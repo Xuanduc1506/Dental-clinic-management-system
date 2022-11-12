@@ -2,6 +2,7 @@ package com.example.dentalclinicmanagementsystem.controller;
 
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordDTO;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordInterfaceDTO;
+import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.service.PatientRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,16 +27,12 @@ public class PatientRecordController {
                                                                          @RequestParam(required = false, defaultValue = "") String causal,
                                                                          @RequestParam(required = false, defaultValue = "") String date,
                                                                          @RequestParam(required = false, defaultValue = "") String treatment,
-                                                                         @RequestParam(required = false, defaultValue = "") String totalCost,
-                                                                         @RequestParam(required = false, defaultValue = "") String realCost,
-                                                                         @RequestParam(required = false, defaultValue = "") String debit,
-                                                                         @RequestParam(required = false, defaultValue = "") String costIncurred,
                                                                          @RequestParam(required = false, defaultValue = "") String laboName,
                                                                          @RequestParam(required = false, defaultValue = "") String serviceName,
                                                                          Pageable pageable) {
 
         return ResponseEntity.ok().body(patientRecordService.getListPatientRecord(patientId, reason, diagnostic, causal,
-                date, treatment, totalCost, realCost, debit, costIncurred, laboName, serviceName, pageable));
+                date, treatment, laboName, serviceName, pageable));
 
     }
 
@@ -44,6 +41,8 @@ public class PatientRecordController {
 
         return ResponseEntity.ok().body(patientRecordService.getDetailRecord(id));
     }
+
+
 
     @PostMapping("{patientId}")
     public ResponseEntity<PatientRecordDTO> addPatientRecord(

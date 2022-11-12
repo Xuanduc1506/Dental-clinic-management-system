@@ -23,6 +23,7 @@ public class MessageConstant {
         private MaterialImport(){}
 
         public static final String MATERIAL_IMPORT_NOT_FOUND = "material import not found";
+        public static final String MATERIAL_IMPORT_OVER_DATE = "material import over date";
     }
 
     public static class CategoryService{
@@ -67,4 +68,32 @@ public class MessageConstant {
         public static final String LABO_NAME_ALREADY_EXIST = "labo name already exist";
     }
 
+    public static class MaterialExport{
+        private MaterialExport(){}
+
+        public static final String MATERIAL_EXPORT_NOT_FOUND = "material export not found";
+        public static final String MATERIAL_EXPORT_OVER_DATE = "material export over date";
+    }
+
+    public static class Receipt {
+        private Receipt(){}
+
+        public static final String RECEIPT_NOT_FOUND = "bill not found";
+        public static final String RECEIPT_OVER_DATE = "bill over date";
+    }
+
+    public static class Timekeeping{
+        private Timekeeping(){}
+
+        public static final String CHECKOUT_NOTABLE = "checkout notable";
+        public static final String CHECKIN_NOTABLE = "checkin notable";
+
+    }
+
+    public static class Bill{
+        private Bill(){}
+
+        public static final String BILL_NOT_FOUND = "bill not found";
+
+    }
 }

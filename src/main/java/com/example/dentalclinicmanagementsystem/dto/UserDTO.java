@@ -21,7 +21,7 @@ public class UserDTO {
     @NotNull(groups = {UserDTO.Login.class})
     private String userName;
 
-    @NotNull(groups = {UserDTO.Login.class})
+    @NotNull(groups = {UserDTO.Login.class,UserDTO.Create.class})
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

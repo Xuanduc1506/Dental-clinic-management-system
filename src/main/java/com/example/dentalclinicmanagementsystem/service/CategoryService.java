@@ -6,12 +6,14 @@ import com.example.dentalclinicmanagementsystem.dto.CategoryServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.DisplayServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.entity.CategoryServiceEntity;
+import com.example.dentalclinicmanagementsystem.entity.PatientRecordServiceMap;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.CategoryMapper;
 import com.example.dentalclinicmanagementsystem.mapper.ServiceMapper;
 import com.example.dentalclinicmanagementsystem.repository.CategoryRepository;
+import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
 import com.example.dentalclinicmanagementsystem.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,11 +21,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CategoryService {
 
     @Autowired
@@ -37,6 +41,9 @@ public class CategoryService {
 
     @Autowired
     private ServiceMapper serviceMapper;
+
+    @Autowired
+    private PatientRecordRepository patientRecordRepository;
 
     public Page<CategoryServiceDTO> getListService(String name, Pageable pageable) {
 
@@ -210,5 +217,9 @@ public class CategoryService {
         }
 
         serviceRepository.delete(serviceDb);
+    }
+
+    public List<ServiceDTO> getTreatingService(Long patientId) {
+        return serviceRepository.findTreatingService(patientRecordRepository.getLastRecordId(patientId));
     }
 }

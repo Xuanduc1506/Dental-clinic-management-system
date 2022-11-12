@@ -2,17 +2,15 @@ package com.example.dentalclinicmanagementsystem.service;
 
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
+import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordDTO;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordInterfaceDTO;
-import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
-import com.example.dentalclinicmanagementsystem.entity.PatientRecordServiceMap;
+import com.example.dentalclinicmanagementsystem.entity.*;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.TokenException;
 import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
-import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
-import com.example.dentalclinicmanagementsystem.repository.PatientRecordServiceMapRepository;
-import com.example.dentalclinicmanagementsystem.repository.ServiceRepository;
+import com.example.dentalclinicmanagementsystem.repository.*;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,11 +23,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
 @Transactional
-public class PatientRecordService {
+public class PatientRecordService extends AbstractService{
 
     @Autowired
     private PatientRecordRepository patientRecordRepository;
@@ -38,20 +37,25 @@ public class PatientRecordService {
     private PatientRecordMapper patientRecordMapper;
 
     @Autowired
-    private ServiceRepository serviceRepository;
+    private PatientRecordServiceMapRepository patientRecordServiceMapRepository;
 
     @Autowired
-    private PatientRecordServiceMapRepository patientRecordServiceMapRepository;
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private TreatmentRepository treatmentRepository;
+
+    @Autowired
+    private TreatmentServiceMapRepository treatmentServiceMapRepository;
 
 
     public Page<PatientRecordInterfaceDTO> getListPatientRecord(Long patientId, String reason, String diagnostic,
                                                                 String causal, String date, String treatment,
-                                                                String totalCost, String realCost, String debit,
-                                                                String costIncurred, String laboName, String serviceName,
+                                                                String laboName, String serviceName,
                                                                 Pageable pageable) {
 
         return patientRecordRepository.getAllByPatientId(patientId, reason, diagnostic, causal, date, treatment,
-                totalCost, realCost, debit, costIncurred, laboName, serviceName, pageable);
+                 laboName, serviceName, pageable);
 
     }
 
@@ -66,18 +70,6 @@ public class PatientRecordService {
 
     }
 
-    private Long getUserId(String token) {
-        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        } else {
-            throw new TokenException("Token invalid");
-        }
-
-        return Long.parseLong(Jwts.parser()
-                .setSigningKey("dental_clinic")
-                .parseClaimsJws(token)
-                .getBody().getId());
-    }
 
     public PatientRecordDTO addPatientRecord(String token, Long patientId, PatientRecordDTO patientRecordDTO) {
 
@@ -85,30 +77,28 @@ public class PatientRecordService {
 
         patientRecordDTO.setPatientRecordId(null);
         patientRecordDTO.setUserId(userId);
-        patientRecordDTO.setPatientId(patientId);
         patientRecordDTO.setDate(LocalDate.now());
 
-        if (Objects.nonNull(patientRecordDTO.getPreRecordId())) {
-            PatientRecord preRecord = patientRecordRepository.findByPatientRecordId(patientRecordDTO.getPreRecordId());
-            if (Objects.isNull(preRecord)) {
-                throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
-                        EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PRE_RECORD);
-            }
+        Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+        if (Objects.equals(patient.getStatus(), StatusConstant.DONE)
+                || Objects.equals(patient.getStatus(), StatusConstant.NOT_TREATMENT)) {
+            Treatment treatment = new Treatment();
+            treatment.setPatientId(patientId);
+            treatmentRepository.save(treatment);
+            patientRecordDTO.setTreatmentId(treatment.getTreatmentId());
+        }
+
+        if (Objects.equals(patient.getStatus(), StatusConstant.TREATING)) {
+
+            Treatment oldTreatment = treatmentRepository.findFirstByPatientIdOrderByTreatmentIdDesc(patientId);
+            patientRecordDTO.setTreatmentId(oldTreatment.getTreatmentId());
         }
 
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
-        List<com.example.dentalclinicmanagementsystem.entity.Service> services = serviceRepository
-                .findAllByServiceIdIn(patientRecordDTO.getServiceId());
+        saveServiceToTreatmentAndRecord(patientRecordDTO, patientRecord);
 
-        if (Objects.equals(services.size(), patientRecordDTO.getServiceId().size())) {
-            throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND,
-                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.Service.SERVICE_NAME);
-
-        }
-
-        savePatientRecordServiceMap(patientRecordDTO, patientRecord);
         return patientRecordMapper.toDto(patientRecord);
     }
 
@@ -130,34 +120,40 @@ public class PatientRecordService {
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
-        List<com.example.dentalclinicmanagementsystem.entity.Service> services = serviceRepository
-                .findAllByServiceIdIn(patientRecordDTO.getServiceId());
-
-        if (Objects.equals(services.size(), patientRecordDTO.getServiceId().size())) {
-            throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND,
-                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.Service.SERVICE_NAME);
-
-        }
-
+        treatmentServiceMapRepository.deleteAllByStartRecordId(id);
         patientRecordServiceMapRepository.deleteAllByPatientRecordId(id);
 
-        savePatientRecordServiceMap(patientRecordDTO, patientRecord);
+        saveServiceToTreatmentAndRecord(patientRecordDTO, patientRecord);
+
         return patientRecordMapper.toDto(patientRecord);
     }
 
-    private void savePatientRecordServiceMap(PatientRecordDTO patientRecordDTO, PatientRecord patientRecord) {
+    private void saveServiceToTreatmentAndRecord(PatientRecordDTO patientRecordDTO, PatientRecord patientRecord) {
+        List<TreatmentServiceMap> treatmentServiceMaps = new ArrayList<>();
         List<PatientRecordServiceMap> patientRecordServiceMaps = new ArrayList<>();
 
-        patientRecordDTO.getServiceId().forEach(serviceId -> {
+        patientRecordDTO.getServiceDTOS().forEach(serviceDTO -> {
+            if(Objects.equals(serviceDTO.getIsNew(), Boolean.TRUE)) {
+                TreatmentServiceMap treatmentServiceMap = new TreatmentServiceMap();
+                treatmentServiceMap.setTreatmentServiceMapId(null);
+                treatmentServiceMap.setTreatmentId(patientRecordDTO.getTreatmentId());
+                treatmentServiceMap.setCurrentPrice(serviceDTO.getPrice());
+                treatmentServiceMap.setDiscount(serviceDTO.getDiscount());
+                treatmentServiceMap.setServiceId(serviceDTO.getServiceId());
+                treatmentServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
+                treatmentServiceMaps.add(treatmentServiceMap);
+            }
+
             PatientRecordServiceMap patientRecordServiceMap = new PatientRecordServiceMap();
             patientRecordServiceMap.setPatientRecordServiceMapId(null);
-            patientRecordServiceMap.setServiceId(serviceId);
             patientRecordServiceMap.setPatientRecordId(patientRecord.getPatientRecordId());
+            patientRecordServiceMap.setServiceId(serviceDTO.getServiceId());
+            patientRecordServiceMap.setStatus(serviceDTO.getStatus());
             patientRecordServiceMaps.add(patientRecordServiceMap);
         });
 
         patientRecordServiceMapRepository.saveAll(patientRecordServiceMaps);
-
+        treatmentServiceMapRepository.saveAll(treatmentServiceMaps);
     }
 
     public void deleteRecord(Long id) {
