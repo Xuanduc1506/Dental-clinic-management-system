@@ -19,4 +19,12 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
 
     List<TreatmentServiceMap> findAllByTreatmentId(Long id);
 
+    @Query("SELECT SUM(tsm.currentPrice - tsm.discount) FROM TreatmentServiceMap tsm " +
+            "JOIN PatientRecord pr ON tsm.treatmentId = pr.treatmentId WHERE MONTH(pr.date) = :month")
+    Integer getTotalIncomeInMonth(@Param("month") Integer month);
+
+    @Query("SELECT SUM(tsm.currentPrice - tsm.discount) FROM TreatmentServiceMap tsm " +
+            "JOIN PatientRecord pr ON tsm.treatmentId = pr.treatmentId WHERE YEAR(pr.date) = :year")
+    Integer getTotalIncomeInYear(@Param("year") Integer year);
+
 }

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MaterialExportRepository extends JpaRepository<MaterialExport, Long> {
 
@@ -33,4 +35,14 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
 
 
     MaterialExport findByMaterialExportIdAndIsDelete(Long id, Boolean isDelete);
+
+    List<MaterialExport> findAllByPatientRecordId(Long patientRecordId);
+
+    @Query("SELECT SUM(me.totalPrice) FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "WHERE me.isDelete = FALSE AND MONTH(pr.date) = :month")
+    Integer getIncomeOfMaterialInMonth(@Param("month") Integer month);
+
+    @Query("SELECT SUM(me.totalPrice) FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "WHERE me.isDelete = FALSE AND MONTH(pr.date) = :year")
+    Integer getIncomeOfMaterialInYear(@Param("year") Integer year);
 }

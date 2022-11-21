@@ -47,6 +47,8 @@ public class PatientRecordDTO {
 
     private String serviceName;
 
+    private List<MaterialExportDTO> materialExportDTOs;
+
     public interface Create {
     }
 

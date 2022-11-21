@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -18,17 +19,17 @@ public class UserDTO {
     @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})
     private String fullName;
 
-    @NotNull(groups = {UserDTO.Login.class})
+    @NotBlank(groups = {UserDTO.Login.class})
     private String userName;
 
-    @NotNull(groups = {UserDTO.Login.class,UserDTO.Create.class})
+    @NotBlank(groups = {UserDTO.Login.class,UserDTO.Create.class})
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @NotNull(groups = {UserDTO.Create.class, UserDTO.Update.class})
+    @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})
     private String birthdate;
 
-    @NotNull(groups = {UserDTO.Create.class, UserDTO.Update.class})
+    @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})
     private String phone;
 
     @NotNull(groups = {UserDTO.Create.class, UserDTO.Update.class})
@@ -41,7 +42,12 @@ public class UserDTO {
 
     private String roleName;
 
-    public UserDTO(Long userId, String fullName, String userName, String birthdate, String phone, Long roleId, String roleName,Integer salary) {
+    @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})
+    @Email
+    private String email;
+
+
+    public UserDTO(Long userId, String fullName, String userName, String birthdate, String phone, Long roleId, String roleName,Integer salary, String email) {
         this.userId = userId;
         this.fullName = fullName;
         this.userName = userName;
@@ -50,6 +56,7 @@ public class UserDTO {
         this.roleId = roleId;
         this.roleName = roleName;
         this.salary = salary;
+        this.email = email;
     }
 
     public interface Create {
@@ -59,5 +66,8 @@ public class UserDTO {
     }
 
     public interface Login {
+    }
+
+    public interface ForgotPassword {
     }
 }

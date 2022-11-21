@@ -41,6 +41,9 @@ public class User implements Serializable {
     @Column(name = "enable")
     private Boolean enable;
 
+    @Column(name = "email")
+    private String email;
+
     @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(

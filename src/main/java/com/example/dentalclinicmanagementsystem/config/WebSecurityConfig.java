@@ -1,5 +1,7 @@
 package com.example.dentalclinicmanagementsystem.config;
 
+import com.example.dentalclinicmanagementsystem.security.CustomAccessDeniedHandler;
+import com.example.dentalclinicmanagementsystem.security.CustomTimeoutTokenHandler;
 import com.example.dentalclinicmanagementsystem.security.JwtAuthenticationFilter;
 import com.example.dentalclinicmanagementsystem.security.UserDetailsServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
@@ -23,10 +28,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserDetailsServiceImp userDetailsServiceImp;
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
+    @Autowired
+    public JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
@@ -51,15 +54,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-//        http.cors().and().csrf().disable();
-//        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//        http.cors().and().csrf().disable()
+//                .authorizeRequests().
+//                antMatchers("/api/login").permitAll().
+//                // all other requests need to be authenticated
+//                        anyRequest().authenticated().and()
+//                .logout().permitAll().and().exceptionHandling()
+//                .authenticationEntryPoint(unauthorizedEntryPoint())
+//                .accessDeniedHandler(accessDeniedHandler()).and().
+//                sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //
-//        http.cors().and().authorizeRequests().antMatchers("/api/login").permitAll()
-//                .anyRequest().authenticated().and().httpBasic();
-
+//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.cors().and().csrf().disable().authorizeRequests().antMatchers("/api/**").permitAll();
         http.httpBasic();
 
     }
+
+    @Bean
+    public AuthenticationEntryPoint unauthorizedEntryPoint() {
+        return new CustomTimeoutTokenHandler();
+        //(request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
+
+
 }

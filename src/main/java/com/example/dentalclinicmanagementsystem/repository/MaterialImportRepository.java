@@ -36,4 +36,12 @@ public interface MaterialImportRepository extends JpaRepository<MaterialImport, 
     MaterialImportDTO getDetail(@Param("id") Long id);
 
     MaterialImport findByMaterialImportIdAndIsDelete(Long id, Boolean isDelete);
+
+    @Query("SELECT sum(mi.totalPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND MONTH(mi.date) = :month")
+    Integer getTotalMoneyInMonth(@Param("month") Integer month);
+
+    @Query("SELECT sum(mi.totalPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND YEAR(mi.date) = :month")
+    Integer getTotalMoneyInYear(@Param("month") Integer year);
+
+
 }

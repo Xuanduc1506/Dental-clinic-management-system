@@ -59,6 +59,7 @@ public class MaterialImportService {
 
         material.setAmount(material.getAmount() + materialImportDTO.getAmount());
         materialRepository.save(material);
+        materialImportDTO.setIsDelete(Boolean.FALSE);
 
         MaterialImport materialImport = materialImportMapper.toEntity(materialImportDTO);
         return materialImportMapper.toDto(materialImportRepository.save(materialImport));
@@ -98,6 +99,7 @@ public class MaterialImportService {
             newMaterial.setAmount(newMaterial.getAmount() + materialImportDTO.getAmount());
             materialRepository.save(newMaterial);
         }
+        materialImportDTO.setIsDelete(Boolean.FALSE);
 
         MaterialImport newMaterialImport = materialImportMapper.toEntity(materialImportDTO);
         return materialImportMapper.toDto(materialImportRepository.save(newMaterialImport));

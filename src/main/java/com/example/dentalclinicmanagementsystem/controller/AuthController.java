@@ -1,14 +1,10 @@
 package com.example.dentalclinicmanagementsystem.controller;
 
-import com.example.dentalclinicmanagementsystem.dto.TokenDTO;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
-import com.example.dentalclinicmanagementsystem.security.TokenProvider;
+import com.example.dentalclinicmanagementsystem.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,21 +14,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private TokenProvider tokenProvider;
-
-    @Autowired
-    private AuthenticationManagerBuilder authenticationManagerBuilder;
+    private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(@Validated(UserDTO.Login.class)@RequestBody UserDTO userDTO){
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDTO.getUserName(),
-                userDTO.getPassword()
-        );
+    public ResponseEntity<Object> login(@Validated(UserDTO.Login.class) @RequestBody UserDTO userDTO) throws AuthenticationException {
+        return authService.login(userDTO);
+    }
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    @PostMapping("/forgot_password")
+    public ResponseEntity<Void> resetPassword(@Validated(UserDTO.ForgotPassword.class) @RequestBody UserDTO userDTO) throws AuthenticationException {
+        authService.resetPassword(userDTO);
+        return ResponseEntity.ok().build();
 
-        return ResponseEntity.ok().body(tokenProvider.createToken(authentication));
     }
 }

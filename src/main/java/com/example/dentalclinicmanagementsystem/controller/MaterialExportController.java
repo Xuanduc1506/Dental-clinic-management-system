@@ -37,6 +37,11 @@ public class MaterialExportController {
 
     }
 
+    @PostMapping()
+    public ResponseEntity<MaterialExportDTO> addMaterialExport(@RequestBody MaterialExportDTO materialExportDTO) {
+        return ResponseEntity.ok().body(materialExportService.addMaterialExport(materialExportDTO));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<MaterialExportDTO> updateMaterialExport(
             @PathVariable Long id,

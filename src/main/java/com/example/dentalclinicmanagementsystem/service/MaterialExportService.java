@@ -105,4 +105,28 @@ public class MaterialExportService {
                     EntityName.MaterialExport.MATERIAL_EXPORT);
         }
     }
+
+    public MaterialExportDTO addMaterialExport(MaterialExportDTO materialExportDTO) {
+        materialExportDTO.setMaterialExportId(null);
+
+        Material material = materialRepository.findByMaterialId(materialExportDTO.getMaterialId());
+        if (Objects.isNull(material)) {
+            throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
+                    EntityName.Material.MATERIAL_NAME);
+        }
+
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExportDTO.getPatientRecordId());
+        if (Objects.isNull(patientRecord)) {
+            throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
+                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
+        }
+
+        material.setAmount(material.getAmount() - materialExportDTO.getAmount());
+        materialRepository.save(material);
+
+        MaterialExport materialExport = materialExportMapper.toEntity(materialExportDTO);
+        materialExportRepository.save(materialExport);
+
+        return materialExportMapper.toDto(materialExport);
+    }
 }

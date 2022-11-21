@@ -96,4 +96,12 @@ public class MessageConstant {
         public static final String BILL_NOT_FOUND = "bill not found";
 
     }
+
+    public static class Token {
+
+        private Token(){}
+
+        public static final String ACCESS_DENY = "access deny";
+        public static final String TOKEN_EXPIRE = "Unauthorized. Token is expired";
+    }
 }
