@@ -7,8 +7,8 @@ public class MessageConstant {
 
         public static final String USER_NOT_FOUND = "user not found";
         public static final String USERNAME_NOT_FOUND = "username not found";
-
         public static final String WRONG_PASSWORD = "wrong password";
+        public static final String ACCESS_DENY = "access deny";
     }
 
     public static class Material{

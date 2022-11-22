@@ -6,10 +6,9 @@ import com.example.dentalclinicmanagementsystem.dto.CategoryServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.DisplayServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.entity.CategoryServiceEntity;
-import com.example.dentalclinicmanagementsystem.entity.PatientRecordServiceMap;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.CategoryMapper;
 import com.example.dentalclinicmanagementsystem.mapper.ServiceMapper;
 import com.example.dentalclinicmanagementsystem.repository.CategoryRepository;
@@ -137,7 +136,7 @@ public class CategoryService {
                 serviceRepository.findAllByCategoryServiceId(id);
 
         if (!CollectionUtils.isEmpty(services)) {
-            throw new UsingEntityException(MessageConstant.CategoryService.CATEGORY_HAVE_BEEN_USED,
+            throw new AccessDenyException(MessageConstant.CategoryService.CATEGORY_HAVE_BEEN_USED,
                     EntityName.CategoryService.CATEGORY_NAME);
         }
 

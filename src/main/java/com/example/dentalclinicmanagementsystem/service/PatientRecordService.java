@@ -7,8 +7,8 @@ import com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordDTO;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordInterfaceDTO;
 import com.example.dentalclinicmanagementsystem.entity.*;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
 import com.example.dentalclinicmanagementsystem.repository.*;
@@ -127,7 +127,7 @@ public class PatientRecordService extends AbstractService {
         }
 
         if (patientRecordDb.getDate().plusDays(1).isAfter(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.PatientRecord.PATIENT_RECORD_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.PatientRecord.PATIENT_RECORD_OVER_DATE,
                     EntityName.PatientRecord.PATIENT_RECORD);
         }
 
@@ -221,7 +221,7 @@ public class PatientRecordService extends AbstractService {
         }
 
         if (patientRecordDb.getDate().plusDays(1).isAfter(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.PatientRecord.PATIENT_RECORD_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.PatientRecord.PATIENT_RECORD_OVER_DATE,
                     EntityName.PatientRecord.PATIENT_RECORD);
         }
 

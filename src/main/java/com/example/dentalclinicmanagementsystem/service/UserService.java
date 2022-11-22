@@ -5,16 +5,13 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
 import com.example.dentalclinicmanagementsystem.entity.User;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.WrongPasswordException;
 import com.example.dentalclinicmanagementsystem.mapper.UserMapper;
 import com.example.dentalclinicmanagementsystem.repository.UserRepository;
-import com.example.dentalclinicmanagementsystem.security.UserDetailImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +24,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserService extends AbstractService {
 
+    public static final Long ADMIN = 1L;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -35,18 +34,6 @@ public class UserService extends AbstractService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//
-//        User user = userRepository.findUsersByUserName(username);
-//        if (user == null) {
-//            throw new RuntimeException("user not found");
-//        }
-//
-//        return new UserDetailImpl(user);
-//    }
 
     public Page<UserDTO> getListUsers(String username,
                                       String phone,
@@ -73,7 +60,21 @@ public class UserService extends AbstractService {
         return saveUser(userDTO);
     }
 
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
+    public UserDTO updateUser(String token, Long id, UserDTO userDTO) {
+
+        Long currentUserId = getUserId(token);
+
+        User currentUser = userRepository.findByUserIdAndEnable(currentUserId, Boolean.TRUE);
+        if (Objects.isNull(currentUser)) {
+            throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
+                    EntityName.User.USER, EntityName.User.USER_ID);
+        }
+
+        if (!Objects.equals(currentUser.getRoleId(), ADMIN) && !Objects.equals(currentUserId, id)) {
+            throw new AccessDenyException(MessageConstant.User.ACCESS_DENY,
+                    EntityName.User.USER);
+        }
+
         User userDb = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
         if (Objects.isNull(userDb)) {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
