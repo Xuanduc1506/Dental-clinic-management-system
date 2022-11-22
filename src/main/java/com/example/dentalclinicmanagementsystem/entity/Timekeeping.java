@@ -3,10 +3,11 @@ package com.example.dentalclinicmanagementsystem.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "timekepping")
+@Table(name = "timekeeping")
 public class Timekeeping {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,9 +18,9 @@ public class Timekeeping {
     private Long userId;
 
     @Column(name = "time_checkin")
-    private java.sql.Date timeCheckin;
+    private LocalDateTime timeCheckin;
 
     @Column(name = "time_checkout")
-    private java.sql.Date timeCheckout;
+    private LocalDateTime timeCheckout;
 
 }

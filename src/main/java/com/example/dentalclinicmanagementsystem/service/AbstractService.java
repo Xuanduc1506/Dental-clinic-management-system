@@ -1,5 +1,9 @@
 package com.example.dentalclinicmanagementsystem.service;
 
+import com.example.dentalclinicmanagementsystem.exception.TokenException;
+import io.jsonwebtoken.Jwts;
+import org.springframework.util.StringUtils;
+
 import java.util.List;
 
 public abstract class AbstractService {
@@ -28,6 +32,19 @@ public abstract class AbstractService {
             }
         }
         return code + maxUser;
+    }
+
+    public Long getUserId(String token) {
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        } else {
+            throw new TokenException("Token invalid");
+        }
+
+        return Long.parseLong(Jwts.parser()
+                .setSigningKey("dental_clinic")
+                .parseClaimsJws(token)
+                .getBody().getId());
     }
 
 }

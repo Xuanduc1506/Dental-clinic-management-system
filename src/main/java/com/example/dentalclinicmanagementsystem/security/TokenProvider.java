@@ -36,7 +36,7 @@ public class TokenProvider {
 
         Role role = roleRepository.findRoleNameByUser(authentication.getName());
 
-        User user = userRepository.findUsersByUserName(authentication.getName());
+        User user = userRepository.findByUserNameAndAndEnable(authentication.getName(), Boolean.TRUE);
         TokenDTO tokenDTO = new TokenDTO();
         tokenDTO.setJwt(Jwts.builder().setSubject(authentication.getName()).setId(user.getUserId().toString()).setIssuedAt(now)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret).setExpiration(expiryDate)

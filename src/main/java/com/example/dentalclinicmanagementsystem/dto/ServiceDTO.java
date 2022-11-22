@@ -1,11 +1,15 @@
 package com.example.dentalclinicmanagementsystem.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ServiceDTO {
 
     private Long serviceId;
@@ -24,6 +28,18 @@ public class ServiceDTO {
 
     @NotNull(groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     private Long categoryServiceId;
+
+    private Integer status;
+
+    private Boolean isNew;
+
+    private Integer discount;
+
+    public ServiceDTO(Long serviceId, String serviceName, Integer status) {
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.status = status;
+    }
 
     public interface Create {
     }

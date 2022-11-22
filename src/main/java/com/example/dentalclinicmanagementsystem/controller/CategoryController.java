@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -91,6 +92,12 @@ public class CategoryController {
     public ResponseEntity<Void> deleteService(@NotNull @PathVariable Long serviceId) {
         categoryService.deleteService(serviceId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("get_treating_service/{patientId}")
+    public ResponseEntity<List<ServiceDTO>> getTreatingService(@PathVariable Long patientId){
+
+        return ResponseEntity.ok().body(categoryService.getTreatingService(patientId));
     }
 
 

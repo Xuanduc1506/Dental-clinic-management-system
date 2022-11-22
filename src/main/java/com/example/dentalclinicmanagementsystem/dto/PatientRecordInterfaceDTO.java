@@ -11,11 +11,7 @@ public interface PatientRecordInterfaceDTO {
     String getCausal();
     LocalDate getDate();
     String getTreatment();
-    Integer getTotalCost();
-    Integer getRealCost();
     String getMarrowRecord();
-    Integer getDebit();
-    Integer getCostIncurred();
     String getNote();
     String getPrescription();
     String getLaboName();
