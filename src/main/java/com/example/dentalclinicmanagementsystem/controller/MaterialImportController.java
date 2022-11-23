@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotNull;
 
 @RestController
+@CrossOrigin
 @RequestMapping("api/material_imports")
 public class MaterialImportController {
 

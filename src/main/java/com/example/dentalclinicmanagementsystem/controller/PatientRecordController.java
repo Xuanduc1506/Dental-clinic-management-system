@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotNull;
 
 @RestController
+@CrossOrigin
 @RequestMapping("api/patient_record")
 public class PatientRecordController {
 
