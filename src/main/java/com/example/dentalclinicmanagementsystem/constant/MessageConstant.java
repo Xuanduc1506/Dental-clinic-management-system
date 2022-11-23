@@ -104,4 +104,11 @@ public class MessageConstant {
         public static final String ACCESS_DENY = "access deny";
         public static final String TOKEN_EXPIRE = "Unauthorized. Token is expired";
     }
+
+    public static class WaitingRoom {
+
+        private WaitingRoom(){}
+
+        public static final String WAITING_ROOM_NOT_FOUND = "waiting room not found";
+    }
 }

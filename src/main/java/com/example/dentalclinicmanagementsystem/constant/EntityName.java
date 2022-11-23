@@ -95,4 +95,11 @@ public class EntityName {
         public static final String BILL = "bill";
         public static final String BILL_ID = "billId";
     }
+
+    public static class WaitingRoom {
+        private WaitingRoom(){}
+
+        public static final String WAITING_ROOM = "waitingRoom";
+        public static final String WAITING_ROOM_ID = "waitingRoomId";
+    }
 }
