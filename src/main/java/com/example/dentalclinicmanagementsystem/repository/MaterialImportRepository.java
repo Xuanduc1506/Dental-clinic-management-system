@@ -12,25 +12,36 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MaterialImportRepository extends JpaRepository<MaterialImport, Long> {
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO(mi.materialImportId, mi.date, " +
-            "mi.amount, mi.supplyName, m.materialName) FROM MaterialImport mi " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO(mi.materialImportId,mi.materialId, mi.date, " +
+            "mi.amount, mi.supplyName, m.materialName, mi.totalPrice) FROM MaterialImport mi " +
             "JOIN Material m ON mi.materialId = m.materialId " +
-            "WHERE (:materialName is null or m.materialName like %:materialName%) " +
+            "WHERE mi.isDelete = FALSE " +
+            "AND (:materialName is null or m.materialName like %:materialName%) " +
             "AND (:date is null or mi.dateTemp like %:date%)" +
             "AND (:amount is null or mi.amountTemp like %:amount%)" +
+            "AND (:totalPrice is null or mi.totalPriceTemp like %:totalPrice%)" +
             "AND (:supplyName is null or mi.supplyName like %:supplyName%)")
     Page<MaterialImportDTO> getListImport(@Param("materialName") String materialName,
                                           @Param("date") String date,
                                           @Param("amount") String amount,
+                                          @Param("totalPrice") String totalPrice,
                                           @Param("supplyName") String supplyName,
                                           Pageable pageable);
 
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO(mi.materialImportId, mi.date, " +
-            "mi.amount, mi.supplyName, m.materialName) FROM MaterialImport mi " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO(mi.materialImportId, mi.materialId, mi.date, " +
+            "mi.amount, mi.supplyName, m.materialName, mi.totalPrice) FROM MaterialImport mi " +
             "JOIN Material m on mi.materialId = m.materialId " +
             "WHERE mi.materialImportId = :id")
     MaterialImportDTO getDetail(@Param("id") Long id);
 
-    MaterialImport findByMaterialImportId(Long id);
+    MaterialImport findByMaterialImportIdAndIsDelete(Long id, Boolean isDelete);
+
+    @Query("SELECT sum(mi.totalPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND MONTH(mi.date) = :month")
+    Integer getTotalMoneyInMonth(@Param("month") Integer month);
+
+    @Query("SELECT sum(mi.totalPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND YEAR(mi.date) = :month")
+    Integer getTotalMoneyInYear(@Param("month") Integer year);
+
+
 }

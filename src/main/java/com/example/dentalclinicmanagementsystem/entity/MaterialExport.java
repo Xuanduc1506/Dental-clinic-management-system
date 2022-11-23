@@ -20,6 +20,18 @@ public class MaterialExport {
     @Column(name = "amount")
     private Integer amount;
 
+    @Column(name = "total_price")
+    private Integer totalPrice;
+
     @Column(name = "patient_record_id")
     private Long patientRecordId;
+
+    @Column(name = "is_delete")
+    private Boolean isDelete;
+
+    @Column(name = "amount", insertable = false, updatable = false)
+    private String amountTemp;
+
+    @Column(name = "total_price", insertable = false, updatable = false)
+    private String totalPriceTemp;
 }

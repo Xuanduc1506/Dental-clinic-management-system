@@ -50,7 +50,7 @@ public class LaboService {
             if (Objects.isNull(number)) {
                 number = LocalDate.now().getMonth().getValue();
             }
-            laboDTO.setTotalMoney(specimenRepository.findTotalCostInMonth(number));
+            laboDTO.setTotalMoney(specimenRepository.findTotalCostInMonthOfLabo(id, number));
 
         }
 
@@ -58,7 +58,7 @@ public class LaboService {
             if (Objects.isNull(number)) {
                 number = LocalDate.now().getYear();
             }
-            laboDTO.setTotalMoney(specimenRepository.findTotalCostInYear(number));
+            laboDTO.setTotalMoney(specimenRepository.findTotalCostInYearOfLabo(id, number));
 
         }
 

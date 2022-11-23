@@ -3,6 +3,7 @@ package com.example.dentalclinicmanagementsystem.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -19,7 +20,7 @@ public class MaterialImport {
     private Long materialId;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "amount")
     private Integer amount;
@@ -27,10 +28,19 @@ public class MaterialImport {
     @Column(name = "supply_name")
     private String supplyName;
 
+    @Column(name = "total_price")
+    private Integer totalPrice;
+
+    @Column(name = "is_delete")
+    private Boolean isDelete;
+
     @Column(name = "date", insertable = false, updatable = false)
     private String dateTemp;
 
     @Column(name = "amount", insertable = false, updatable = false)
     private String amountTemp;
+
+    @Column(name = "total_price", insertable = false, updatable = false)
+    private String totalPriceTemp;
 
 }

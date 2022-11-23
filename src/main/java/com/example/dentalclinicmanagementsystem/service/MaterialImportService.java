@@ -6,6 +6,7 @@ import com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
 import com.example.dentalclinicmanagementsystem.entity.MaterialImport;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
+import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialImportMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialImportRepository;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
@@ -14,9 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Service
+@Transactional
 public class MaterialImportService {
 
     @Autowired
@@ -28,9 +32,9 @@ public class MaterialImportService {
     @Autowired
     private MaterialRepository materialRepository;
 
-    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount, String supplyName,
-                                                 Pageable pageable) {
-        return materialImportRepository.getListImport(materialName, date, amount, supplyName, pageable);
+    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount,String totalPrice,
+                                                 String supplyName, Pageable pageable) {
+        return materialImportRepository.getListImport(materialName, date, amount,totalPrice, supplyName, pageable);
     }
 
     public MaterialImportDTO getDetail(Long id) {
@@ -55,6 +59,7 @@ public class MaterialImportService {
 
         material.setAmount(material.getAmount() + materialImportDTO.getAmount());
         materialRepository.save(material);
+        materialImportDTO.setIsDelete(Boolean.FALSE);
 
         MaterialImport materialImport = materialImportMapper.toEntity(materialImportDTO);
         return materialImportMapper.toDto(materialImportRepository.save(materialImport));
@@ -64,11 +69,16 @@ public class MaterialImportService {
     public MaterialImportDTO updateImport(Long id, MaterialImportDTO materialImportDTO) {
 
         materialImportDTO.setMaterialImportId(id);
-        MaterialImport oldMaterialImport = materialImportRepository.findByMaterialImportId(id);
+        MaterialImport oldMaterialImport = materialImportRepository.findByMaterialImportIdAndIsDelete(id, Boolean.FALSE);
 
         if (Objects.isNull(oldMaterialImport)) {
             throw new EntityNotFoundException(MessageConstant.MaterialImport.MATERIAL_IMPORT_NOT_FOUND,
-                    EntityName.MaterialImport.MATERIAL_IMPORT_ID, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
+                    EntityName.MaterialImport.MATERIAL_IMPORT, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
+        }
+
+        if (oldMaterialImport.getDate().plusDays(1).isAfter(LocalDate.now())) {
+            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+                    EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 
         Material newMaterial = materialRepository.findByMaterialId(materialImportDTO.getMaterialId());
@@ -89,17 +99,23 @@ public class MaterialImportService {
             newMaterial.setAmount(newMaterial.getAmount() + materialImportDTO.getAmount());
             materialRepository.save(newMaterial);
         }
+        materialImportDTO.setIsDelete(Boolean.FALSE);
 
         MaterialImport newMaterialImport = materialImportMapper.toEntity(materialImportDTO);
         return materialImportMapper.toDto(materialImportRepository.save(newMaterialImport));
     }
 
     public void deleteImport(Long id) {
-        MaterialImport materialImport = materialImportRepository.findByMaterialImportId(id);
+        MaterialImport materialImport = materialImportRepository.findByMaterialImportIdAndIsDelete(id, Boolean.FALSE);
 
         if (Objects.isNull(materialImport)) {
             throw new EntityNotFoundException(MessageConstant.MaterialImport.MATERIAL_IMPORT_NOT_FOUND,
                     EntityName.MaterialImport.MATERIAL_IMPORT_ID, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
+        }
+
+        if (materialImport.getDate().plusDays(1).isAfter(LocalDate.now())) {
+            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+                    EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 
         Material material = materialRepository.findByMaterialId(materialImport.getMaterialId());
@@ -110,6 +126,7 @@ public class MaterialImportService {
 
         material.setAmount(material.getAmount() - materialImport.getAmount());
         materialRepository.save(material);
-        materialImportRepository.delete(materialImport);
+        materialImport.setIsDelete(Boolean.TRUE);
+        materialImportRepository.save(materialImport);
     }
 }

@@ -24,11 +24,13 @@ public class MaterialImportController {
             @RequestParam(required = false, defaultValue = "") String materialName,
             @RequestParam(required = false, defaultValue = "") String date,
             @RequestParam(required = false, defaultValue = "") String amount,
+            @RequestParam(required = false, defaultValue = "") String totalPrice,
             @RequestParam(required = false, defaultValue = "") String supplyName,
             Pageable pageable
             ){
 
-        return ResponseEntity.ok().body(materialImportService.getListImport(materialName, date, amount, supplyName, pageable));
+        return ResponseEntity.ok().body(materialImportService.getListImport(materialName, date, amount,totalPrice,
+                supplyName, pageable));
     }
 
     @GetMapping("/{id}")

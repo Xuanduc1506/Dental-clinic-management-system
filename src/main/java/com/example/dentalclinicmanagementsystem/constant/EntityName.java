@@ -68,4 +68,31 @@ public class EntityName {
         public static final String LABO = "labo";
         public static final String LABO_ID = "laboId";
     }
+
+    public static class MaterialExport{
+        private MaterialExport(){}
+
+        public static final String MATERIAL_EXPORT = "materialExport";
+        public static final String MATERIAL_EXPORT_ID = "materialExportId";
+    }
+
+    public static class Receipt {
+        private Receipt(){}
+
+        public static final String RECEIPT = "receipt";
+        public static final String RECEIPT_ID = "receiptId";
+    }
+
+    public static class Timekeeping {
+        private Timekeeping(){}
+
+        public static final String TIMEKEEPING = "timekeeping";
+    }
+
+    public static class Bill {
+        private Bill(){}
+
+        public static final String BILL = "bill";
+        public static final String BILL_ID = "billId";
+    }
 }

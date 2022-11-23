@@ -19,4 +19,7 @@ public class PatientRecordServiceMap {
     @Column(name = "service_id")
     private Long serviceId;
 
+    @Column(name = "status")
+    private Integer status;
+
 }

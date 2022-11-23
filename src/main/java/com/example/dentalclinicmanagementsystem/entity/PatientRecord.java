@@ -30,26 +30,14 @@ public class PatientRecord {
     @Column(name = "treatment")
     private String treatment;
 
-    @Column(name = "total_cost")
-    private Integer totalCost;
-
-    @Column(name = "real_cost")
-    private Integer realCost;
-
     @Column(name = "marrow_record")
     private String marrowRecord;
-
-    @Column(name = "debit")
-    private Integer debit;
-
-    @Column(name = "cost_incurred")
-    private Integer costIncurred;
 
     @Column(name = "note")
     private String note;
 
-    @Column(name = "patient_id")
-    private Long patientId;
+    @Column(name = "treatment_id")
+    private Long treatmentId;
 
     @Column(name = "user_id")
     private Long userId;
@@ -57,7 +45,6 @@ public class PatientRecord {
     @Column(name = "prescription")
     private String prescription;
 
-    @Column(name = "pre_record_id")
-    private Long preRecordId;
-
+    @Column(name = "date", insertable = false, updatable = false)
+    private String dateTemp;
 }

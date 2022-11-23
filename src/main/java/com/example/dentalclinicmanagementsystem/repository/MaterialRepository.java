@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, Long> {
 
@@ -24,4 +26,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     Material findByMaterialId(Long id);
 
     Material findByMaterialName(String name);
+
+    List<Material> findAllByMaterialIdIn(List<Long> ids);
 }
