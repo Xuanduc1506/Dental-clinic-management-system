@@ -90,6 +90,12 @@ public class PatientRecordService extends AbstractService {
         patientRecordDTO.setDate(LocalDate.now());
 
         Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+
+        if (Objects.isNull(patient)) {
+            throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
+                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
+        }
+
         if (Objects.equals(patient.getStatus(), StatusConstant.DONE)
                 || Objects.equals(patient.getStatus(), StatusConstant.NOT_TREATMENT)) {
             Treatment treatment = new Treatment();
