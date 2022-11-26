@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -268,5 +269,13 @@ public class PatientRecordService extends AbstractService {
 
         patientRecordServiceMapRepository.deleteAllByPatientRecordId(id);
         patientRecordRepository.delete(patientRecordDb);
+    }
+
+    public List<PatientRecordDTO> getAllRecord(Long patientId, String date) {
+
+        if (StringUtils.hasLength(date)) {
+            date = "";
+        }
+        return patientRecordMapper.toDto(patientRecordRepository.findRecordByPatientId(patientId, date));
     }
 }

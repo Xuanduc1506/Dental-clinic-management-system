@@ -3,10 +3,8 @@ package com.example.dentalclinicmanagementsystem.service;
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.CategoryServiceDTO;
-import com.example.dentalclinicmanagementsystem.dto.DisplayServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.entity.CategoryServiceEntity;
-import com.example.dentalclinicmanagementsystem.entity.PatientRecordServiceMap;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
@@ -83,7 +81,7 @@ public class CategoryService {
         return categoryServiceDTO;
     }
 
-    public DisplayServiceDTO displayAllService(String name) {
+    public List<CategoryServiceDTO> displayAllService(String name) {
 
         List<CategoryServiceDTO> categoryServiceDTOS = categoryMapper.toDto(categoryRepository.findAll());
         List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCase(name));
@@ -97,9 +95,7 @@ public class CategoryService {
             categoryServiceDTO.setServiceDTOS(serviceOfCategory);
         });
 
-        DisplayServiceDTO displayServiceDTO = new DisplayServiceDTO();
-        displayServiceDTO.setCategoryServiceDTOS(categoryServiceDTOS);
-        return displayServiceDTO;
+        return categoryServiceDTOS;
     }
 
     public CategoryServiceDTO updateCategory(Long id, CategoryServiceDTO categoryServiceDTO) {

@@ -23,7 +23,7 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
             "WHERE me.isDelete = FALSE " +
             "AND (:materialName is null or m.materialName like %:materialName%)" +
             "AND (:date is null or pr.dateTemp like %:date%)" +
-            "AND (:amount is null or me.amountTemp like :amount)" +
+            "AND (:amount is null or me.amountTemp like %:amount%)" +
             "AND (:totalPrice is null or me.totalPriceTemp like %:totalPrice%)" +
             "AND (:patientName is null or p.patientName like %:patientName%)")
     Page<MaterialExportDTO> getListMaterialExport(@Param("materialName")String materialName,

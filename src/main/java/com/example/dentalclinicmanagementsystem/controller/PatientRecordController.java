@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -40,6 +41,12 @@ public class PatientRecordController {
     }
 
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.PATIENT_RECORD_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.PATIENT_RECORD_WRITE + "\")")
+    @GetMapping("get_all_record/{patientId}")
+    public ResponseEntity<List<PatientRecordDTO>> getAllRecord(@PathVariable Long patientId,
+                                                               @RequestParam(required = false, defaultValue = "") String date) {
+        return ResponseEntity.ok().body(patientRecordService.getAllRecord(patientId, date));
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<PatientRecordDTO> getDetailRecord(@NotNull @PathVariable Long id) {
 

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
@@ -37,4 +39,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
 
     Patient findByPatientIdAndIsDeleted(Long id, Boolean isDeleted);
+
+    List<Patient> findAllByPatientNameContainingAndIsDeleted(String name, Boolean isDeleted);
 }
