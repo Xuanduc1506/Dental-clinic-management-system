@@ -1,7 +1,6 @@
 package com.example.dentalclinicmanagementsystem.controller;
 
 import com.example.dentalclinicmanagementsystem.dto.CategoryServiceDTO;
-import com.example.dentalclinicmanagementsystem.dto.DisplayServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class CategoryController {
     }
 
     @GetMapping("get_list_service")
-    public ResponseEntity<DisplayServiceDTO> displayAllService(
+    public ResponseEntity<List<CategoryServiceDTO>> displayAllService(
             @RequestParam(required = false, defaultValue = "") String name) {
 
         return ResponseEntity.ok().body(categoryService.displayAllService(name));
