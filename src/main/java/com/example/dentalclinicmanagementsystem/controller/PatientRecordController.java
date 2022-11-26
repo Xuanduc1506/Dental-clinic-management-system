@@ -38,7 +38,7 @@ public class PatientRecordController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<PatientRecordInterfaceDTO> getDetailRecord(@NotNull @PathVariable Long id) {
+    public ResponseEntity<PatientRecordDTO> getDetailRecord(@NotNull @PathVariable Long id) {
 
         return ResponseEntity.ok().body(patientRecordService.getDetailRecord(id));
     }

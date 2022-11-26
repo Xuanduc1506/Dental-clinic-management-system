@@ -27,4 +27,7 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
             "JOIN PatientRecord pr ON tsm.treatmentId = pr.treatmentId WHERE YEAR(pr.date) = :year")
     Integer getTotalIncomeInYear(@Param("year") Integer year);
 
+    @Query("SELECT tsm.serviceId FROM TreatmentServiceMap tsm WHERE tsm.startRecordId = :patientRecordId")
+    List<Long> findAllServiceIdByPatientRecordId(@Param("patientRecordId")Long patientRecordId);
+
 }

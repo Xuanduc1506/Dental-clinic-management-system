@@ -6,11 +6,13 @@ import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordDTO;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordInterfaceDTO;
+import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.entity.*;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
+import com.example.dentalclinicmanagementsystem.mapper.ServiceMapper;
 import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,6 +58,12 @@ public class PatientRecordService extends AbstractService {
     private MaterialRepository materialRepository;
 
     @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
+    private ServiceMapper serviceMapper;
+
+    @Autowired
     private MaterialExportMapper materialExportMapper;
 
 
@@ -69,14 +77,41 @@ public class PatientRecordService extends AbstractService {
 
     }
 
-    public PatientRecordInterfaceDTO getDetailRecord(Long id) {
+    public PatientRecordDTO getDetailRecord(Long id) {
         PatientRecordInterfaceDTO patientRecordInterfaceDTO = patientRecordRepository.findPatientRecordDtoByPatientRecordId(id);
 
         if (Objects.isNull(patientRecordInterfaceDTO)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
         }
-        return patientRecordInterfaceDTO;
+
+        PatientRecordDTO patientRecordDTO = new PatientRecordDTO();
+        patientRecordDTO.setPatientRecordId(patientRecordInterfaceDTO.getPatientRecordId());
+        patientRecordDTO.setReason(patientRecordInterfaceDTO.getReason());
+        patientRecordDTO.setDiagnostic(patientRecordInterfaceDTO.getDiagnostic());
+        patientRecordDTO.setCausal(patientRecordInterfaceDTO.getCausal());
+        patientRecordDTO.setDate(patientRecordInterfaceDTO.getDate());
+        patientRecordDTO.setTreatment(patientRecordInterfaceDTO.getTreatment());
+        patientRecordDTO.setMarrowRecord(patientRecordInterfaceDTO.getMarrowRecord());
+        patientRecordDTO.setNote(patientRecordInterfaceDTO.getNote());
+        patientRecordDTO.setPrescription(patientRecordInterfaceDTO.getPrescription());
+        patientRecordDTO.setLaboName(patientRecordInterfaceDTO.getLaboName());
+        patientRecordDTO.setPrescription(patientRecordInterfaceDTO.getPrescription());
+        patientRecordDTO.setServiceName(patientRecordInterfaceDTO.getServices());
+
+        List<PatientRecordServiceMap> patientRecordServiceMaps = patientRecordServiceMapRepository.findAllByPatientRecordId(id);
+        List<Long> serviceIds = patientRecordServiceMaps.stream().map(PatientRecordServiceMap::getServiceId).collect(Collectors.toList());
+        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByServiceIdIn(serviceIds));
+
+        List<Long> serviceIdNew = treatmentServiceMapRepository.findAllServiceIdByPatientRecordId(id);
+        serviceDTOS.forEach(serviceDTO -> {
+            if (serviceIdNew.contains(serviceDTO.getServiceId())) {
+                serviceDTO.setIsNew(Boolean.TRUE);
+            }
+        });
+
+        patientRecordDTO.setServiceDTOS(serviceDTOS);
+        return patientRecordDTO;
 
     }
 
