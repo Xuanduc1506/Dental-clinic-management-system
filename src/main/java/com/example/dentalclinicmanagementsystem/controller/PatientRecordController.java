@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -35,6 +36,12 @@ public class PatientRecordController {
         return ResponseEntity.ok().body(patientRecordService.getListPatientRecord(patientId, reason, diagnostic, causal,
                 date, treatment, laboName, serviceName, pageable));
 
+    }
+
+    @GetMapping("get_all_record/{patientId}")
+    public ResponseEntity<List<PatientRecordDTO>> getAllRecord(@PathVariable Long patientId,
+                                                               @RequestParam(required = false, defaultValue = "") String date) {
+        return ResponseEntity.ok().body(patientRecordService.getAllRecord(patientId, date));
     }
 
     @GetMapping("{id}")

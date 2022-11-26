@@ -77,8 +77,9 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, Lo
     PatientRecord findByPatientRecordId(Long id);
 
     @Query("SELECT pr FROM PatientRecord pr JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
-            "WHERE t.patientId = :patientId ORDER BY pr.patientRecordId DESC")
-    List<PatientRecord> findRecordByPatientId(Long patientId);
+            "WHERE t.patientId = :patientId AND (:date is null or pr.dateTemp like %:date%) ORDER BY pr.patientRecordId DESC")
+    List<PatientRecord> findRecordByPatientId(@Param("patientId") Long patientId,
+                                              @Param("date") String date);
 
 
     @Query("SELECT MAX(pr.patientRecordId) FROM Treatment t join PatientRecord pr ON t.treatmentId = pr.treatmentId " +

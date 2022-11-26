@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -30,6 +31,11 @@ public class MaterialController {
                                                               Pageable pageable) {
 
         return ResponseEntity.ok().body(materialService.getListMaterials(name, unit, price, amount, pageable));
+    }
+
+    @GetMapping("get_all_material")
+    public ResponseEntity<List<MaterialDTO>> getAllMaterial(@RequestParam(required = false, defaultValue = "") String name) {
+        return ResponseEntity.ok().body(materialService.getAllMaterial(name));
     }
 
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.MATERIAL_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.MATERIAL_WRITE + "\")")

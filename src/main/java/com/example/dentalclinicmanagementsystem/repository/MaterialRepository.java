@@ -28,4 +28,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     Material findByMaterialName(String name);
 
     List<Material> findAllByMaterialIdIn(List<Long> ids);
+
+    List<Material> findAllByMaterialNameContaining(String name);
 }

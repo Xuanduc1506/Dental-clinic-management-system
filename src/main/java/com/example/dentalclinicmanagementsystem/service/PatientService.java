@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -95,5 +96,14 @@ public class PatientService {
         patient.setIsDeleted(Boolean.TRUE);
 
         patientRepository.save(patient);
+    }
+
+    public List<PatientDTO> getAllPatient(String name) {
+
+        if (StringUtils.hasLength(name)) {
+            name = "";
+        }
+
+        return patientMapper.toDto(patientRepository.findAllByPatientNameContainingAndIsDeleted(name, Boolean.FALSE));
     }
 }
