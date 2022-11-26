@@ -48,7 +48,7 @@ public class WaitingRoomService {
         return waitingRoomRepository.getListWaitingRoom(patientName,date, pageable);
     }
 
-    public void confirmCustomer(Long id) {
+    public void confirmCustomer(Long id, Boolean isAttend) {
 
         WaitingRoom waitingRoom = waitingRoomRepository.findByWaitingRoomIdAndStatus(id, StatusConstant.WAITING);
 
@@ -57,7 +57,12 @@ public class WaitingRoomService {
                     EntityName.WaitingRoom.WAITING_ROOM, EntityName.WaitingRoom.WAITING_ROOM_ID);
         }
 
-        waitingRoom.setStatus(StatusConstant.TREATING);
+        if(Objects.equals(isAttend, Boolean.TRUE)) {
+            waitingRoom.setStatus(StatusConstant.TREATING);
+        } else {
+            waitingRoom.setIsDeleted(Boolean.TRUE);
+        }
         waitingRoomRepository.save(waitingRoom);
+
     }
 }

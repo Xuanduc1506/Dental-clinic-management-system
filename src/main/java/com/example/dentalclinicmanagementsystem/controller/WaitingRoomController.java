@@ -1,6 +1,7 @@
 package com.example.dentalclinicmanagementsystem.controller;
 
 import com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO;
+import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.service.WaitingRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,13 +37,16 @@ public class WaitingRoomController {
     }
 
     @PostMapping("confirm-customer/{id}")
-    public ResponseEntity<Void> confirmCustomer(@PathVariable Long id) {
+    public ResponseEntity<Void> confirmCustomer(@PathVariable Long id,
+                                                @RequestParam Boolean isAttend) {
 
-        waitingRoomService.confirmCustomer(id);
+        waitingRoomService.confirmCustomer(id, isAttend);
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("")
+    public void addPatientToWaitingRoom(@RequestBody Patient patient) {
 
-
+    }
 
 }

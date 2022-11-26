@@ -26,4 +26,7 @@ public class WaitingRoom {
     @Column(name = "is_booked")
     private Boolean isBooked;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
 }
