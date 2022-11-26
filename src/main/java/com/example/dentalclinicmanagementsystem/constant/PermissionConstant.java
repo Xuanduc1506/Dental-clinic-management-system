@@ -22,6 +22,12 @@ public class PermissionConstant {
     public static final String IMPORT_MATERIAL_READ = "import_material_read";
     public static final String IMPORT_MATERIAL_WRITE = "import_material_write";
 
+    public static final String PATIENT_READ = "patient_read";
+    public static final String PATIENT_WRITE = "patient_write";
+
+    public static final String PATIENT_RECORD_READ = "patient_record_read";
+    public static final String PATIENT_RECORD_WRITE = "patient_record_write";
+
 
 
 }
