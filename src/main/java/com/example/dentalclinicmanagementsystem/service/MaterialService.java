@@ -55,6 +55,7 @@ public class MaterialService {
         }
 
         materialDTO.setMaterialId(null);
+        materialDTO.setAmount(0);
         Material material = materialMapper.toEntity(materialDTO);
         return materialMapper.toDto(materialRepository.save(material));
     }
