@@ -45,7 +45,7 @@ public class User implements Serializable {
     private String email;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_permission_map",
             joinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "role_id") },
