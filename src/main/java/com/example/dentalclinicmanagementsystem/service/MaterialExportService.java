@@ -85,6 +85,7 @@ public class MaterialExportService {
         materialRepository.save(newMaterial);
 
         MaterialExport newMaterialExport = materialExportMapper.toEntity(materialExportDTO);
+        newMaterialExport.setIsDelete(Boolean.FALSE);
         return materialExportMapper.toDto(materialExportRepository.save(newMaterialExport));
 
     }
@@ -94,6 +95,16 @@ public class MaterialExportService {
         MaterialExport materialExport = materialExportRepository.findByMaterialExportIdAndIsDelete(id, Boolean.FALSE);
         validateUpdateAndDelete(materialExport);
 
+        Material material = materialRepository.findByMaterialId(materialExport.getMaterialId());
+        if (Objects.isNull(material)) {
+            throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
+                    EntityName.Material.MATERIAL_NAME);
+        }
+
+        material.setAmount(material.getAmount() + materialExport.getAmount());
+        materialRepository.save(material);
+        materialExport.setIsDelete(Boolean.TRUE);
+        materialExportRepository.save(materialExport);
 
     }
 
@@ -105,7 +116,7 @@ public class MaterialExportService {
 
         PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExport.getPatientRecordId());
 
-        if (patientRecord.getDate().plusDays(1).isAfter(LocalDate.now())) {
+        if (patientRecord.getDate().plusDays(1).isBefore(LocalDate.now())) {
             throw new UsingEntityException(MessageConstant.MaterialExport.MATERIAL_EXPORT_OVER_DATE,
                     EntityName.MaterialExport.MATERIAL_EXPORT);
         }
@@ -130,6 +141,7 @@ public class MaterialExportService {
         materialRepository.save(material);
 
         MaterialExport materialExport = materialExportMapper.toEntity(materialExportDTO);
+        materialExport.setIsDelete(Boolean.FALSE);
         materialExportRepository.save(materialExport);
 
         return materialExportMapper.toDto(materialExport);

@@ -168,7 +168,7 @@ public class PatientRecordService extends AbstractService {
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
         }
 
-        if (patientRecordDb.getDate().plusDays(1).isAfter(LocalDate.now())) {
+        if (patientRecordDb.getDate().plusDays(1).isBefore(LocalDate.now())) {
             throw new UsingEntityException(MessageConstant.PatientRecord.PATIENT_RECORD_OVER_DATE,
                     EntityName.PatientRecord.PATIENT_RECORD);
         }
@@ -262,7 +262,7 @@ public class PatientRecordService extends AbstractService {
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
         }
 
-        if (patientRecordDb.getDate().plusDays(1).isAfter(LocalDate.now())) {
+        if (patientRecordDb.getDate().plusDays(1).isBefore(LocalDate.now())) {
             throw new UsingEntityException(MessageConstant.PatientRecord.PATIENT_RECORD_OVER_DATE,
                     EntityName.PatientRecord.PATIENT_RECORD);
         }
