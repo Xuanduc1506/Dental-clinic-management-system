@@ -44,13 +44,13 @@ public class MaterialExportService {
 
     public MaterialExportDTO getDetailMaterialExport(Long id) {
 
-        MaterialExport materialExport = materialExportRepository.findByMaterialExportIdAndIsDelete(id, Boolean.FALSE);
-        if (Objects.isNull(materialExport)) {
+        MaterialExportDTO materialExportDTO = materialExportRepository.getDetail(id);
+        if (Objects.isNull(materialExportDTO)) {
             throw new EntityNotFoundException(MessageConstant.MaterialExport.MATERIAL_EXPORT_NOT_FOUND,
                     EntityName.MaterialExport.MATERIAL_EXPORT, EntityName.MaterialExport.MATERIAL_EXPORT_ID);
         }
 
-        return materialExportMapper.toDto(materialExport);
+        return materialExportDTO;
     }
 
 

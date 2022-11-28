@@ -40,5 +40,8 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     Patient findByPatientIdAndIsDeleted(Long id, Boolean isDeleted);
 
-    List<Patient> findAllByPatientNameContainingAndIsDeleted(String name, Boolean isDeleted);
+    @Query("SELECT p FROM Patient p JOIN Treatment t ON t.patientId = p.patientId " +
+            "WHERE p.isDeleted = FALSE " +
+            "AND (:name is null or p.patientName like %:name%) ")
+    List<Patient> findAllByPatientNameContaining(@Param("name") String name);
 }
