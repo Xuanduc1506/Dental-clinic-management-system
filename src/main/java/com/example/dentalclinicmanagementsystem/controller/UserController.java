@@ -42,7 +42,7 @@ public class UserController {
         return ResponseEntity.ok().body(userService.registerUser(userDTO));
     }
 
-    @PreAuthorize("hasAuthority(\"" + PermissionConstant.USER_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.USER_WRITE + "\")")
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.USER_UPDATE + "\")")
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@NotNull @PathVariable Long id,
                                               @Validated(UserDTO.Update.class) @RequestBody UserDTO userDTO) {
