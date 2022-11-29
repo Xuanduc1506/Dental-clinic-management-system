@@ -218,4 +218,13 @@ public class CategoryService {
     public List<ServiceDTO> getTreatingService(Long patientId) {
         return serviceRepository.findTreatingService(patientRecordRepository.getLastRecordId(patientId));
     }
+
+    public List<ServiceDTO> getAllService(String name) {
+
+        if (Objects.isNull(name)) {
+            name = "";
+        }
+
+        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCase(name));
+    }
 }

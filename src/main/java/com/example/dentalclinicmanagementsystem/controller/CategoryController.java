@@ -112,5 +112,11 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryService.getTreatingService(patientId));
     }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.CATEGORY_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.CATEGORY_WRITE + "\")")
+    @GetMapping("get_all_service")
+    public ResponseEntity<List<ServiceDTO>> getAllService(@RequestParam(required = false, defaultValue = "") String name){
+
+        return ResponseEntity.ok().body(categoryService.getAllService(name));
+    }
 
 }
