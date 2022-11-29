@@ -24,6 +24,23 @@ public class IncomeController {
         return ResponseEntity.ok().body(incomeService.getIncome(month, year));
     }
 
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.INCOME_READ + "\")")
+    @GetMapping("net_income")
+    public ResponseEntity<IncomeDTO> getNetIncome(@RequestParam(required = false) Integer month,
+                                               @RequestParam(required = false) Integer year) {
+
+        return ResponseEntity.ok().body(incomeService.getNetIncome(month, year));
+    }
+
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.INCOME_READ + "\")")
+    @GetMapping("total_spend")
+    public ResponseEntity<IncomeDTO> getTotalSpend(@RequestParam(required = false) Integer month,
+                                                  @RequestParam(required = false) Integer year) {
+
+        return ResponseEntity.ok().body(incomeService.getTotalSpend(month, year));
+    }
+
+
 
 
 }

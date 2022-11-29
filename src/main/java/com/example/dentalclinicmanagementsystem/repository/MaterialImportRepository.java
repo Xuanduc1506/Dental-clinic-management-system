@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.repository;
 
+import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
 import com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO;
 import com.example.dentalclinicmanagementsystem.entity.MaterialImport;
 import org.springframework.data.domain.Page;
@@ -8,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface MaterialImportRepository extends JpaRepository<MaterialImport, Long> {
@@ -43,5 +46,9 @@ public interface MaterialImportRepository extends JpaRepository<MaterialImport, 
     @Query("SELECT sum(mi.unitPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND YEAR(mi.date) = :month")
     Integer getTotalMoneyInYear(@Param("month") Integer year);
 
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(m.materialName, mi.date, mi.unitPrice * mi.amount) " +
+            "FROM MaterialImport mi JOIN Material m ON mi.materialId = m.materialId")
+    List<IncomeDetailDTO> findAllPrice(@Param("month") Integer month,
+                                       @Param("year") Integer year);
 
 }

@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.repository;
 
+import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
 import com.example.dentalclinicmanagementsystem.entity.TreatmentServiceMap;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -29,5 +30,12 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
 
     @Query("SELECT tsm.serviceId FROM TreatmentServiceMap tsm WHERE tsm.startRecordId = :patientRecordId")
     List<Long> findAllServiceIdByPatientRecordId(@Param("patientRecordId")Long patientRecordId);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(s.serviceName, pr.date, tsm.currentPrice - tsm.discount) " +
+            "FROM TreatmentServiceMap tsm JOIN Service s ON tsm.serviceId = s.serviceId " +
+            "JOIN PatientRecord pr ON tsm.startRecordId = pr.patientRecordId " +
+            "WHERE MONTH(pr.date) = :month AND YEAR(pr.date) = :year")
+    List<IncomeDetailDTO> findAllServiceInTime(@Param("month") Integer month,
+                                               @Param("year")Integer year);
 
 }

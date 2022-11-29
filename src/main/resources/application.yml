@@ -4,9 +4,12 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:mysql://34.124.230.31:3306/dental_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+#    url: jdbc:mysql://34.124.230.31:3306/dental_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+#    username: root
+#    password: Nxduc1506
+    url: jdbc:mysql://localhost:3306/dental_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
     username: root
-    password: Nxduc1506
+    password: Nxduc1506@
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com

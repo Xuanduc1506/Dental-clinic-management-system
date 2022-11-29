@@ -7,8 +7,8 @@ import java.util.List;
 @Data
 public class IncomeDTO {
 
-    private Integer totalIncome;
+    private Long totalIncome;
 
-    List<TreatmentServiceMapDTO> treatmentServiceMapDTOS;
+    List<IncomeDetailDTO> incomeDetailDTOS;
 
 }

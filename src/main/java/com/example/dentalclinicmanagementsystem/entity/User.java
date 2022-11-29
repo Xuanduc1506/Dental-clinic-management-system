@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -44,7 +45,7 @@ public class User implements Serializable {
     @Column(name = "email")
     private String email;
 
-    @JsonIgnore
+    @JsonBackReference
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_permission_map",

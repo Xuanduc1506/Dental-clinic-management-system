@@ -114,7 +114,7 @@ public class ReceiptService {
 
         Pageable pageable = PageRequest.of(FIRST_PAGE, LAST_TOW_RECORD, Sort.by(Sort.Direction.DESC, "receiptId"));
 
-        List<ReceiptDTO> receiptDTOS = receiptRepository.findLaseTowReceipt(id, pageable);
+        List<ReceiptDTO> receiptDTOS = receiptRepository.findLastTwoReceipt(id, pageable);
 
         List<Long> ids = receiptDTOS.stream().map(ReceiptDTO::getReceiptId).collect(Collectors.toList());
 

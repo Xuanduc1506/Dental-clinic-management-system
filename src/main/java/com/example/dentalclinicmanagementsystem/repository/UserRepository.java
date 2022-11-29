@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.repository;
 
+import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
 import com.example.dentalclinicmanagementsystem.entity.User;
 import org.springframework.data.domain.Page;
@@ -55,4 +56,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     User findByUserNameAndAndEnable(String username, Boolean enable);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(u.fullName, u.salary * count(t.timekeepingId)) " +
+            "FROM User u JOIN Timekeeping t ON u.userId = t.userId " +
+            "WHERE MONTH(t.timeCheckin) = :month AND YEAR(t.timeCheckin) = :year " +
+            "AND MONTH(t.timeCheckout) = :month AND YEAR(t.timeCheckout) = :year " +
+            "GROUP BY u.userId")
+    List<IncomeDetailDTO> findTotalSalary(@Param("month") Integer month,
+                                          @Param("year") Integer year);
 }
