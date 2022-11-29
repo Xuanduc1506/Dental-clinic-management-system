@@ -4,6 +4,7 @@ public class PermissionConstant {
 
     public static final String USER_READ = "user_read";
     public static final String USER_WRITE = "user_write";
+    public static final String USER_UPDATE = "user_update";
 
     public static final String MATERIAL_READ = "material_read";
     public static final String MATERIAL_WRITE = "material_write";
@@ -27,6 +28,8 @@ public class PermissionConstant {
 
     public static final String PATIENT_RECORD_READ = "patient_record_read";
     public static final String PATIENT_RECORD_WRITE = "patient_record_write";
+
+    public static final String ROLE_READ = "role_read";
 
 
 
