@@ -32,6 +32,14 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryService.getListService(name, pageable));
     }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.CATEGORY_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.CATEGORY_WRITE + "\")")
+    @GetMapping("get_all_category_service")
+    public ResponseEntity<List<CategoryServiceDTO>> getListService(
+            @RequestParam(required = false, defaultValue = "") String name) {
+
+        return ResponseEntity.ok().body(categoryService.getAllCategory(name));
+    }
+
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.CATEGORY_WRITE + "\")")
     @PostMapping()
     public ResponseEntity<CategoryServiceDTO> addCategory(
@@ -119,4 +127,11 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryService.getAllService(name));
     }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.CATEGORY_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.CATEGORY_WRITE + "\")")
+    @GetMapping("get_all_service_by_category_id/{categoryId}")
+    public ResponseEntity<List<ServiceDTO>> getAllServiceByCategoryId(@PathVariable Long categoryId,
+                                                          @RequestParam(required = false, defaultValue = "")String name){
+
+        return ResponseEntity.ok().body(categoryService.getAllServiceByCategoryId(categoryId, name));
+    }
 }

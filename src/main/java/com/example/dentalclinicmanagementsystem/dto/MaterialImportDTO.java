@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -31,18 +30,18 @@ public class MaterialImportDTO {
     private String materialName;
 
     @NotNull(groups = {MaterialImportDTO.Create.class, MaterialImportDTO.Update.class})
-    private Integer totalPrice;
+    private Integer unitPrice;
 
     private Boolean isDelete;
 
-    public MaterialImportDTO(Long materialImportId, Long materialId, LocalDate date, Integer amount, String supplyName, String materialName, Integer totalPrice) {
+    public MaterialImportDTO(Long materialImportId, Long materialId, LocalDate date, Integer amount, String supplyName, String materialName, Integer unitPrice) {
         this.materialImportId = materialImportId;
         this.materialId = materialId;
         this.date = date;
         this.amount = amount;
         this.supplyName = supplyName;
         this.materialName = materialName;
-        this.totalPrice = totalPrice;
+        this.unitPrice = unitPrice;
     }
 
     public interface Create {

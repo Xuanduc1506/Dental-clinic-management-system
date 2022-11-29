@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface MaterialImportRepository extends JpaRepository<MaterialImport, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO(mi.materialImportId,mi.materialId, mi.date, " +
-            "mi.amount, mi.supplyName, m.materialName, mi.totalPrice) FROM MaterialImport mi " +
+            "mi.amount, mi.supplyName, m.materialName, mi.unitPrice) FROM MaterialImport mi " +
             "JOIN Material m ON mi.materialId = m.materialId " +
             "WHERE mi.isDelete = FALSE " +
             "AND (:materialName is null or m.materialName like %:materialName%) " +
@@ -30,17 +30,17 @@ public interface MaterialImportRepository extends JpaRepository<MaterialImport, 
 
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO(mi.materialImportId, mi.materialId, mi.date, " +
-            "mi.amount, mi.supplyName, m.materialName, mi.totalPrice) FROM MaterialImport mi " +
+            "mi.amount, mi.supplyName, m.materialName, mi.unitPrice) FROM MaterialImport mi " +
             "JOIN Material m on mi.materialId = m.materialId " +
             "WHERE mi.materialImportId = :id")
     MaterialImportDTO getDetail(@Param("id") Long id);
 
     MaterialImport findByMaterialImportIdAndIsDelete(Long id, Boolean isDelete);
 
-    @Query("SELECT sum(mi.totalPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND MONTH(mi.date) = :month")
+    @Query("SELECT sum(mi.unitPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND MONTH(mi.date) = :month")
     Integer getTotalMoneyInMonth(@Param("month") Integer month);
 
-    @Query("SELECT sum(mi.totalPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND YEAR(mi.date) = :month")
+    @Query("SELECT sum(mi.unitPrice) FROM MaterialImport mi WHERE mi.isDelete = FALSE AND YEAR(mi.date) = :month")
     Integer getTotalMoneyInYear(@Param("month") Integer year);
 
 

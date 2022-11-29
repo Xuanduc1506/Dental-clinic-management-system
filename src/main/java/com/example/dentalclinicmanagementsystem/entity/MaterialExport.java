@@ -20,8 +20,8 @@ public class MaterialExport {
     @Column(name = "amount")
     private Integer amount;
 
-    @Column(name = "total_price")
-    private Integer totalPrice;
+    @Column(name = "unit_price")
+    private Integer unitPrice;
 
     @Column(name = "patient_record_id")
     private Long patientRecordId;

@@ -28,8 +28,8 @@ public class MaterialImport {
     @Column(name = "supply_name")
     private String supplyName;
 
-    @Column(name = "total_price")
-    private Integer totalPrice;
+    @Column(name = "unit_price")
+    private Integer unitPrice;
 
     @Column(name = "is_delete")
     private Boolean isDelete;

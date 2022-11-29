@@ -227,4 +227,21 @@ public class CategoryService {
 
         return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCase(name));
     }
+
+    public List<ServiceDTO> getAllServiceByCategoryId(Long categoryId, String name) {
+
+        if (Objects.isNull(name)) {
+            name = "";
+        }
+
+        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingAndCategoryServiceId(name, categoryId));
+    }
+
+    public List<CategoryServiceDTO> getAllCategory(String name) {
+
+        if (Objects.isNull(name)) {
+            name = "";
+        }
+        return categoryMapper.toDto(categoryRepository.findAllByCategoryServiceNameContainingIgnoreCase(name));
+    }
 }

@@ -18,10 +18,10 @@ public class IncomeController {
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.INCOME_READ + "\")")
     @GetMapping()
-    public ResponseEntity<IncomeDTO> getIncome(@RequestParam(required = false, defaultValue = "month") String statisticsBy,
-                                               @RequestParam(required = false) Integer number) {
+    public ResponseEntity<IncomeDTO> getIncome(@RequestParam(required = false) Integer month,
+                                               @RequestParam(required = false) Integer year) {
 
-        return ResponseEntity.ok().body(incomeService.getIncome(statisticsBy, number));
+        return ResponseEntity.ok().body(incomeService.getIncome(month, year));
     }
 
 

@@ -16,4 +16,6 @@ public class TreatmentServiceMapDTO {
     private Integer discount;
 
     private Long startRecordId;
+
+    private String serviceName;
 }

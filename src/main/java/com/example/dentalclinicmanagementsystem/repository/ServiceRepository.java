@@ -35,4 +35,6 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
             "JOIN Service s ON prsm.serviceId = s.serviceId " +
             "WHERE pr.patientRecordId = :patientRecordId AND prsm.status = 1")
     List<ServiceDTO> findTreatingService(@Param("patientRecordId") Long patientRecordId);
+
+    List<Service> findAllByServiceNameContainingAndCategoryServiceId(String name, Long categoryId);
 }

@@ -24,7 +24,7 @@ public class MaterialExportDTO {
     private Long patientRecordId;
 
     @NotNull(groups = {MaterialExportDTO.Create.class, MaterialExportDTO.Update.class})
-    private Integer totalPrice;
+    private Integer unitPrice;
 
     private String materialName;
 
@@ -34,12 +34,12 @@ public class MaterialExportDTO {
 
     private Boolean isDelete;
 
-    public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer totalPrice, String materialName, LocalDate date, String patientName) {
+    public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date, String patientName) {
         this.materialExportId = materialExportId;
         this.materialId = materialId;
         this.amount = amount;
         this.patientRecordId = patientRecordId;
-        this.totalPrice = totalPrice;
+        this.unitPrice = unitPrice;
         this.materialName = materialName;
         this.date = date;
         this.patientName = patientName;
