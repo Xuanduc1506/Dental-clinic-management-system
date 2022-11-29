@@ -99,11 +99,6 @@ public class PatientService {
     }
 
     public List<PatientDTO> getAllPatient(String name) {
-
-        if (StringUtils.hasLength(name)) {
-            name = "";
-        }
-
-        return patientMapper.toDto(patientRepository.findAllByPatientNameContainingAndIsDeleted(name, Boolean.FALSE));
+        return patientMapper.toDto(patientRepository.findAllByPatientNameContaining(name));
     }
 }

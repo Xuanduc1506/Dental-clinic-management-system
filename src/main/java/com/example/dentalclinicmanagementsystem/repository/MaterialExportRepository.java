@@ -45,4 +45,13 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
     @Query("SELECT SUM(me.totalPrice) FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
             "WHERE me.isDelete = FALSE AND MONTH(pr.date) = :year")
     Integer getIncomeOfMaterialInYear(@Param("year") Integer year);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO(me.materialExportId, me.materialId, " +
+            "me.amount, me.patientRecordId, me.totalPrice, m.materialName, pr.date, p.patientName) " +
+            "FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "JOIN Material m ON me.materialId = m.materialId " +
+            "JOIN Treatment t ON t.treatmentId = pr.treatmentId " +
+            "JOIN Patient p ON p.patientId = t.patientId " +
+            "WHERE me.materialExportId = :id AND me.isDelete = FALSE ")
+    MaterialExportDTO getDetail(@Param("id") Long id);
 }

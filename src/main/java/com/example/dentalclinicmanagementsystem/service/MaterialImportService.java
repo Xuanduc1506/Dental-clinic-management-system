@@ -76,7 +76,7 @@ public class MaterialImportService {
                     EntityName.MaterialImport.MATERIAL_IMPORT, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
         }
 
-        if (oldMaterialImport.getDate().plusDays(1).isAfter(LocalDate.now())) {
+        if (oldMaterialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
             throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }
@@ -113,7 +113,7 @@ public class MaterialImportService {
                     EntityName.MaterialImport.MATERIAL_IMPORT_ID, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
         }
 
-        if (materialImport.getDate().plusDays(1).isAfter(LocalDate.now())) {
+        if (materialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
             throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }

@@ -39,21 +39,21 @@ public class IncomeService {
             if (Objects.isNull(number)) {
                 number = LocalDate.now().getMonth().getValue();
             }
-            serviceIncome = treatmentServiceMapRepository.getTotalIncomeInMonth(number);
-            materialIncome = materialExportRepository.getIncomeOfMaterialInMonth(number);
-            userSalary = userRepository.totalMoneyOfUserInMonth(number);
-            buyMaterial = materialImportRepository.getTotalMoneyInMonth(number);
-            laboPayment = specimenRepository.findTotalCostInMonth(number);
+            serviceIncome = Objects.nonNull(treatmentServiceMapRepository.getTotalIncomeInMonth(number)) ? treatmentServiceMapRepository.getTotalIncomeInMonth(number) : 0 ;
+            materialIncome = Objects.nonNull(materialExportRepository.getIncomeOfMaterialInMonth(number)) ? materialExportRepository.getIncomeOfMaterialInMonth(number) : 0;
+            userSalary = Objects.nonNull(userRepository.totalMoneyOfUserInMonth(number)) ? userRepository.totalMoneyOfUserInMonth(number) : 0;
+            buyMaterial = Objects.nonNull(materialImportRepository.getTotalMoneyInMonth(number)) ? materialImportRepository.getTotalMoneyInMonth(number) : 0;
+            laboPayment = Objects.nonNull(specimenRepository.findTotalCostInMonth(number)) ? specimenRepository.findTotalCostInMonth(number) : 0;
 
         } else {
             if (Objects.isNull(number)) {
                 number = LocalDate.now().getYear();
             }
-            serviceIncome = treatmentServiceMapRepository.getTotalIncomeInYear(number);
-            materialIncome = materialExportRepository.getIncomeOfMaterialInYear(number);
-            userSalary = userRepository.totalMoneyOfUserInYear(number);
-            buyMaterial = materialImportRepository.getTotalMoneyInYear(number);
-            laboPayment = specimenRepository.findTotalCostInYear(number);
+            serviceIncome = Objects.nonNull(treatmentServiceMapRepository.getTotalIncomeInYear(number)) ? treatmentServiceMapRepository.getTotalIncomeInYear(number) : 0;
+            materialIncome = Objects.nonNull(materialExportRepository.getIncomeOfMaterialInYear(number)) ? materialExportRepository.getIncomeOfMaterialInYear(number) : 0;
+            userSalary = Objects.nonNull(userRepository.totalMoneyOfUserInYear(number)) ? userRepository.totalMoneyOfUserInYear(number) : 0;
+            buyMaterial = Objects.nonNull(materialImportRepository.getTotalMoneyInYear(number)) ? materialImportRepository.getTotalMoneyInYear(number) : 0;
+            laboPayment = Objects.nonNull(specimenRepository.findTotalCostInYear(number)) ? specimenRepository.findTotalCostInYear(number) : 0;
         }
         incomeDTO.setTotalIncome(serviceIncome + materialIncome);
         incomeDTO.setNetIncome(incomeDTO.getTotalIncome() - userSalary - buyMaterial - laboPayment);
