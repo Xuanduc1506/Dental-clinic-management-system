@@ -58,6 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().
                 antMatchers("/api/login").permitAll().
                 antMatchers("/api/forgot_password").permitAll().
+                antMatchers("/api/timekeeping/**").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and()
                 .logout().permitAll().and().exceptionHandling()
