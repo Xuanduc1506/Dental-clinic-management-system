@@ -39,6 +39,8 @@ public class MaterialExportDTO {
 
     private String statusChange;
 
+    private Integer totalAmount;
+
     private Boolean isShow;
 
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date) {
@@ -51,7 +53,7 @@ public class MaterialExportDTO {
         this.date = date;
     }
 
-    public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, Boolean isShow) {
+    public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, Boolean isShow, Integer totalAmount) {
         this.materialExportId = materialExportId;
         this.materialId = materialId;
         this.amount = amount;
@@ -59,6 +61,7 @@ public class MaterialExportDTO {
         this.unitPrice = unitPrice;
         this.materialName = materialName;
         this.isShow = isShow;
+        this.totalAmount = totalAmount;
     }
 
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date, String patientName) {
