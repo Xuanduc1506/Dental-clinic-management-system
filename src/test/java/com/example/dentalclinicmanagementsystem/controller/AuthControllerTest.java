@@ -2,12 +2,9 @@ package com.example.dentalclinicmanagementsystem.controller;
 
 import com.example.dentalclinicmanagementsystem.dto.TokenDTO;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
-import com.example.dentalclinicmanagementsystem.dto.exception.TokenExceptionDTO;
-import com.example.dentalclinicmanagementsystem.repository.UserRepository;
 import com.example.dentalclinicmanagementsystem.security.TokenProvider;
 import com.example.dentalclinicmanagementsystem.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,15 +13,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -43,16 +35,12 @@ class AuthControllerTest {
     private TokenProvider tokenProvider;
 
     @MockBean
-    private AuthenticationManager authenticationManager;
-
-    @MockBean
     private AuthService authService;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Nested
     @DisplayName("Login")
     class TestLogin {
+
         @Test
         @DisplayName("Login success")
         void loginSuccess() throws Exception {
@@ -116,13 +104,8 @@ class AuthControllerTest {
         @Test
         @DisplayName("Wrong Username Or Password")
         void wrongUsernameOrPassword() throws Exception {
-//
-//            assertThrows(AuthenticationException.class, () -> {
-//                TokenExceptionDTO tokenExceptionDTO = new TokenExceptionDTO();
-//                tokenExceptionDTO.setMessage("Wrong username or password");
-//            });
 
-            doThrow(AuthenticationException.class).when(authService).login(any(UserDTO.class));
+            doThrow(AuthenticationServiceException.class).when(authService).login(any(UserDTO.class));
             String user = "{\n" +
                     "    \"userName\":\"x1\",\n" +
                     "    \"password\":\"123\"\n" +
@@ -130,10 +113,9 @@ class AuthControllerTest {
             mockMvc.perform(post("/api/login")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(user))
-                    .andExpect(status().isBadRequest()).andExpect(content()
-                            .string("[{\"message\":\"Wrong username or password\"}]"));
+                    .andExpect(status().isUnauthorized()).andExpect(content()
+                            .string("{\"message\":\"Wrong username or password\"}"));
         }
-
     }
 
 }
