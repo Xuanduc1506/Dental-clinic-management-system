@@ -106,12 +106,17 @@ public class TimekeepingService extends AbstractService {
             timekeepingWithButtonDTO.setCheckoutEnable(Boolean.FALSE);
         } else {
             TimekeepingDTO lastTimeKeeping = timekeepingMapper.toDto(timekeepingRepository
-                    .findFirstByUserIdOrderByTimekeepingIdAsc(userId));
+                    .findFirstByUserIdOrderByTimekeepingIdDesc(userId));
             if (Objects.nonNull(lastTimeKeeping.getTimeCheckin())
                     && Objects.isNull(lastTimeKeeping.getTimeCheckout())
                     && lastTimeKeeping.getTimeCheckin().plusHours(TIME_POINT).isBefore(LocalDateTime.now())) {
                 timekeepingWithButtonDTO.setCheckinEnable(Boolean.FALSE);
                 timekeepingWithButtonDTO.setCheckoutEnable(Boolean.TRUE);
+            } else if (Objects.nonNull(lastTimeKeeping.getTimeCheckin())
+                    && Objects.isNull(lastTimeKeeping.getTimeCheckout())
+                    && lastTimeKeeping.getTimeCheckin().plusHours(TIME_POINT).isAfter(LocalDateTime.now())) {
+                timekeepingWithButtonDTO.setCheckinEnable(Boolean.FALSE);
+                timekeepingWithButtonDTO.setCheckoutEnable(Boolean.FALSE);
             } else {
                 timekeepingWithButtonDTO.setCheckinEnable(Boolean.TRUE);
                 timekeepingWithButtonDTO.setCheckoutEnable(Boolean.TRUE);

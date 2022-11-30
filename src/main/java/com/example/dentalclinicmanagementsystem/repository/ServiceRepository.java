@@ -15,9 +15,9 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     List<Service> findAllByCategoryServiceId(Long id);
 
-    List<Service> findAllByServiceNameContainingIgnoreCase(String name);
+    List<Service> findAllByServiceNameContainingIgnoreCaseAndIsDeleted(String name, Boolean isDeleted);
 
-    Service findByServiceId(Long id);
+    Service findByServiceIdAndIsDeleted(Long id, Boolean isDeleted);
 
     Service findByServiceName(String name);
 
@@ -29,10 +29,11 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
             "WHERE p.patientId = :patientId")
     List<Service> findAllServiceNotPayingByPatientId(@PathVariable("patientId") Long patientId);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName, prsm.status) " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName,tsm.currentPrice, tsm.discount, prsm.status) " +
             "FROM PatientRecord pr " +
             "JOIN PatientRecordServiceMap prsm ON pr.patientRecordId = prsm.patientRecordId " +
             "JOIN Service s ON prsm.serviceId = s.serviceId " +
+            "JOIN TreatmentServiceMap  tsm ON tsm.startRecordId = pr.patientRecordId " +
             "WHERE pr.patientRecordId = :patientRecordId AND prsm.status = 1")
     List<ServiceDTO> findTreatingService(@Param("patientRecordId") Long patientRecordId);
 

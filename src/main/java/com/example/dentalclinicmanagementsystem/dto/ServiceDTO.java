@@ -35,10 +35,14 @@ public class ServiceDTO {
 
     private Integer discount;
 
-    public ServiceDTO(Long serviceId, String serviceName, Integer status) {
+    private Boolean isDeleted;
+
+    public ServiceDTO(Long serviceId, String serviceName,Integer price, Integer discount, Integer status) {
         this.serviceId = serviceId;
         this.serviceName = serviceName;
         this.status = status;
+        this.price = price;
+        this.discount = discount;
     }
 
     public interface Create {

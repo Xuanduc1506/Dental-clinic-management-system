@@ -28,5 +28,8 @@ public class Service {
     @Column(name = "category_service_id")
     private Long categoryServiceId;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
 
 }

@@ -33,10 +33,10 @@ public class LaboController {
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.LABO_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.LABO_WRITE + "\")")
     @GetMapping("{id}")
     public ResponseEntity<LaboDTO> getDetailLabo(@NotNull @PathVariable Long id,
-                                                 @RequestParam(defaultValue = "month") String statisticBy,
-                                                 @RequestParam(required = false) Integer number) {
+                                                 @RequestParam(required = false) Integer month,
+                                                 @RequestParam(required = false) Integer year) {
 
-        return ResponseEntity.ok().body(laboService.getDetailLabo(id, statisticBy, number));
+        return ResponseEntity.ok().body(laboService.getDetailLabo(id, month, year));
     }
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.LABO_WRITE + "\")")
@@ -61,6 +61,8 @@ public class LaboController {
         laboService.deleteLabo(id);
         return ResponseEntity.ok().build();
     }
+
+
 
 
 

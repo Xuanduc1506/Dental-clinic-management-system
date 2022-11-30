@@ -84,7 +84,7 @@ public class CategoryService {
     public List<CategoryServiceDTO> displayAllService(String name) {
 
         List<CategoryServiceDTO> categoryServiceDTOS = categoryMapper.toDto(categoryRepository.findAll());
-        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCase(name));
+        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCaseAndIsDeleted(name, Boolean.FALSE));
 
         categoryServiceDTOS.forEach(categoryServiceDTO -> {
             List<ServiceDTO> serviceOfCategory = serviceDTOS
@@ -142,7 +142,7 @@ public class CategoryService {
 
     public ServiceDTO getDetailService(Long serviceId) {
 
-        com.example.dentalclinicmanagementsystem.entity.Service service = serviceRepository.findByServiceId(serviceId);
+        com.example.dentalclinicmanagementsystem.entity.Service service = serviceRepository.findByServiceIdAndIsDeleted(serviceId, Boolean.FALSE);
         if (Objects.isNull(service)) {
             throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND, EntityName.Service.SERVICE,
                     EntityName.Service.SERVICE_ID);
@@ -176,7 +176,7 @@ public class CategoryService {
     public ServiceDTO updateService(Long serviceId, ServiceDTO serviceDTO) {
 
         serviceDTO.setServiceId(serviceId);
-        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceId(serviceId);
+        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceIdAndIsDeleted(serviceId, Boolean.FALSE);
         if (Objects.isNull(serviceDb)) {
             throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND, EntityName.Service.SERVICE,
                     EntityName.Service.SERVICE_ID);
@@ -203,16 +203,17 @@ public class CategoryService {
         return serviceMapper.toDto(serviceRepository.save(service));
     }
 
-
     public void deleteService(Long serviceId) {
 
-        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceId(serviceId);
+        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceIdAndIsDeleted(serviceId, Boolean.FALSE);
         if (Objects.isNull(serviceDb)) {
             throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND, EntityName.Service.SERVICE,
                     EntityName.Service.SERVICE_ID);
         }
 
-        serviceRepository.delete(serviceDb);
+        serviceDb.setIsDeleted(Boolean.TRUE);
+
+        serviceRepository.save(serviceDb);
     }
 
     public List<ServiceDTO> getTreatingService(Long patientId) {
@@ -225,7 +226,7 @@ public class CategoryService {
             name = "";
         }
 
-        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCase(name));
+        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCaseAndIsDeleted(name, Boolean.FALSE));
     }
 
     public List<ServiceDTO> getAllServiceByCategoryId(Long categoryId, String name) {

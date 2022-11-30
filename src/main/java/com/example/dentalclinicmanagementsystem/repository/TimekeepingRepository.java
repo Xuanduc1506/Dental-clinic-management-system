@@ -34,7 +34,7 @@ public interface TimekeepingRepository extends JpaRepository<Timekeeping, Long> 
                                                    @Param("userId")Long userId,
                                                    Pageable pageable);
 
-    Timekeeping findFirstByUserIdOrderByTimekeepingIdAsc(Long userId);
+//    Timekeeping findFirstByUserIdOrderByTimekeepingIdDesc(Long userId);
 
     @Query("SELECT COUNT(t.timekeepingId) FROM Timekeeping t " +
             "WHERE t.userId = :userId " +

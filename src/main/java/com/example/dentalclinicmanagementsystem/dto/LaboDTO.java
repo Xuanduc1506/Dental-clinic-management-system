@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -22,6 +23,8 @@ public class LaboDTO {
     private Boolean isDeleted;
 
     private Integer totalMoney;
+
+    private List<SpecimensDTO> specimensDTOS;
 
     public LaboDTO(Long laboId, String laboName, String phone, Integer totalMoney) {
         this.laboId = laboId;
