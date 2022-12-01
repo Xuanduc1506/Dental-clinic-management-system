@@ -25,12 +25,12 @@ public class MaterialExportController {
             @RequestParam(required = false, defaultValue = "") String materialName,
             @RequestParam(required = false, defaultValue = "") String date,
             @RequestParam(required = false, defaultValue = "") String amount,
-            @RequestParam(required = false, defaultValue = "") String totalPrice,
+            @RequestParam(required = false, defaultValue = "") String unitPrice,
             @RequestParam(required = false, defaultValue = "") String patientName,
             Pageable pageable) {
 
         return ResponseEntity.ok().body(
-                materialExportService.getListExport(materialName, date, amount, totalPrice, patientName, pageable));
+                materialExportService.getListExport(materialName, date, amount, unitPrice, patientName, pageable));
     }
 
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_WRITE + "\")")

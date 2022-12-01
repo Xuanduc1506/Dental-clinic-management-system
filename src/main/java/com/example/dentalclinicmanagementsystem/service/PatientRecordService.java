@@ -102,7 +102,7 @@ public class PatientRecordService extends AbstractService {
 
         List<PatientRecordServiceMap> patientRecordServiceMaps = patientRecordServiceMapRepository.findAllByPatientRecordId(id);
         List<Long> serviceIds = patientRecordServiceMaps.stream().map(PatientRecordServiceMap::getServiceId).collect(Collectors.toList());
-        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByServiceIdIn(serviceIds));
+        List<ServiceDTO> serviceDTOS = serviceRepository.findAllByServiceIdIn(serviceIds, id);
 
         List<Long> serviceIdNew = treatmentServiceMapRepository.findAllServiceIdByPatientRecordId(id);
         serviceDTOS.forEach(serviceDTO -> {

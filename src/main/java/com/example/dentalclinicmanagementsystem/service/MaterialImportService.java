@@ -32,9 +32,9 @@ public class MaterialImportService {
     @Autowired
     private MaterialRepository materialRepository;
 
-    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount,String totalPrice,
+    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount,String unitPrice,
                                                  String supplyName, Pageable pageable) {
-        return materialImportRepository.getListImport(materialName, date, amount,totalPrice, supplyName, pageable);
+        return materialImportRepository.getListImport(materialName, date, amount,unitPrice, supplyName, pageable);
     }
 
     public MaterialImportDTO getDetail(Long id) {

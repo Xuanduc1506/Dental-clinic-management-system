@@ -169,6 +169,7 @@ public class CategoryService {
                     EntityName.Service.SERVICE, EntityName.CategoryService.CATEGORY_ID);
         }
 
+        serviceDTO.setIsDeleted(Boolean.FALSE);
         com.example.dentalclinicmanagementsystem.entity.Service service = serviceMapper.toEntity(serviceDTO);
         return serviceMapper.toDto(serviceRepository.save(service));
     }
@@ -192,13 +193,7 @@ public class CategoryService {
             }
         }
 
-        CategoryServiceEntity categoryServiceEntity =
-                categoryRepository.findByCategoryServiceId(serviceDTO.getCategoryServiceId());
-        if (Objects.isNull(categoryServiceEntity)) {
-            throw new EntityNotFoundException(MessageConstant.CategoryService.CATEGORY_NOT_FOUND,
-                    EntityName.Service.SERVICE, EntityName.CategoryService.CATEGORY_ID);
-        }
-
+        serviceDTO.setIsDeleted(Boolean.FALSE);
         com.example.dentalclinicmanagementsystem.entity.Service service = serviceMapper.toEntity(serviceDTO);
         return serviceMapper.toDto(serviceRepository.save(service));
     }

@@ -50,4 +50,16 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     List<IncomeDetailDTO> findIncomeInTime(@Param("month") Integer month,
                                            @Param("year") Integer year);
 
+    Receipt findFirstByTreatmentIdOrderByReceiptIdDesc(Long treatmentId);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.receiptId, r.payment, r.date, r.debit) " +
+            "FROM Receipt r WHERE r.treatmentId = :treatmentId " +
+            "AND (:payment is null or r.paymentTemp like %:payment%) " +
+            "AND (:date is null or r.dateTemp like %:date%) " +
+            "AND (:debit is null or r.debitTemp like %:debit%)")
+    List<ReceiptDTO> getListReceiptsByTreatmentId(@Param("treatmentId") Long treatmentId,
+                                                  @Param("payment") String payment,
+                                                  @Param("date") String date,
+                                                  @Param("debit") String debit);
+
 }

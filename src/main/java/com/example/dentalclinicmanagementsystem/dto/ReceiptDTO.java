@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,6 +25,8 @@ public class ReceiptDTO {
     private Integer debit;
 
     private Integer oldDebit;
+
+    private List<TreatmentServiceMapDTO> newServices;
 
     public ReceiptDTO(Long receiptId, Integer payment, LocalDate date, Integer debit) {
         this.receiptId = receiptId;

@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin
 @RequestMapping("api/receipts")
@@ -28,6 +30,16 @@ public class ReceiptController {
 
     }
 
+    @GetMapping("get_list_receipts_by_treatment/{treatmentId}")
+    public ResponseEntity<List<ReceiptDTO>> getListReceiptsByTreatmentId(@PathVariable Long treatmentId,
+                                                                         @RequestParam(required = false, defaultValue = "") String payment,
+                                                                         @RequestParam(required = false, defaultValue = "") String date,
+                                                                         @RequestParam(required = false, defaultValue = "") String debit) {
+
+        return ResponseEntity.ok().body(receiptService.getListReceiptsByTreatmentId(treatmentId, payment, date, debit));
+
+    }
+
     @GetMapping("{id}")
     public ResponseEntity<ReceiptDTO> getDetailReceipt(@PathVariable Long id) {
 
@@ -39,6 +51,11 @@ public class ReceiptController {
                                                  @Validated(ReceiptDTO.Create.class) @RequestBody ReceiptDTO receiptDTO) {
 
         return ResponseEntity.ok().body( receiptService.addReceipt(patientId, receiptDTO));
+    }
+
+    @GetMapping("new_receipts/{treatmentId}")
+    public ResponseEntity<ReceiptDTO> getNewReceipts(@PathVariable Long treatmentId) {
+        return ResponseEntity.ok().body(receiptService.getNewReceipts(treatmentId));
     }
 
     @PutMapping("{id}")

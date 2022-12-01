@@ -32,6 +32,6 @@ public class MaterialExport {
     @Column(name = "amount", insertable = false, updatable = false)
     private String amountTemp;
 
-    @Column(name = "total_price", insertable = false, updatable = false)
-    private String totalPriceTemp;
+    @Column(name = "unit_price", insertable = false, updatable = false)
+    private String unitPriceTemp;
 }

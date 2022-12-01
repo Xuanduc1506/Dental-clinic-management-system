@@ -37,9 +37,9 @@ public class MaterialExportService {
     @Autowired
     private MaterialRepository materialRepository;
 
-    public Page<MaterialExportDTO> getListExport(String materialName, String date, String amount, String totalPrice,
+    public Page<MaterialExportDTO> getListExport(String materialName, String date, String amount, String unitPrice,
                                                  String patientName, Pageable pageable) {
-        return materialExportRepository.getListMaterialExport(materialName, date, amount, totalPrice, patientName, pageable);
+        return materialExportRepository.getListMaterialExport(materialName, date, amount, unitPrice, patientName, pageable);
     }
 
     public MaterialExportDTO getDetailMaterialExport(Long id) {

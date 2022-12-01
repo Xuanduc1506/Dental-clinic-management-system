@@ -3,6 +3,7 @@ package com.example.dentalclinicmanagementsystem.service;
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.ReceiptDTO;
+import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
 import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import com.example.dentalclinicmanagementsystem.entity.Treatment;
@@ -129,5 +130,31 @@ public class ReceiptService {
         }
 
         return receiptDTO;
+    }
+
+    public ReceiptDTO getNewReceipts(Long treatmentId) {
+
+        Receipt lastReceipt = receiptRepository.findFirstByTreatmentIdOrderByReceiptIdDesc(treatmentId);
+        if (Objects.isNull(lastReceipt)) {
+            lastReceipt = new Receipt();
+        }
+        ReceiptDTO receiptDTO = receiptMapper.toDto(lastReceipt);
+        receiptDTO.setPayment(null);
+        receiptDTO.setDate(LocalDate.now());
+
+        List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);
+        receiptDTO.setNewServices(treatmentServiceMapDTOS);
+        return receiptDTO;
+    }
+
+    public List<ReceiptDTO> getListReceiptsByTreatmentId(Long treatmentId, String payment, String date, String debit) {
+
+//return null;
+        List<ReceiptDTO> receiptDTOS = receiptRepository.getListReceiptsByTreatmentId(treatmentId, payment, date, debit);
+
+        for (int i = 1; i < receiptDTOS.size(); i++) {
+            receiptDTOS.get(i).setOldDebit(receiptDTOS.get(i - 1).getDebit());
+        }
+        return receiptDTOS;
     }
 }

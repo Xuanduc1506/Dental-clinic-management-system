@@ -42,6 +42,7 @@ public class UserDTO {
 
     private String roleName;
 
+
     @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})
     @Email
     private String email;

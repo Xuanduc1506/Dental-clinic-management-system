@@ -4,6 +4,7 @@ import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
 import com.example.dentalclinicmanagementsystem.entity.User;
+import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.WrongPasswordException;
 import com.example.dentalclinicmanagementsystem.mapper.UserMapper;
@@ -37,17 +38,6 @@ public class UserService extends AbstractService {
     private PasswordEncoder passwordEncoder;
 
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//
-//        User user = userRepository.findUsersByUserName(username);
-//        if (user == null) {
-//            throw new RuntimeException("user not found");
-//        }
-//
-//        return new UserDetailImpl(user);
-//    }
-
     public Page<UserDTO> getListUsers(String username,
                                       String phone,
                                       String roleName,
@@ -69,6 +59,10 @@ public class UserService extends AbstractService {
         userDTO.setUserId(null);
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        User user = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
+        if (Objects.isNull(user)) {
+            throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
+        }
 
         return saveUser(userDTO);
     }
@@ -82,6 +76,13 @@ public class UserService extends AbstractService {
         userDTO.setUserId(id);
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(userDb.getPassword());
+
+        if (!Objects.equals(userDb.getEmail(), userDTO.getEmail())) {
+            User userEmail = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
+            if (Objects.nonNull(userEmail)) {
+                throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
+            }
+        }
 
         if(Objects.equals(userDb.getFullName(), userDTO.getFullName())){
             userDTO.setEnable(Boolean.TRUE);

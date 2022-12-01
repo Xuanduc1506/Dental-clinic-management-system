@@ -26,7 +26,7 @@ public class ServiceDTO {
     @NotNull(groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     private Integer price;
 
-    @NotNull(groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
+    @NotNull(groups = {ServiceDTO.Create.class})
     private Long categoryServiceId;
 
     private Integer status;
@@ -43,6 +43,12 @@ public class ServiceDTO {
         this.status = status;
         this.price = price;
         this.discount = discount;
+    }
+
+    public ServiceDTO(Long serviceId, String serviceName, Integer status) {
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.status = status;
     }
 
     public interface Create {

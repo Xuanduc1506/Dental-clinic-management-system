@@ -25,12 +25,12 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
             "AND (:materialName is null or m.materialName like %:materialName%)" +
             "AND (:date is null or pr.dateTemp like %:date%)" +
             "AND (:amount is null or me.amountTemp like %:amount%)" +
-            "AND (:totalPrice is null or me.totalPriceTemp like %:totalPrice%)" +
+            "AND (:unitPrice is null or me.unitPriceTemp like %:unitPrice%)" +
             "AND (:patientName is null or p.patientName like %:patientName%)")
     Page<MaterialExportDTO> getListMaterialExport(@Param("materialName")String materialName,
                                                   @Param("date")String date,
                                                   @Param("amount")String amount,
-                                                  @Param("totalPrice")String totalPrice,
+                                                  @Param("unitPrice")String unitPrice,
                                                   @Param("patientName")String patientName,
                                                   Pageable pageable);
 
@@ -38,14 +38,6 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
     MaterialExport findByMaterialExportIdAndIsDelete(Long id, Boolean isDelete);
 
     List<MaterialExport> findAllByPatientRecordId(Long patientRecordId);
-
-    @Query("SELECT SUM(me.unitPrice) FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
-            "WHERE me.isDelete = FALSE AND MONTH(pr.date) = :month")
-    Integer getIncomeOfMaterialInMonth(@Param("month") Integer month);
-
-    @Query("SELECT SUM(me.unitPrice) FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
-            "WHERE me.isDelete = FALSE AND MONTH(pr.date) = :year")
-    Integer getIncomeOfMaterialInYear(@Param("year") Integer year);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO(me.materialExportId, me.materialId, " +
             "me.amount, me.patientRecordId, me.unitPrice, m.materialName, pr.date, p.patientName) " +

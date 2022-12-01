@@ -21,13 +21,11 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     Service findByServiceName(String name);
 
-    List<Service> findAllByServiceIdIn(List<Long> ids);
-
-    @Query("SELECT s FROM Service s JOIN TreatmentServiceMap tsm ON s.serviceId = tsm.serviceId " +
-            "JOIN Treatment t ON t.treatmentId = tsm.treatmentId " +
-            "JOIN Patient p ON p.patientId = t.patientId " +
-            "WHERE p.patientId = :patientId")
-    List<Service> findAllServiceNotPayingByPatientId(@PathVariable("patientId") Long patientId);
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName, prsm.status) " +
+            "FROM Service s JOIN PatientRecordServiceMap prsm ON s.serviceId = prsm.serviceId " +
+            "WHERE s.serviceId in :ids AND prsm.patientRecordId = :patientRecordId ")
+    List<ServiceDTO> findAllByServiceIdIn(List<Long> ids,
+                                          Long patientRecordId);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName,tsm.currentPrice, tsm.discount, prsm.status) " +
             "FROM PatientRecord pr " +

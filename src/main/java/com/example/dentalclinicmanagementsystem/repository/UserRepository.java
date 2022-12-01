@@ -21,7 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "where u.enable = true " +
             "AND (:username is null or u.userName like %:username%) " +
             "AND (:phone is null or u.phone like %:phone%) " +
-            "AND (:roleName is null or r.roleName like %:roleName%)",
+            "AND (:roleName is null or r.roleName like %:roleName%) " +
+            "ORDER BY u.userId DESC ",
             countQuery = "select count(u.userId)" +
                     "from User u left join Role r on u.roleId = r.roleId " +
                     "where u.enable = true " +
@@ -34,6 +35,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                               Pageable pageable);
 
     User findByUserIdAndEnable(Long id, Boolean enable);
+
+    User findByEmailAndEnable(String email, Boolean enable);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.UserDTO(u.userId, u.fullName, u.userName," +
             " u.birthdate, u.phone, u.roleId, r.roleName, u.salary, u.email)" +
