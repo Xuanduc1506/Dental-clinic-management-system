@@ -3,6 +3,7 @@ package com.example.dentalclinicmanagementsystem.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,20 +17,26 @@ public class PatientRecordDTO {
 
     private Long patientRecordId;
 
+    @Length(max = 255, groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     @NotBlank(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private String reason;
 
+    @Length(max = 255, groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     @NotBlank(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private String diagnostic;
 
+    @Length(max = 255, groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     @NotBlank(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private String causal;
 
+    @NotBlank(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private LocalDate date;
 
+    @Length(max = 255, groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     @NotBlank(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private String treatment;
 
+    @Length(max = 255, groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private String marrowRecord;
 
     private String note;

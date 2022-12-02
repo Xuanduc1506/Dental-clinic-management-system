@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 @Data
@@ -17,12 +18,14 @@ public class MaterialExportDTO {
     @NotNull(groups = {MaterialExportDTO.Create.class, MaterialExportDTO.Update.class})
     private Long materialId;
 
+    @Positive
     @NotNull(groups = {MaterialExportDTO.Create.class, MaterialExportDTO.Update.class})
     private Integer amount;
 
     @NotNull(groups = {MaterialExportDTO.Create.class, MaterialExportDTO.Update.class})
     private Long patientRecordId;
 
+    @Positive
     @NotNull(groups = {MaterialExportDTO.Create.class, MaterialExportDTO.Update.class})
     private Integer unitPrice;
 

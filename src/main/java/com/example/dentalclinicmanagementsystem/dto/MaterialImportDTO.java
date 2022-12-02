@@ -3,9 +3,11 @@ package com.example.dentalclinicmanagementsystem.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 @Data
@@ -21,14 +23,17 @@ public class MaterialImportDTO {
     @NotNull(groups = {MaterialImportDTO.Create.class, MaterialImportDTO.Update.class})
     private LocalDate date;
 
+    @Positive
     @NotNull(groups = {MaterialImportDTO.Create.class, MaterialImportDTO.Update.class})
     private Integer amount;
 
+    @Length(max = 255, groups = {MaterialImportDTO.Create.class, MaterialImportDTO.Update.class})
     @NotBlank(groups = {MaterialImportDTO.Create.class, MaterialImportDTO.Update.class})
     private String supplyName;
 
     private String materialName;
 
+    @Positive
     @NotNull(groups = {MaterialImportDTO.Create.class, MaterialImportDTO.Update.class})
     private Integer unitPrice;
 

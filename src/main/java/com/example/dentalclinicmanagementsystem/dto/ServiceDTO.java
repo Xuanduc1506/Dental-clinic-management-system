@@ -3,9 +3,11 @@ package com.example.dentalclinicmanagementsystem.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @Data
 @NoArgsConstructor
@@ -14,15 +16,19 @@ public class ServiceDTO {
 
     private Long serviceId;
 
+    @Length(max = 255, groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     @NotBlank(groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     private String serviceName;
 
+    @Length(max = 45, groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     @NotBlank(groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     private String unit;
 
+    @Positive
     @NotNull(groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     private Integer marketPrice;
 
+    @Positive
     @NotNull(groups = {ServiceDTO.Create.class, ServiceDTO.Update.class})
     private Integer price;
 
