@@ -3,25 +3,25 @@ package com.example.dentalclinicmanagementsystem.service;
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
+import com.example.dentalclinicmanagementsystem.entity.Permission;
 import com.example.dentalclinicmanagementsystem.entity.User;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.WrongPasswordException;
 import com.example.dentalclinicmanagementsystem.mapper.UserMapper;
+import com.example.dentalclinicmanagementsystem.repository.PermissionRepository;
 import com.example.dentalclinicmanagementsystem.repository.UserRepository;
-import com.example.dentalclinicmanagementsystem.security.UserDetailImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +36,11 @@ public class UserService extends AbstractService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PermissionRepository permissionRepository;
+
+    public static final Long ADMIN = 1L;
 
 
     public Page<UserDTO> getListUsers(String username,
@@ -60,35 +65,49 @@ public class UserService extends AbstractService {
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         User user = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
-        if (Objects.isNull(user)) {
+        if (Objects.nonNull(user)) {
             throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
         }
 
         return saveUser(userDTO);
     }
 
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
+    public UserDTO updateUser(String token, Long id, UserDTO userDTO) {
+        userDTO.setUserId(id);
+        Long currentUserId = getUserId(token);
+
+        User currentUser = userRepository.findByUserIdAndEnable(currentUserId, Boolean.TRUE);
+        if (Objects.isNull(currentUser)) {
+            throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
+                    EntityName.User.USER, EntityName.User.USER_ID);
+        }
+
+        if (!Objects.equals(currentUser.getRoleId(), ADMIN) && !Objects.equals(currentUserId, id)) {
+            throw new AccessDenyException(MessageConstant.User.ACCESS_DENY,
+                    EntityName.User.USER);
+        }
+
         User userDb = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
         if (Objects.isNull(userDb)) {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
                     EntityName.User.USER, EntityName.User.USER_ID);
         }
+
+        if (!Objects.equals(currentUser.getRoleId(), ADMIN) && !Objects.equals(userDTO.getRoleId(), userDb.getRoleId())) {
+            throw new AccessDenyException(MessageConstant.User.CAN_NOT_CHANGE_ROLE,
+                    EntityName.User.USER);
+        }
+
+        Set<Permission> permissions = permissionRepository.findAllByRoleId(userDTO.getRoleId());
+        userDTO.setPermissions(permissions);
         userDTO.setUserId(id);
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(userDb.getPassword());
-
-        if (!Objects.equals(userDb.getEmail(), userDTO.getEmail())) {
-            User userEmail = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
-            if (Objects.nonNull(userEmail)) {
-                throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
-            }
-        }
 
         if(Objects.equals(userDb.getFullName(), userDTO.getFullName())){
             userDTO.setEnable(Boolean.TRUE);
 
             User user = userMapper.toEntity(userDTO);
-            user.setPermissions(null);
             return userMapper.toDto(userRepository.save(user));
         } else {
             return saveUser(userDTO);
@@ -104,7 +123,6 @@ public class UserService extends AbstractService {
         userDTO.setEnable(Boolean.TRUE);
 
         User user = userMapper.toEntity(userDTO);
-        user.setPermissions(null);
         return userMapper.toDto(userRepository.save(user));
     }
 

@@ -38,10 +38,8 @@ public class PatientDTO {
     @Length(max = 255, groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String email;
 
-    @Email(groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String bodyPrehistory;
 
-    @Email(groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String teethPrehistory;
 
     @Positive

@@ -82,11 +82,11 @@ public class HandleException extends ResponseEntityExceptionHandler {
                 .body(tokenExceptionMapper.toDto(tokenException));
     }
 
-    @ExceptionHandler(UsingEntityException.class)
+    @ExceptionHandler(AccessDenyException.class)
     public ResponseEntity<UsingEntityExceptionDTO> handleUsingEntityException(
-            UsingEntityException usingEntityException) {
+            AccessDenyException accessDenyException) {
 
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-                .body(usingEntityExceptionMapper.toDto(usingEntityException));
+                .body(usingEntityExceptionMapper.toDto(accessDenyException));
     }
 }

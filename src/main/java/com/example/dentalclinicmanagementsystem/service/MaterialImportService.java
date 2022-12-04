@@ -5,8 +5,8 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
 import com.example.dentalclinicmanagementsystem.entity.MaterialImport;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialImportMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialImportRepository;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
@@ -77,7 +77,7 @@ public class MaterialImportService {
         }
 
         if (oldMaterialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 
@@ -114,7 +114,7 @@ public class MaterialImportService {
         }
 
         if (materialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 

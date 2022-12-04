@@ -14,7 +14,7 @@ public interface LaboRepository extends JpaRepository<Labo, Long> {
 
 
     @Query(value = "SELECT new com.example.dentalclinicmanagementsystem.dto.LaboDTO(l.laboId, l.laboName, l.phone," +
-            "CASE WHEN sum(s.price) is null THEN 0 ELSE sum(s.price) END)" +
+            "CASE WHEN sum(s.unitPrice) is null THEN 0 ELSE sum(s.unitPrice) END)" +
             "FROM Labo l LEFT JOIN Specimen s ON l.laboId = s.laboId WHERE l.isDeleted = FALSE " +
             "AND (:name is null or l.laboName like %:name%)" +
             "AND (:phone is null or l.phone like %:phone%)" +

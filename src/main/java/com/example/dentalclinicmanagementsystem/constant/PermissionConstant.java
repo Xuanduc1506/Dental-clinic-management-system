@@ -31,6 +31,12 @@ public class PermissionConstant {
 
     public static final String ROLE_READ = "role_read";
 
+    public static final String SPECIMEN_READ = "specimen_read";
+    public static final String SPECIMEN_WRITE = "specimen_write";
 
+    public static final String BILL_READ = "bill_read";
+
+    public static final String RECEIPT_READ = "receipt_read";
+    public static final String RECEIPT_WRITE = "receipt_write";
 
 }

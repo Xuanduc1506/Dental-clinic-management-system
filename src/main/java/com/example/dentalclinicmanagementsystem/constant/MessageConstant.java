@@ -9,6 +9,8 @@ public class MessageConstant {
         public static final String USERNAME_NOT_FOUND = "username not found";
         public static final String WRONG_PASSWORD = "wrong password";
         public static final String EMAIL_ALREADY_EXIST = "email already exist";
+        public static final String ACCESS_DENY = "access deny";
+        public static final String CAN_NOT_CHANGE_ROLE = "can not change role";
     }
 
     public static class Material{
@@ -103,5 +105,12 @@ public class MessageConstant {
 
         public static final String ACCESS_DENY = "access deny";
         public static final String TOKEN_EXPIRE = "Unauthorized. Token is expired";
+    }
+
+    public static class Specimen {
+
+        private Specimen(){}
+
+        public static final String SPECIMEN_NOT_FOUND = "specimen not found";
     }
 }

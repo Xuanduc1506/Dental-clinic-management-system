@@ -6,8 +6,8 @@ import com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
 import com.example.dentalclinicmanagementsystem.entity.MaterialExport;
 import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialExportRepository;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
@@ -117,7 +117,7 @@ public class MaterialExportService {
         PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExport.getPatientRecordId());
 
         if (patientRecord.getDate().plusDays(1).isBefore(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialExport.MATERIAL_EXPORT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.MaterialExport.MATERIAL_EXPORT_OVER_DATE,
                     EntityName.MaterialExport.MATERIAL_EXPORT);
         }
     }
