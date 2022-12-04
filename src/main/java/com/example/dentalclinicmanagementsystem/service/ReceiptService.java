@@ -8,7 +8,7 @@ import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import com.example.dentalclinicmanagementsystem.entity.Treatment;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.mapper.ReceiptMapper;
 import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
 import com.example.dentalclinicmanagementsystem.repository.ReceiptRepository;
@@ -88,7 +88,7 @@ public class ReceiptService {
         }
 
         if (receiptDb.getDate().plusDays(1).isAfter(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.Receipt.RECEIPT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.Receipt.RECEIPT_OVER_DATE,
                     EntityName.Receipt.RECEIPT_ID);
         }
 

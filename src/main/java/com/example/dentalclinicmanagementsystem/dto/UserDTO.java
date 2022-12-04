@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.dto;
 
+import com.example.dentalclinicmanagementsystem.entity.Permission;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,8 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -42,6 +45,7 @@ public class UserDTO {
 
     private String roleName;
 
+    private Set<Permission> permissions = new HashSet<>();
 
     @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})
     @Email

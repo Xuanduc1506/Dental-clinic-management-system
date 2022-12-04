@@ -7,7 +7,7 @@ import com.example.dentalclinicmanagementsystem.dto.TimekeepingWithButtonDTO;
 import com.example.dentalclinicmanagementsystem.entity.Timekeeping;
 import com.example.dentalclinicmanagementsystem.entity.User;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.mapper.TimekeepingMapper;
 import com.example.dentalclinicmanagementsystem.repository.TimekeepingRepository;
 import com.example.dentalclinicmanagementsystem.repository.UserRepository;
@@ -50,7 +50,7 @@ public class TimekeepingService extends AbstractService {
             timekeeping.setTimeCheckin(LocalDateTime.now());
             timekeepingRepository.save(timekeeping);
         } else {
-            throw new UsingEntityException(MessageConstant.Timekeeping.CHECKOUT_NOTABLE,
+            throw new AccessDenyException(MessageConstant.Timekeeping.CHECKOUT_NOTABLE,
                     EntityName.Timekeeping.TIMEKEEPING);
         }
     }
@@ -66,7 +66,7 @@ public class TimekeepingService extends AbstractService {
             lastTimekeeping.setTimeCheckout(LocalDateTime.now());
             timekeepingRepository.save(lastTimekeeping);
         } else {
-            throw new UsingEntityException(MessageConstant.Timekeeping.CHECKIN_NOTABLE,
+            throw new AccessDenyException(MessageConstant.Timekeeping.CHECKIN_NOTABLE,
                     EntityName.Timekeeping.TIMEKEEPING);
         }
     }

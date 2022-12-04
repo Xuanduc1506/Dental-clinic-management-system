@@ -6,8 +6,8 @@ import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.PatientDTO;
 import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.PatientMapper;
 import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
 import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -91,7 +90,7 @@ public class PatientService {
 
         List<PatientRecord> patientRecords = patientRecordRepository.getAllByPatientId(id);
         if (!CollectionUtils.isEmpty(patientRecords)) {
-            throw new UsingEntityException(MessageConstant.Patient.PATIENT_HAVE_BEEN_USED, EntityName.Patient.PATIENT);
+            throw new AccessDenyException(MessageConstant.Patient.PATIENT_HAVE_BEEN_USED, EntityName.Patient.PATIENT);
         }
         patient.setIsDeleted(Boolean.TRUE);
 
