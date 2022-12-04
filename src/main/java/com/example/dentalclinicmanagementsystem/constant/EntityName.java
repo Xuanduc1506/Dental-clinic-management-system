@@ -96,4 +96,14 @@ public class EntityName {
         public static final String BILL = "bill";
         public static final String BILL_ID = "billId";
     }
+
+    public static class Specimen {
+        private Specimen(){}
+
+        public static final String SPECIMEN = "specimen";
+        public static final String SPECIMEN_ID = "specimenId";
+        public static final String PATIENT_RECORD_NOT_FOUND = "patient record not found";
+        public static final String LABO_NOT_FOUND = "labo not found";
+
+    }
 }

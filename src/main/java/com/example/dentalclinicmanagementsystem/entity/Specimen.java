@@ -26,8 +26,8 @@ public class Specimen {
     @Column(name = "amount")
     private Integer amount;
 
-    @Column(name = "price")
-    private Integer price;
+    @Column(name = "unit_price")
+    private Integer unitPrice;
 
     @Column(name = "patient_record_id")
     private Long patientRecordId;
@@ -35,5 +35,7 @@ public class Specimen {
     @Column(name = "labo_id")
     private Long laboId;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
 }

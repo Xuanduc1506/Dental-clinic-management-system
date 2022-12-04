@@ -104,4 +104,11 @@ public class MessageConstant {
         public static final String ACCESS_DENY = "access deny";
         public static final String TOKEN_EXPIRE = "Unauthorized. Token is expired";
     }
+
+    public static class Specimen {
+
+        private Specimen(){}
+
+        public static final String SPECIMEN_NOT_FOUND = "specimen not found";
+    }
 }

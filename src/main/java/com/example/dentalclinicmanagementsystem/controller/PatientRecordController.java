@@ -47,6 +47,7 @@ public class PatientRecordController {
         return ResponseEntity.ok().body(patientRecordService.getAllRecord(patientId, date));
     }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.PATIENT_RECORD_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.PATIENT_RECORD_WRITE + "\")")
     @GetMapping("{id}")
     public ResponseEntity<PatientRecordDTO> getDetailRecord(@NotNull @PathVariable Long id) {
 
