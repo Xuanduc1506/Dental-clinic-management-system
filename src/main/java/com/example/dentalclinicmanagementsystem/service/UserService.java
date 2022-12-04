@@ -60,7 +60,7 @@ public class UserService extends AbstractService {
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         User user = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
-        if (Objects.isNull(user)) {
+        if (Objects.nonNull(user)) {
             throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
         }
 
