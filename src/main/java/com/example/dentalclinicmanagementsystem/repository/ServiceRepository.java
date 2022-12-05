@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -35,5 +34,5 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
             "WHERE pr.patientRecordId = :patientRecordId AND prsm.status = 1")
     List<ServiceDTO> findTreatingService(@Param("patientRecordId") Long patientRecordId);
 
-    List<Service> findAllByServiceNameContainingAndCategoryServiceId(String name, Long categoryId);
+    List<Service> findAllByServiceNameContainingAndCategoryServiceIdAndIsDeletedOrderByServiceIdDesc(String name, Long categoryId, Boolean isDeleted);
 }

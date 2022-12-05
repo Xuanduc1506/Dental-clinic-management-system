@@ -65,7 +65,7 @@ public class SpecimenService {
     }
 
     private SpecimensDTO saveSpecimen(SpecimensDTO specimensDTO) {
-        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(specimensDTO.getPatientRecordId());
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordIdAndIsDeleted(specimensDTO.getPatientRecordId(), Boolean.FALSE);
         if (Objects.isNull(patientRecord)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.Specimen.SPECIMEN, EntityName.Specimen.PATIENT_RECORD_NOT_FOUND);

@@ -23,7 +23,8 @@ public interface MaterialImportRepository extends JpaRepository<MaterialImport, 
             "AND (:date is null or mi.dateTemp like %:date%)" +
             "AND (:amount is null or mi.amountTemp like %:amount%)" +
             "AND (:unitPrice is null or mi.unitPriceTemp like %:unitPrice%)" +
-            "AND (:supplyName is null or mi.supplyName like %:supplyName%)")
+            "AND (:supplyName is null or mi.supplyName like %:supplyName%) " +
+            "ORDER BY mi.materialImportId DESC")
     Page<MaterialImportDTO> getListImport(@Param("materialName") String materialName,
                                           @Param("date") String date,
                                           @Param("amount") String amount,

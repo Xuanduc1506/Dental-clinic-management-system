@@ -45,7 +45,7 @@ public class CategoryService {
 
     public Page<CategoryServiceDTO> getListService(String name, Pageable pageable) {
 
-        return categoryRepository.findAllByCategoryServiceNameContainingIgnoreCase(name, pageable).map(
+        return categoryRepository.findAllByCategoryServiceNameContainingIgnoreCaseOrderByCategoryServiceIdDesc(name, pageable).map(
                 entity -> categoryMapper.toDto(entity));
     }
 
@@ -230,7 +230,7 @@ public class CategoryService {
             name = "";
         }
 
-        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingAndCategoryServiceId(name, categoryId));
+        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingAndCategoryServiceIdAndIsDeletedOrderByServiceIdDesc(name, categoryId, Boolean.FALSE));
     }
 
     public List<CategoryServiceDTO> getAllCategory(String name) {

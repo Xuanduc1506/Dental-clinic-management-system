@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryServiceEntity, Long> {
 
-    Page<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCase(
+    Page<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCaseOrderByCategoryServiceIdDesc(
             String CategoryServiceName, Pageable pageable);
 
     CategoryServiceEntity findByCategoryServiceName(String name);

@@ -21,7 +21,8 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
             "JOIN TreatmentServiceMap tsm ON t.treatmentId = tsm.treatmentId " +
             "AND (:patientName is null or p.patientName like %:patientName%)" +
             "AND (:phone is null or p.phone like %:phone%)" +
-            "GROUP BY t.treatmentId")
+            "GROUP BY t.treatmentId " +
+            "ORDER BY t.treatmentId DESC ")
     Page<TreatmentDTO> getListBills(@Param("patientName")String patientName,
                                     @Param("phone")String phone,
                                     Pageable pageable);

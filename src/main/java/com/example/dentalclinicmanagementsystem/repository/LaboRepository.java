@@ -18,11 +18,13 @@ public interface LaboRepository extends JpaRepository<Labo, Long> {
             "FROM Labo l LEFT JOIN Specimen s ON l.laboId = s.laboId WHERE l.isDeleted = FALSE " +
             "AND (:name is null or l.laboName like %:name%)" +
             "AND (:phone is null or l.phone like %:phone%)" +
-            "GROUP BY l.laboId",
+            "GROUP BY l.laboId " +
+            "ORDER BY l.laboId DESC",
             countQuery = "SELECT COUNT(l.laboId) FROM Labo l WHERE l.isDeleted = FALSE " +
                     "AND (:name is null or l.laboName like %:name%)" +
                     "AND (:phone is null or l.phone like %:phone%)" +
-                    "GROUP BY l.laboId")
+                    "GROUP BY l.laboId " +
+                    "ORDER BY l.laboId DESC")
     Page<LaboDTO> getListLabo(@Param("name") String name,
                               @Param("phone") String phone,
                               Pageable pageable);

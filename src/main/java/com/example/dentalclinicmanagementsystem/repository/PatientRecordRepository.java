@@ -36,6 +36,7 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, Lo
             "LEFT JOIN specimens s on pr.patient_record_id = s.patient_record_id " +
             "LEFT JOIN labos l on l.labo_id = s.labo_id " +
             "WHERE t.patient_id = :patientId " +
+            "AND pr.is_deleted = FALSE " +
             "AND pr.reason like %:reason% " +
             "AND pr.diagnostic like %:diagnostic% " +
             "AND pr.causal like %:causal% " +
@@ -43,7 +44,8 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, Lo
             "AND pr.treatment like %:treatment% " +
             "GROUP BY pr.patient_record_id " +
             "HAVING (`laboName` IS NULL OR `laboName` like %:laboName%) " +
-            "AND (`services` like %:serviceName%)", nativeQuery = true)
+            "AND (`services` like %:serviceName%) " +
+            "ORDER BY pr.patient_record_id DESC", nativeQuery = true)
     Page<PatientRecordInterfaceDTO> getAllByPatientId(@Param("patientId") Long patientId,
                                                       @Param("reason") String reason,
                                                       @Param("diagnostic") String diagnostic,
@@ -71,10 +73,11 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, Lo
             "LEFT JOIN specimens s on pr.patient_record_id = s.patient_record_id " +
             "LEFT JOIN labos l on l.labo_id = s.labo_id " +
             "WHERE pr.patient_record_id = :id " +
+            "AND pr.is_deleted = FALSE " +
             "GROUP BY pr.patient_record_id ", nativeQuery = true)
     PatientRecordInterfaceDTO findPatientRecordDtoByPatientRecordId(Long id);
 
-    PatientRecord findByPatientRecordId(Long id);
+    PatientRecord findByPatientRecordIdAndIsDeleted(Long id, Boolean isDeleted);
 
     @Query("SELECT pr FROM PatientRecord pr JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
             "WHERE t.patientId = :patientId AND (:date is null or pr.dateTemp like %:date%) ORDER BY pr.patientRecordId DESC")

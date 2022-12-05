@@ -29,7 +29,7 @@ public class PatientRecordDTO {
     @NotBlank(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private String causal;
 
-    @NotBlank(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
+    @NotNull(groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private LocalDate date;
 
     @Length(max = 255, groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
@@ -53,6 +53,8 @@ public class PatientRecordDTO {
     private String laboName;
 
     private String serviceName;
+
+    private Boolean isDeleted;
 
     private List<MaterialExportDTO> materialExportDTOs;
 

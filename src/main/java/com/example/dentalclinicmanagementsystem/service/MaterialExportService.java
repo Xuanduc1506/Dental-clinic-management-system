@@ -65,7 +65,7 @@ public class MaterialExportService {
                     EntityName.Material.MATERIAL_NAME);
         }
 
-        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExportDTO.getPatientRecordId());
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordIdAndIsDeleted(materialExportDTO.getPatientRecordId(), Boolean.FALSE);
         if (Objects.isNull(patientRecord)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
@@ -114,7 +114,7 @@ public class MaterialExportService {
                     EntityName.MaterialExport.MATERIAL_EXPORT, EntityName.MaterialExport.MATERIAL_EXPORT_ID);
         }
 
-        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExport.getPatientRecordId());
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordIdAndIsDeleted(materialExport.getPatientRecordId(), Boolean.FALSE);
 
         if (patientRecord.getDate().plusDays(1).isBefore(LocalDate.now())) {
             throw new AccessDenyException(MessageConstant.MaterialExport.MATERIAL_EXPORT_OVER_DATE,
@@ -131,7 +131,7 @@ public class MaterialExportService {
                     EntityName.Material.MATERIAL_NAME);
         }
 
-        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExportDTO.getPatientRecordId());
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordIdAndIsDeleted(materialExportDTO.getPatientRecordId(), Boolean.FALSE);
         if (Objects.isNull(patientRecord)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);

@@ -26,7 +26,8 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
             "AND (:date is null or pr.dateTemp like %:date%)" +
             "AND (:amount is null or me.amountTemp like %:amount%)" +
             "AND (:unitPrice is null or me.unitPriceTemp like %:unitPrice%)" +
-            "AND (:patientName is null or p.patientName like %:patientName%)")
+            "AND (:patientName is null or p.patientName like %:patientName%) " +
+            "ORDER BY me.materialExportId DESC")
     Page<MaterialExportDTO> getListMaterialExport(@Param("materialName")String materialName,
                                                   @Param("date")String date,
                                                   @Param("amount")String amount,

@@ -8,11 +8,10 @@ import com.example.dentalclinicmanagementsystem.dto.PatientRecordDTO;
 import com.example.dentalclinicmanagementsystem.dto.PatientRecordInterfaceDTO;
 import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.entity.*;
-import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
+import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
-import com.example.dentalclinicmanagementsystem.mapper.ServiceMapper;
 import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -62,7 +61,7 @@ public class PatientRecordService extends AbstractService {
     private ServiceRepository serviceRepository;
 
     @Autowired
-    private ServiceMapper serviceMapper;
+    private SpecimenRepository specimenRepository;
 
     @Autowired
     private MaterialExportMapper materialExportMapper;
@@ -146,6 +145,7 @@ public class PatientRecordService extends AbstractService {
             patientRecordDTO.setTreatmentId(oldTreatment.getTreatmentId());
         }
 
+        patientRecordDTO.setIsDeleted(Boolean.FALSE);
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
@@ -162,7 +162,7 @@ public class PatientRecordService extends AbstractService {
 
         patientRecordDTO.setPatientRecordId(id);
 
-        PatientRecord patientRecordDb = patientRecordRepository.findByPatientRecordId(id);
+        PatientRecord patientRecordDb = patientRecordRepository.findByPatientRecordIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(patientRecordDb)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
@@ -187,7 +187,7 @@ public class PatientRecordService extends AbstractService {
 
         materials.forEach(material -> {
             Optional<MaterialExport> materialExportOptional = materialExports
-                    .stream().filter(me ->Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
+                    .stream().filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
             materialExportOptional.ifPresent(materialExport ->
                     material.setAmount(material.getAmount() + materialExport.getAmount()));
         });
@@ -205,14 +205,14 @@ public class PatientRecordService extends AbstractService {
                 .collect(Collectors.toList());
 
         List<Material> materials = materialRepository.findAllByMaterialIdIn(materialIds);
-        if(materials.size() < materialIds.size()) {
+        if (materials.size() < materialIds.size()) {
             throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.Material.MATERIAL_ID);
         }
 
         materials.forEach(material -> {
             Optional<MaterialExportDTO> materialExportDTOOptional = materialExportDTOS
-                    .stream().filter(me ->Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
+                    .stream().filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
             materialExportDTOOptional.ifPresent(materialExport ->
                     material.setAmount(material.getAmount() - materialExport.getAmount()));
         });
@@ -256,7 +256,7 @@ public class PatientRecordService extends AbstractService {
 
     public void deleteRecord(Long id) {
 
-        PatientRecord patientRecordDb = patientRecordRepository.findByPatientRecordId(id);
+        PatientRecord patientRecordDb = patientRecordRepository.findByPatientRecordIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(patientRecordDb)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
@@ -268,7 +268,11 @@ public class PatientRecordService extends AbstractService {
         }
 
         patientRecordServiceMapRepository.deleteAllByPatientRecordId(id);
-        patientRecordRepository.delete(patientRecordDb);
+        treatmentServiceMapRepository.deleteAllByStartRecordId(id);
+        specimenRepository.deleteAllByPatientRecordId(id);
+
+        patientRecordDb.setIsDeleted(Boolean.TRUE);
+        patientRecordRepository.save(patientRecordDb);
     }
 
     public List<PatientRecordDTO> getAllRecord(Long patientId, String date) {
