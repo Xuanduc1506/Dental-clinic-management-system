@@ -5,6 +5,6 @@ RUN mvn clean install
 
 FROM openjdk
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 80
 COPY --from=buildder /app/target/DentalClinicManagementSystem-0.0.1-SNAPSHOT.jar .
 CMD java -jar DentalClinicManagementSystem-0.0.1-SNAPSHOT.jar
