@@ -5,6 +5,7 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.CategoryServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.entity.CategoryServiceEntity;
+import com.example.dentalclinicmanagementsystem.entity.TreatmentServiceMap;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
@@ -13,6 +14,7 @@ import com.example.dentalclinicmanagementsystem.mapper.ServiceMapper;
 import com.example.dentalclinicmanagementsystem.repository.CategoryRepository;
 import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
 import com.example.dentalclinicmanagementsystem.repository.ServiceRepository;
+import com.example.dentalclinicmanagementsystem.repository.TreatmentServiceMapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,9 @@ public class CategoryService {
 
     @Autowired
     private PatientRecordRepository patientRecordRepository;
+
+    @Autowired
+    private TreatmentServiceMapRepository treatmentServiceMapRepository;
 
     public Page<CategoryServiceDTO> getListService(String name, Pageable pageable) {
 
@@ -212,7 +217,20 @@ public class CategoryService {
     }
 
     public List<ServiceDTO> getTreatingService(Long patientId) {
-        return serviceRepository.findTreatingService(patientRecordRepository.getLastRecordId(patientId));
+        List<ServiceDTO> serviceDTOS = serviceRepository.findTreatingService(patientRecordRepository.getLastRecordId(patientId));
+        List<Long> serviceIds = serviceDTOS.stream().map(ServiceDTO::getServiceId).collect(Collectors.toList());
+        List<TreatmentServiceMap> treatmentServiceMaps = treatmentServiceMapRepository.findAllByPatientId(patientId, serviceIds);
+        serviceDTOS.forEach(serviceDTO -> {
+            treatmentServiceMaps.stream()
+                    .filter(item -> Objects.equals(serviceDTO.getServiceId(), item.getServiceId()))
+                    .findFirst().ifPresent(i -> {
+                        serviceDTO.setPrice(i.getCurrentPrice());
+                        serviceDTO.setDiscount(i.getDiscount());
+                        treatmentServiceMaps.remove(i);
+                    });
+        });
+        return serviceDTOS;
+
     }
 
     public List<ServiceDTO> getAllService(String name) {

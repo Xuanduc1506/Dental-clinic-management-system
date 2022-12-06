@@ -149,11 +149,12 @@ public class PatientRecordService extends AbstractService {
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
-        saveServiceToTreatmentAndRecord(patientRecordDTO, patientRecord);
+        saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
 
         if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOs())) {
             insertMaterialExport(patientRecord.getPatientRecordId(), patientRecordDTO.getMaterialExportDTOs());
         }
+
 
         return patientRecordMapper.toDto(patientRecord);
     }
@@ -161,6 +162,12 @@ public class PatientRecordService extends AbstractService {
     public PatientRecordDTO updateRecord(Long id, PatientRecordDTO patientRecordDTO) {
 
         patientRecordDTO.setPatientRecordId(id);
+
+        Patient patient = patientRepository.findByPatientRecordId(id);
+        if (Objects.isNull(patient)) {
+            throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
+                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
+        }
 
         PatientRecord patientRecordDb = patientRecordRepository.findByPatientRecordIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(patientRecordDb)) {
@@ -179,7 +186,7 @@ public class PatientRecordService extends AbstractService {
         treatmentServiceMapRepository.deleteAllByStartRecordId(id);
         patientRecordServiceMapRepository.deleteAllByPatientRecordId(id);
 
-        saveServiceToTreatmentAndRecord(patientRecordDTO, patientRecord);
+        saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
 
         List<MaterialExport> materialExports = materialExportRepository.findAllByPatientRecordId(id);
         List<Long> materialIds = materialExports.stream().map(MaterialExport::getMaterialId).collect(Collectors.toList());
@@ -226,7 +233,7 @@ public class PatientRecordService extends AbstractService {
         materialExportRepository.saveAll(materialExportMapper.toEntity(materialExportDTOS));
     }
 
-    private void saveServiceToTreatmentAndRecord(PatientRecordDTO patientRecordDTO, PatientRecord patientRecord) {
+    private void saveServiceToTreatmentAndRecord(Patient patient, PatientRecordDTO patientRecordDTO, PatientRecord patientRecord) {
         List<TreatmentServiceMap> treatmentServiceMaps = new ArrayList<>();
         List<PatientRecordServiceMap> patientRecordServiceMaps = new ArrayList<>();
 
@@ -249,6 +256,17 @@ public class PatientRecordService extends AbstractService {
             patientRecordServiceMap.setStatus(serviceDTO.getStatus());
             patientRecordServiceMaps.add(patientRecordServiceMap);
         });
+
+        List<ServiceDTO> listServiceNotDone = patientRecordDTO.getServiceDTOS().stream()
+                .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.TREATING)).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(listServiceNotDone)) {
+            patient.setStatus(StatusConstant.DONE);
+        } else {
+            patient.setStatus(StatusConstant.TREATING);
+        }
+
+        patientRepository.save(patient);
 
         patientRecordServiceMapRepository.saveAll(patientRecordServiceMaps);
         treatmentServiceMapRepository.saveAll(treatmentServiceMaps);

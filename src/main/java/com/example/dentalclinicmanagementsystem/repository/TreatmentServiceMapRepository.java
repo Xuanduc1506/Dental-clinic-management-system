@@ -42,4 +42,8 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
     List<TreatmentServiceMapDTO> findAllServiceInLastRecord(@Param("treatmentId") Long treatmentId);
 
 
+    @Query("SELECT tsm FROM TreatmentServiceMap tsm JOIN Treatment t ON tsm.treatmentId = t.treatmentId " +
+            "WHERE t.patientId = :patientId AND tsm.serviceId IN :serviceIds")
+    List<TreatmentServiceMap> findAllByPatientId(@Param("patientId") Long patientId,
+                                                 @Param("serviceIds") List<Long> serviceIds);
 }

@@ -26,12 +26,14 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     List<ServiceDTO> findAllByServiceIdIn(List<Long> ids,
                                           Long patientRecordId);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName,tsm.currentPrice, tsm.discount, prsm.status) " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName," +
+//            "tsm.currentPrice, tsm.discount, " +
+            "prsm.status) " +
             "FROM PatientRecord pr " +
-            "JOIN PatientRecordServiceMap prsm ON pr.patientRecordId = prsm.patientRecordId " +
+            "JOIN PatientRecordServiceMap prsm ON pr.patientRecordId = prsm.patientRecordId AND prsm.status = 1" +
             "JOIN Service s ON prsm.serviceId = s.serviceId " +
-            "JOIN TreatmentServiceMap  tsm ON tsm.startRecordId = pr.patientRecordId " +
-            "WHERE pr.patientRecordId = :patientRecordId AND prsm.status = 1")
+//            "JOIN TreatmentServiceMap  tsm ON tsm.treatmentId = pr.treatmentId AND tsm.serviceId = s.serviceId " +
+            "WHERE pr.patientRecordId = :patientRecordId ")
     List<ServiceDTO> findTreatingService(@Param("patientRecordId") Long patientRecordId);
 
     List<Service> findAllByServiceNameContainingAndCategoryServiceIdAndIsDeletedOrderByServiceIdDesc(String name, Long categoryId, Boolean isDeleted);
