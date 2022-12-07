@@ -1,6 +1,7 @@
 package com.example.dentalclinicmanagementsystem.dto;
 
 import com.example.dentalclinicmanagementsystem.entity.Permission;
+import com.example.dentalclinicmanagementsystem.entity.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,11 +48,13 @@ public class UserDTO {
     @NotNull(groups = {UserDTO.Create.class, UserDTO.Update.class})
     private Long roleId;
 
+    private Role role;
+
     private Boolean enable;
 
     private String roleName;
 
-    private Set<Permission> permissions = new HashSet<>();
+//    private Set<Permission> permissions = new HashSet<>();
 
     @Length(max = 255, groups = {UserDTO.Create.class, UserDTO.Update.class})
     @NotBlank(groups = {UserDTO.Create.class, UserDTO.Update.class})

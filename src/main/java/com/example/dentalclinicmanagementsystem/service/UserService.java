@@ -4,6 +4,7 @@ import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
 import com.example.dentalclinicmanagementsystem.entity.Permission;
+import com.example.dentalclinicmanagementsystem.entity.Role;
 import com.example.dentalclinicmanagementsystem.entity.User;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
@@ -11,6 +12,7 @@ import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundExceptio
 import com.example.dentalclinicmanagementsystem.exception.WrongPasswordException;
 import com.example.dentalclinicmanagementsystem.mapper.UserMapper;
 import com.example.dentalclinicmanagementsystem.repository.PermissionRepository;
+import com.example.dentalclinicmanagementsystem.repository.RoleRepository;
 import com.example.dentalclinicmanagementsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -39,6 +42,9 @@ public class UserService extends AbstractService {
 
     @Autowired
     private PermissionRepository permissionRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     public static final Long ADMIN = 1L;
 
@@ -68,6 +74,8 @@ public class UserService extends AbstractService {
         if (Objects.nonNull(user)) {
             throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
         }
+        Role role = roleRepository.findByRoleId(userDTO.getRoleId());
+        userDTO.setRole(role);
 
         return saveUser(userDTO);
     }
@@ -82,7 +90,7 @@ public class UserService extends AbstractService {
                     EntityName.User.USER, EntityName.User.USER_ID);
         }
 
-        if (!Objects.equals(currentUser.getRoleId(), ADMIN) && !Objects.equals(currentUserId, id)) {
+        if (!Objects.equals(currentUser.getRole().getRoleId(), ADMIN) && !Objects.equals(currentUserId, id)) {
             throw new AccessDenyException(MessageConstant.User.ACCESS_DENY,
                     EntityName.User.USER);
         }
@@ -93,13 +101,15 @@ public class UserService extends AbstractService {
                     EntityName.User.USER, EntityName.User.USER_ID);
         }
 
-        if (!Objects.equals(currentUser.getRoleId(), ADMIN) && !Objects.equals(userDTO.getRoleId(), userDb.getRoleId())) {
+        if (!Objects.equals(currentUser.getRole().getRoleId(), ADMIN) && !Objects.equals(userDTO.getRoleId(), userDb.getRole().getRoleId())) {
             throw new AccessDenyException(MessageConstant.User.CAN_NOT_CHANGE_ROLE,
                     EntityName.User.USER);
         }
 
-        Set<Permission> permissions = permissionRepository.findAllByRoleId(userDTO.getRoleId());
-        userDTO.setPermissions(permissions);
+//        Set<Permission> permissions = permissionRepository.findAllByRoleId(userDTO.getRoleId());
+//        userDTO.setPermissions(permissions);
+        Role role = roleRepository.findByRoleId(userDTO.getRoleId());
+        userDTO.setRole(role);
         userDTO.setUserId(id);
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(userDb.getPassword());

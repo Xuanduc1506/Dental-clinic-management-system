@@ -20,8 +20,6 @@ public class MaterialDTO {
     @NotBlank(groups = {MaterialDTO.Create.class, MaterialDTO.Update.class})
     private String unit;
 
-    @Positive
-    @NotNull(groups = {MaterialDTO.Create.class, MaterialDTO.Update.class})
     private Integer amount;
 
     @Positive

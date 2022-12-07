@@ -106,4 +106,11 @@ public class EntityName {
         public static final String LABO_NOT_FOUND = "labo not found";
 
     }
+
+    public static class WaitingRoom {
+        private WaitingRoom(){}
+
+        public static final String WAITING_ROOM = "waitingRoom";
+        public static final String WAITING_ROOM_ID = "waitingRoomId";
+    }
 }

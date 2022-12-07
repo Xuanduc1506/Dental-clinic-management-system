@@ -11,7 +11,7 @@ public class TreatmentServiceMapDTO {
 
     private Long treatmentServiceMapId;
 
-    private String treatmentId;
+    private Long treatmentId;
 
     private Long serviceId;
 
@@ -23,7 +23,8 @@ public class TreatmentServiceMapDTO {
 
     private String serviceName;
 
-    public TreatmentServiceMapDTO(Long serviceId, Integer currentPrice, Integer discount, String serviceName) {
+    public TreatmentServiceMapDTO(Long treatmentId, Long serviceId, Integer currentPrice, Integer discount, String serviceName) {
+        this.treatmentId = treatmentId;
         this.serviceId = serviceId;
         this.currentPrice = currentPrice;
         this.discount = discount;

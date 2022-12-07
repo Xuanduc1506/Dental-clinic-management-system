@@ -19,7 +19,7 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
 
     void deleteAllByStartRecordId(Long patientRecordId);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.serviceId, tsm.currentPrice, tsm.discount, s.serviceName) FROM TreatmentServiceMap tsm " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.treatmentId, tsm.serviceId, tsm.currentPrice, tsm.discount, s.serviceName) FROM TreatmentServiceMap tsm " +
             "JOIN Service s ON tsm.serviceId = s.serviceId WHERE tsm.treatmentId = :id")
     List<TreatmentServiceMapDTO> findAllByTreatmentId(Long id);
 
@@ -33,7 +33,7 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
     List<IncomeDetailDTO> findAllServiceInTime(@Param("month") Integer month,
                                                @Param("year")Integer year);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.serviceId, tsm.currentPrice, " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.treatmentId, tsm.serviceId, tsm.currentPrice, " +
             "tsm.discount, s.serviceName)" +
             " FROM TreatmentServiceMap tsm JOIN Service s ON tsm.serviceId = s.serviceId" +
             " WHERE tsm.treatmentId = :treatmentId " +

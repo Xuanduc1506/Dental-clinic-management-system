@@ -149,7 +149,6 @@ public class ReceiptService {
 
     public List<ReceiptDTO> getListReceiptsByTreatmentId(Long treatmentId, String payment, String date, String debit) {
 
-//return null;
         List<ReceiptDTO> receiptDTOS = receiptRepository.getListReceiptsByTreatmentId(treatmentId, payment, date, debit);
 
         for (int i = 1; i < receiptDTOS.size(); i++) {

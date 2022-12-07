@@ -112,5 +112,13 @@ public class MessageConstant {
         private Specimen(){}
 
         public static final String SPECIMEN_NOT_FOUND = "specimen not found";
+        public static final String RECEIVE_DATE_MUST_BEFORE_DELIVERY_DATE = "specimen not found";
+    }
+
+    public static class WaitingRoom {
+
+        private WaitingRoom(){}
+
+        public static final String WAITING_ROOM_NOT_FOUND = "waiting room not found";
     }
 }

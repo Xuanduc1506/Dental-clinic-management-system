@@ -33,7 +33,8 @@ public class ReceiptDTO {
 
     private List<TreatmentServiceMapDTO> newServices;
 
-    public ReceiptDTO(Long receiptId, Integer payment, LocalDate date, Integer debit) {
+    public ReceiptDTO(Long treatmentId, Long receiptId, Integer payment, LocalDate date, Integer debit) {
+        this.treatmentId = treatmentId;
         this.receiptId = receiptId;
         this.payment = payment;
         this.date = date;

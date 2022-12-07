@@ -36,8 +36,8 @@ public class User implements Serializable {
     @Column(name = "salary")
     private Integer salary;
 
-    @Column(name = "role_id")
-    private Long roleId;
+//    @Column(name = "role_id")
+//    private Long roleId;
 
     @Column(name = "enable")
     private Boolean enable;
@@ -45,13 +45,14 @@ public class User implements Serializable {
     @Column(name = "email")
     private String email;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
     @JsonBackReference
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "role_permission_map",
-            joinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "role_id") },
-            inverseJoinColumns = { @JoinColumn(name = "permission_id", referencedColumnName = "permission_id") }
-    )
-    private Set<Permission> permissions = new HashSet<>();
-
+//    @JoinTable(
+//            name = "role",
+//            joinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "role_id") },
+//            inverseJoinColumns = { @JoinColumn(name = "permission_id", referencedColumnName = "permission_id") }
+//    )
+//    private Set<Permission> permissions = new HashSet<>();
+    private Role role;
 }

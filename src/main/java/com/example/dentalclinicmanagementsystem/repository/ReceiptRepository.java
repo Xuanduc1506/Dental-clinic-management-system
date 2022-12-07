@@ -1,6 +1,5 @@
 package com.example.dentalclinicmanagementsystem.repository;
 
-import com.example.dentalclinicmanagementsystem.dto.IncomeDTO;
 import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
 import com.example.dentalclinicmanagementsystem.dto.ReceiptDTO;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
@@ -21,7 +20,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     Receipt findByReceiptId(Long id);
 
-    @Query(value = "SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.receiptId, r.payment, r.date, r.debit)" +
+    @Query(value = "SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.treatmentId, r.receiptId, r.payment, r.date, r.debit)" +
             "FROM Receipt r JOIN Treatment t ON r.treatmentId = t.treatmentId " +
             "WHERE t.patientId = :patientId " +
             "AND (:payment is null or r.paymentTemp like %:payment%) " +
@@ -40,7 +39,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
                                      Pageable pageable);
 
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.receiptId, r.payment, r.date, r.debit)" +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.treatmentId, r.receiptId, r.payment, r.date, r.debit)" +
             "FROM Receipt r WHERE r.receiptId <= :id")
     List<ReceiptDTO> findLastTwoReceipt(Long id, Pageable pageable);
 
@@ -52,7 +51,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     Receipt findFirstByTreatmentIdOrderByReceiptIdDesc(Long treatmentId);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.receiptId, r.payment, r.date, r.debit) " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.treatmentId, r.receiptId, r.payment, r.date, r.debit) " +
             "FROM Receipt r WHERE r.treatmentId = :treatmentId " +
             "AND (:payment is null or r.paymentTemp like %:payment%) " +
             "AND (:date is null or r.dateTemp like %:date%) " +

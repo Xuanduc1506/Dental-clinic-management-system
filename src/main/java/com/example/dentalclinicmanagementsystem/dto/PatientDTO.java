@@ -42,7 +42,6 @@ public class PatientDTO {
 
     private String teethPrehistory;
 
-    @Positive
     private Integer status;
 
     private Boolean isDeleted;

@@ -21,7 +21,7 @@ public class UserDetailImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        for (Permission permission : user.getPermissions()) {
+        for (Permission permission : user.getRole().getPermissions()) {
             authorities.add(new SimpleGrantedAuthority(permission.getPermissionName()));
         }
         return authorities;

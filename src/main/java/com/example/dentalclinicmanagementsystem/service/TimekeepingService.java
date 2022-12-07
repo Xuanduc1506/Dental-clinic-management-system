@@ -84,7 +84,7 @@ public class TimekeepingService extends AbstractService {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
                     EntityName.User.USER, EntityName.User.USER_ID);
         }
-        if (Objects.equals(user.getRoleId(), ADMIN)) {
+        if (Objects.equals(user.getRole().getRoleId(), ADMIN)) {
             timekeepingWithButtonDTO.setTimekeepingDTOS(timekeepingRepository.
                     getListTimeKeepingOfAdmin(startTime, endTime, fullName, pageable));
             timekeepingWithButtonDTO.setCheckinEnable(Boolean.FALSE);

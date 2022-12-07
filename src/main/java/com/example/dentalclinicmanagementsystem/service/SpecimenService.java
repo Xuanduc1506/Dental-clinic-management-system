@@ -6,6 +6,7 @@ import com.example.dentalclinicmanagementsystem.dto.SpecimensDTO;
 import com.example.dentalclinicmanagementsystem.entity.Labo;
 import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
 import com.example.dentalclinicmanagementsystem.entity.Specimen;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.SpecimenMapper;
 import com.example.dentalclinicmanagementsystem.repository.LaboRepository;
@@ -75,6 +76,10 @@ public class SpecimenService {
         if (Objects.isNull(labo)) {
             throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
                     EntityName.Specimen.SPECIMEN, EntityName.Specimen.LABO_NOT_FOUND);
+        }
+
+        if (specimensDTO.getReceiveDate().isAfter(specimensDTO.getDeliveryDate())) {
+            throw new AccessDenyException(MessageConstant.Specimen.RECEIVE_DATE_MUST_BEFORE_DELIVERY_DATE, EntityName.Specimen.SPECIMEN);
         }
 
         Specimen specimen = specimenMapper.toEntity(specimensDTO);
