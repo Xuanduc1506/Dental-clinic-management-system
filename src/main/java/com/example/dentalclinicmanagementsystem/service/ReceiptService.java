@@ -142,6 +142,7 @@ public class ReceiptService {
         }
         ReceiptDTO receiptDTO = receiptMapper.toDto(lastReceipt);
         receiptDTO.setPayment(null);
+        receiptDTO.setOldDebit(Objects.nonNull(receiptDTO.getOldDebit()) ? receiptDTO.getOldDebit() : 0);
         receiptDTO.setDate(LocalDate.now());
 
         List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);

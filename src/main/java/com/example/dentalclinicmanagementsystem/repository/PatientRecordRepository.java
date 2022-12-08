@@ -98,7 +98,8 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, Lo
     PatientRecord findByPatientRecordIdAndIsDeleted(Long id, Boolean isDeleted);
 
     @Query("SELECT pr FROM PatientRecord pr JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
-            "WHERE t.patientId = :patientId AND (:date is null or pr.dateTemp like %:date%) ORDER BY pr.patientRecordId DESC")
+            "WHERE t.patientId = :patientId AND (:date is null or pr.dateTemp like %:date%) AND pr.isDeleted = FALSE " +
+            "ORDER BY pr.patientRecordId DESC")
     List<PatientRecord> findRecordByPatientId(@Param("patientId") Long patientId,
                                               @Param("date") String date);
 
