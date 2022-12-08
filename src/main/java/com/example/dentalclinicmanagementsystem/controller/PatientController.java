@@ -45,6 +45,7 @@ public class PatientController {
         return ResponseEntity.ok().body(patientService.getAllPatient(name));
     }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.PATIENT_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.PATIENT_WRITE + "\")")
     @GetMapping("/{id}")
     public ResponseEntity<PatientDTO> getDetailPatient(@NotNull @PathVariable Long id) {
 
@@ -72,6 +73,15 @@ public class PatientController {
 
         patientService.deletePatient(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.PATIENT_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.PATIENT_WRITE + "\")")
+    @PostMapping("{patientId}/waiting_room")
+    public ResponseEntity<Void> addPatientToWaitingRoom(@PathVariable Long patientId) {
+
+        patientService.addPatientToWaitingRoom(patientId);
+        return ResponseEntity.ok().build();
+
     }
 
 }

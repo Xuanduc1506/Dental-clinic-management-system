@@ -51,6 +51,7 @@ public class MessageConstant {
 
         public static final String PATIENT_NOT_FOUND = "patient not found";
         public static final String PATIENT_HAVE_BEEN_USED = "patient have been use";
+        public static final String PATIENT_HAVE_ALREADY_IN_WAITING_ROOM = "patient have already in waiting room";
 
     }
 

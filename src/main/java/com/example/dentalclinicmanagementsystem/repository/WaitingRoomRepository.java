@@ -28,5 +28,6 @@ public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> 
     List<WaitingRoomDTO> findAllListConfirm();
 
 
+    WaitingRoom findByPatientIdAndDateAndIsDeleted(Long patientId, LocalDate date, Boolean isDeleted);
 
 }
