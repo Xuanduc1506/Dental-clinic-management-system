@@ -65,7 +65,9 @@ public class ReceiptService {
         Treatment treatment = treatmentRepository.findFirstByPatientIdOrderByTreatmentIdDesc(patientId);
 
         Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatment.getTreatmentId());
-        Integer paid = receiptRepository.getPaidByTreatmentId(treatment.getTreatmentId()) + receiptDTO.getPayment();
+        Integer oldPaid = receiptRepository.getPaidByTreatmentId(treatment.getTreatmentId());
+
+        Integer paid = (Objects.nonNull(oldPaid) ? oldPaid : 0) + receiptDTO.getPayment();
 
         receiptDTO.setReceiptId(null);
         receiptDTO.setTreatmentId(treatment.getTreatmentId());
