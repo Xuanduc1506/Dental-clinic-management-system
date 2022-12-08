@@ -22,11 +22,8 @@ public class ReceiptDTO {
 
     private Long treatmentId;
 
-    @NotNull(groups = {ReceiptDTO.Create.class, ReceiptDTO.Update.class})
     private LocalDate date;
 
-    @Positive
-    @NotNull(groups = {ReceiptDTO.Create.class, ReceiptDTO.Update.class})
     private Integer debit;
 
     private Integer oldDebit;
