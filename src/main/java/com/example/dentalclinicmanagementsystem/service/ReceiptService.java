@@ -7,13 +7,11 @@ import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
 import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import com.example.dentalclinicmanagementsystem.entity.Treatment;
+import com.example.dentalclinicmanagementsystem.entity.WaitingRoom;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.mapper.ReceiptMapper;
-import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
-import com.example.dentalclinicmanagementsystem.repository.ReceiptRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentServiceMapRepository;
+import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -53,6 +51,9 @@ public class ReceiptService {
     @Autowired
     private TreatmentServiceMapRepository treatmentServiceMapRepository;
 
+    @Autowired
+    private WaitingRoomRepository waitingRoomRepository;
+
     public ReceiptDTO addReceipt(Long patientId, ReceiptDTO receiptDTO) {
 
         Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
@@ -75,6 +76,13 @@ public class ReceiptService {
         receiptDTO.setDate(LocalDate.now());
         Receipt receipt = receiptMapper.toEntity(receiptDTO);
         receiptRepository.save(receipt);
+
+        WaitingRoom waitingRoom = waitingRoomRepository.findByPatientIdAndDateAndIsDeleted(patientId, LocalDate.now(), Boolean.FALSE);
+        if (Objects.nonNull(waitingRoom)) {
+            waitingRoom.setIsDeleted(Boolean.TRUE);
+            waitingRoomRepository.save(waitingRoom);
+        }
+
 
         return receiptMapper.toDto(receipt);
     }
@@ -142,7 +150,7 @@ public class ReceiptService {
         }
         ReceiptDTO receiptDTO = receiptMapper.toDto(lastReceipt);
         receiptDTO.setPayment(null);
-        receiptDTO.setOldDebit(Objects.nonNull(receiptDTO.getOldDebit()) ? receiptDTO.getOldDebit() : 0);
+        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit()) ? receiptDTO.getDebit() : 0);
         receiptDTO.setDate(LocalDate.now());
 
         List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);
