@@ -10,5 +10,15 @@ public class StatusConstant {
     public static final int WAITING = 2;
     public static final int CONFIRMING = 3;
 
+    public static final int PREPARE_SPECIMEN = 1;
+
+    public static final int LABO_RECEIVE = 2;
+
+    public static final int LABO_DELIVERY = 3;
+
+    public static final int PATIENT_USED = 4;
+
+    public static final int SPECIMEN_ERROR = 5;
+
 
 }

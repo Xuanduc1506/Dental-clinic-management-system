@@ -113,7 +113,8 @@ public class MessageConstant {
         private Specimen(){}
 
         public static final String SPECIMEN_NOT_FOUND = "specimen not found";
-        public static final String RECEIVE_DATE_MUST_BEFORE_DELIVERY_DATE = "specimen not found";
+        public static final String RECEIVE_DATE_MUST_BEFORE_DELIVERY_DATE = "receive date must before delivery date";
+        public static final String RECEIVE_DATE_MUST_NOT_BE_NULL = "receive date must not be null";
     }
 
     public static class WaitingRoom {

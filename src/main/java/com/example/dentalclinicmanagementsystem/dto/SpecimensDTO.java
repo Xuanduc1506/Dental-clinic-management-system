@@ -21,10 +21,8 @@ public class SpecimensDTO {
     @NotBlank(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private String specimenName;
 
-    @NotNull(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private LocalDate receiveDate;
 
-    @NotNull(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private LocalDate deliveryDate;
 
     @Positive
@@ -37,6 +35,14 @@ public class SpecimensDTO {
 
     @NotNull(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private Long laboId;
+
+    private Integer status;
+
+    private Long serviceId;
+
+    private String serviceName;
+
+    private String laboName;
 
     @NotNull(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private Long patientRecordId;
@@ -55,6 +61,22 @@ public class SpecimensDTO {
         this.laboId = laboId;
         this.patientRecordId = patientRecordId;
         this.patientName = patientName;
+    }
+
+    public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, Long patientRecordId, String patientName, String laboName) {
+        this.specimenId = specimenId;
+        this.specimenName = specimenName;
+        this.receiveDate = receiveDate;
+        this.deliveryDate = deliveryDate;
+        this.amount = amount;
+        this.unitPrice = unitPrice;
+        this.laboId = laboId;
+        this.status = status;
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.patientRecordId = patientRecordId;
+        this.patientName = patientName;
+        this.laboName = laboName;
     }
 
     public interface Create {

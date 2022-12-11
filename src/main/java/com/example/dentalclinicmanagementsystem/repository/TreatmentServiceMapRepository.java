@@ -46,4 +46,9 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
             "WHERE t.patientId = :patientId AND tsm.serviceId IN :serviceIds")
     List<TreatmentServiceMap> findAllByPatientId(@Param("patientId") Long patientId,
                                                  @Param("serviceIds") List<Long> serviceIds);
+
+    @Query("SELECT tsm.startRecordId FROM TreatmentServiceMap tsm " +
+            "WHERE tsm.treatmentId = :treatmentId AND tsm.serviceId in :serviceIds")
+    List<Long> findAllStartRecordByTreatmentIdAndListServiceId(@Param("treatmentId") Long treatmentId,
+                                                               @Param("serviceIds") List<Long> serviceIds);
 }

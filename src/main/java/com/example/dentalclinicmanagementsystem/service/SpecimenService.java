@@ -2,6 +2,7 @@ package com.example.dentalclinicmanagementsystem.service;
 
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
+import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.SpecimensDTO;
 import com.example.dentalclinicmanagementsystem.entity.Labo;
 import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
@@ -13,6 +14,8 @@ import com.example.dentalclinicmanagementsystem.repository.LaboRepository;
 import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
 import com.example.dentalclinicmanagementsystem.repository.SpecimenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -78,7 +81,16 @@ public class SpecimenService {
                     EntityName.Specimen.SPECIMEN, EntityName.Specimen.LABO_NOT_FOUND);
         }
 
-        if (specimensDTO.getReceiveDate().isAfter(specimensDTO.getDeliveryDate())) {
+        if (Objects.nonNull(specimensDTO.getReceiveDate()) && Objects.nonNull(specimensDTO.getDeliveryDate())) {
+            if (specimensDTO.getReceiveDate().isAfter(specimensDTO.getDeliveryDate())) {
+                throw new AccessDenyException(MessageConstant.Specimen.RECEIVE_DATE_MUST_BEFORE_DELIVERY_DATE, EntityName.Specimen.SPECIMEN);
+            }
+            specimensDTO.setStatus(StatusConstant.LABO_DELIVERY);
+        } else if (Objects.nonNull(specimensDTO.getReceiveDate()) && Objects.isNull(specimensDTO.getDeliveryDate())) {
+            specimensDTO.setStatus(StatusConstant.LABO_RECEIVE);
+        } else if (Objects.isNull(specimensDTO.getReceiveDate()) && Objects.isNull(specimensDTO.getDeliveryDate())) {
+            specimensDTO.setStatus(StatusConstant.PREPARE_SPECIMEN);
+        } else {
             throw new AccessDenyException(MessageConstant.Specimen.RECEIVE_DATE_MUST_BEFORE_DELIVERY_DATE, EntityName.Specimen.SPECIMEN);
         }
 
@@ -96,5 +108,10 @@ public class SpecimenService {
         }
         specimen.setIsDeleted(Boolean.TRUE);
         specimenRepository.save(specimen);
+    }
+
+    public Page<SpecimensDTO> getPageSpecimens(String specimenName, String patientName, String receiveDate, String deliveryDate, String laboName, String serviceName, Integer status, Pageable pageable) {
+
+        return specimenRepository.getPageSpecimens(specimenName, patientName, receiveDate, deliveryDate, laboName, serviceName, status, pageable);
     }
 }

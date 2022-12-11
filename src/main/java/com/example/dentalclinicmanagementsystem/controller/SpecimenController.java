@@ -4,6 +4,8 @@ import com.example.dentalclinicmanagementsystem.constant.PermissionConstant;
 import com.example.dentalclinicmanagementsystem.dto.SpecimensDTO;
 import com.example.dentalclinicmanagementsystem.service.SpecimenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +18,19 @@ public class SpecimenController {
 
     @Autowired
     private SpecimenService specimenService;
+
+    @GetMapping("get_list_speciemns")
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.SPECIMEN_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.SPECIMEN_WRITE + "\")")
+    public ResponseEntity<Page<SpecimensDTO>> getPageSpecimens(@RequestParam(required = false,defaultValue = "") String specimenName,
+                                                               @RequestParam(required = false,defaultValue = "") String patientName,
+                                                               @RequestParam(required = false,defaultValue = "") String receiveDate,
+                                                               @RequestParam(required = false,defaultValue = "") String deliveryDate,
+                                                               @RequestParam(required = false,defaultValue = "") String laboName,
+                                                               @RequestParam(required = false,defaultValue = "") String serviceName,
+                                                               @RequestParam(required = false) Integer status,
+                                                               Pageable pageable) {
+        return ResponseEntity.ok().body(specimenService.getPageSpecimens(specimenName, patientName, receiveDate, deliveryDate, laboName, serviceName, status, pageable));
+    }
 
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.SPECIMEN_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.SPECIMEN_WRITE + "\")")
     @GetMapping("{id}")

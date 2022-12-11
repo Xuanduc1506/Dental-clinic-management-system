@@ -257,6 +257,7 @@ public class PatientRecordService extends AbstractService {
             patientRecordServiceMaps.add(patientRecordServiceMap);
         });
 
+        // Update date status of patient when all service is done.
         List<ServiceDTO> listServiceNotDone = patientRecordDTO.getServiceDTOS().stream()
                 .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.TREATING)).collect(Collectors.toList());
 
@@ -270,6 +271,19 @@ public class PatientRecordService extends AbstractService {
 
         patientRecordServiceMapRepository.saveAll(patientRecordServiceMaps);
         treatmentServiceMapRepository.saveAll(treatmentServiceMaps);
+
+        // Handle specimen when service done.
+
+        List<Long> serviceIdsDone = patientRecordDTO.getServiceDTOS().stream()
+                .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.DONE))
+                .map(ServiceDTO::getServiceId).collect(Collectors.toList());
+
+        List<Long> startRecordIds = treatmentServiceMapRepository.findAllStartRecordByTreatmentIdAndListServiceId(patientRecord.getTreatmentId(), serviceIdsDone);
+        List<Specimen> specimens = specimenRepository.findAllByPatientRecordIdInAndServiceIdInAndIsDeleted(startRecordIds, serviceIdsDone, Boolean.FALSE);
+        specimens.forEach(specimen -> specimen.setStatus(StatusConstant.PATIENT_USED));
+        specimenRepository.saveAll(specimens);
+
+
     }
 
     public void deleteRecord(Long id) {
