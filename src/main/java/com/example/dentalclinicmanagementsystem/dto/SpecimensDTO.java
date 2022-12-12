@@ -25,6 +25,8 @@ public class SpecimensDTO {
 
     private LocalDate deliveryDate;
 
+    private LocalDate usedDate;
+
     @Positive
     @NotNull(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private Integer amount;
@@ -63,7 +65,7 @@ public class SpecimensDTO {
         this.patientName = patientName;
     }
 
-    public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, Long patientRecordId, String patientName, String laboName) {
+    public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, Long patientRecordId, String patientName, String laboName, LocalDate usedDate) {
         this.specimenId = specimenId;
         this.specimenName = specimenName;
         this.receiveDate = receiveDate;
@@ -77,6 +79,7 @@ public class SpecimensDTO {
         this.patientRecordId = patientRecordId;
         this.patientName = patientName;
         this.laboName = laboName;
+        this.usedDate = usedDate;
     }
 
     public interface Create {

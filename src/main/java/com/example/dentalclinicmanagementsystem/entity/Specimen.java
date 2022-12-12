@@ -23,6 +23,9 @@ public class Specimen {
     @Column(name = "delivery_date")
     private LocalDate deliveryDate;
 
+    @Column(name = "used_date")
+    private LocalDate usedDate;
+
     @Column(name = "amount")
     private Integer amount;
 
@@ -49,6 +52,9 @@ public class Specimen {
 
     @Column(name = "delivery_date", insertable = false, updatable = false)
     private String tempDeliveryDate;
+
+    @Column(name = "used_date", insertable = false, updatable = false)
+    private String tempUsedDate;
 
     @Column(name = "amount", insertable = false, updatable = false)
     private String tempAmount;

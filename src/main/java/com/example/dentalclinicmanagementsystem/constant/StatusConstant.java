@@ -20,5 +20,7 @@ public class StatusConstant {
 
     public static final int SPECIMEN_ERROR = 5;
 
+    public static final int SPECIMEN_COMPLETED = 6;
+
 
 }

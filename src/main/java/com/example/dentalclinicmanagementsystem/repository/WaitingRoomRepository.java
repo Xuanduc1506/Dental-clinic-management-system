@@ -16,8 +16,12 @@ import java.util.List;
 public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status) " +
-            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId WHERE wr.status <> 3 " +
-            "AND wr.isDeleted = FALSE ORDER BY wr.isBooked DESC")
+            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId " +
+            "WHERE wr.status <> 3 " +
+            "AND wr.isDeleted = FALSE " +
+            "AND (:patientName is null or p.patientName like %:patientName%) " +
+            "AND wr.date = :date " +
+            "ORDER BY wr.isBooked DESC")
     Page<WaitingRoomDTO> getListWaitingRoom(@Param("patientName") String patientName,
                                             @Param("date") LocalDate date,
                                             Pageable pageable);

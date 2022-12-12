@@ -64,6 +64,9 @@ public class PatientRecordService extends AbstractService {
     private SpecimenRepository specimenRepository;
 
     @Autowired
+    private WaitingRoomRepository waitingRoomRepository;
+
+    @Autowired
     private MaterialExportMapper materialExportMapper;
 
 
@@ -150,6 +153,12 @@ public class PatientRecordService extends AbstractService {
         patientRecordRepository.save(patientRecord);
 
         saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
+
+        WaitingRoom waitingRoom = waitingRoomRepository.findByPatientIdAndDateAndIsDeleted(patientId, LocalDate.now(), Boolean.FALSE);
+        if (Objects.nonNull(waitingRoom)) {
+            waitingRoom.setIsDeleted(Boolean.TRUE);
+            waitingRoomRepository.save(waitingRoom);
+        }
 
         if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOs())) {
             insertMaterialExport(patientRecord.getPatientRecordId(), patientRecordDTO.getMaterialExportDTOs());
@@ -273,16 +282,17 @@ public class PatientRecordService extends AbstractService {
         treatmentServiceMapRepository.saveAll(treatmentServiceMaps);
 
         // Handle specimen when service done.
-
         List<Long> serviceIdsDone = patientRecordDTO.getServiceDTOS().stream()
                 .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.DONE))
                 .map(ServiceDTO::getServiceId).collect(Collectors.toList());
 
         List<Long> startRecordIds = treatmentServiceMapRepository.findAllStartRecordByTreatmentIdAndListServiceId(patientRecord.getTreatmentId(), serviceIdsDone);
         List<Specimen> specimens = specimenRepository.findAllByPatientRecordIdInAndServiceIdInAndIsDeleted(startRecordIds, serviceIdsDone, Boolean.FALSE);
-        specimens.forEach(specimen -> specimen.setStatus(StatusConstant.PATIENT_USED));
+        specimens.forEach(specimen -> {
+            specimen.setStatus(StatusConstant.SPECIMEN_COMPLETED);
+            specimen.setUsedDate(LocalDate.now());
+        });
         specimenRepository.saveAll(specimens);
-
 
     }
 

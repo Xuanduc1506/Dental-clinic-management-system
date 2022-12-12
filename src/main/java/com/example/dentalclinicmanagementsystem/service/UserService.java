@@ -147,7 +147,9 @@ public class UserService extends AbstractService {
         userRepository.save(user);
     }
 
-    public void changePassword(Long id, String oldPassword, String newPassword) {
+    public void changePassword(String token, String oldPassword, String newPassword) {
+
+        Long id = getUserId(token);
         User user = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
         if (Objects.isNull(user)) {
             throw new EntityNotFoundException(MessageConstant.User.USERNAME_NOT_FOUND,
@@ -162,4 +164,15 @@ public class UserService extends AbstractService {
     }
 
 
+    public UserDTO getProfile(String token) {
+
+        Long id = getUserId(token);
+        User user = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
+        if (Objects.isNull(user)) {
+            throw new EntityNotFoundException(MessageConstant.User.USERNAME_NOT_FOUND,
+                    EntityName.User.USER, EntityName.User.USERNAME);
+        }
+
+        return userMapper.toDto(user);
+    }
 }

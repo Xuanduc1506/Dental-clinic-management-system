@@ -22,8 +22,8 @@ public class AuthController {
     }
 
     @PostMapping("/forgot_password")
-    public ResponseEntity<Void> resetPassword(@Validated(UserDTO.ForgotPassword.class) @RequestBody UserDTO userDTO) throws AuthenticationException {
-        authService.resetPassword(userDTO);
+    public ResponseEntity<Void> resetPassword(@RequestParam String username) throws AuthenticationException {
+        authService.resetPassword(username);
         return ResponseEntity.ok().build();
 
     }

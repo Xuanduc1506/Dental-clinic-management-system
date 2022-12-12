@@ -8,9 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
 
     @Query("SELECT SUM(s.unitPrice * s.amount) FROM Specimen s WHERE s.laboId = :id " +
@@ -40,7 +42,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, s.receiveDate, " +
             "s.deliveryDate, s.amount, s.unitPrice, s.laboId, s.status, s.serviceId, ser.serviceName, s.patientRecordId, " +
-            "p.patientName, l.laboName) " +
+            "p.patientName, l.laboName, s.usedDate) " +
             "FROM Specimen s JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
             "JOIN Service ser ON s.serviceId = ser.serviceId " +
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
@@ -57,7 +59,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, s.receiveDate, " +
             "s.deliveryDate, s.amount, s.unitPrice, s.laboId, s.status, s.serviceId, ser.serviceName, s.patientRecordId, " +
-            "p.patientName, l.laboName) FROM Specimen s " +
+            "p.patientName, l.laboName, s.usedDate) FROM Specimen s " +
             "JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
             "JOIN Patient p ON t.patientId = p.patientId " +
@@ -65,15 +67,17 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
             "JOIN Labo l ON s.laboId = l.laboId WHERE s.isDeleted = FALSE " +
             "AND (:specimenName is null or s.specimenName like %:specimenName%) " +
             "AND (:patientName is null or p.patientName like %:patientName%) " +
-            "AND (:receiveDate is null or s.tempReceiveDate like %:receiveDate%) " +
-            "AND (:deliveryDate is null or s.tempDeliveryDate like %:deliveryDate%) " +
+            "AND (:receiveDate is null or s.tempReceiveDate is null or s.tempReceiveDate like %:receiveDate%) " +
+            "AND (:usedDate is null or s.tempUsedDate is null or  s.tempUsedDate like %:usedDate%) " +
+            "AND (:deliveryDate is null or s.tempDeliveryDate is null or s.tempDeliveryDate like %:deliveryDate%) " +
             "AND (:laboName is null or l.laboName like %:laboName%) " +
             "AND (:serviceName is null or ser.serviceName like %:serviceName%) " +
-            "AND (:status is null or s.status = :status)")
+            "AND (:status is null or s.status = :status) ORDER BY s.specimenId DESC")
     Page<SpecimensDTO> getPageSpecimens(@Param("specimenName") String specimenName,
                                         @Param("patientName") String patientName,
                                         @Param("receiveDate") String receiveDate,
                                         @Param("deliveryDate") String deliveryDate,
+                                        @Param("usedDate") String usedDate,
                                         @Param("laboName") String laboName,
                                         @Param("serviceName") String serviceName,
                                         @Param("status") Integer status,

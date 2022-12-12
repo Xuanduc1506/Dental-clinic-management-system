@@ -1,6 +1,7 @@
 package com.example.dentalclinicmanagementsystem.controller;
 
 import com.example.dentalclinicmanagementsystem.constant.PermissionConstant;
+import com.example.dentalclinicmanagementsystem.dto.SpecimenHistoryDTO;
 import com.example.dentalclinicmanagementsystem.dto.SpecimensDTO;
 import com.example.dentalclinicmanagementsystem.service.SpecimenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,13 @@ public class SpecimenController {
     public ResponseEntity<Page<SpecimensDTO>> getPageSpecimens(@RequestParam(required = false,defaultValue = "") String specimenName,
                                                                @RequestParam(required = false,defaultValue = "") String patientName,
                                                                @RequestParam(required = false,defaultValue = "") String receiveDate,
+                                                               @RequestParam(required = false,defaultValue = "") String usedDate,
                                                                @RequestParam(required = false,defaultValue = "") String deliveryDate,
                                                                @RequestParam(required = false,defaultValue = "") String laboName,
                                                                @RequestParam(required = false,defaultValue = "") String serviceName,
                                                                @RequestParam(required = false) Integer status,
                                                                Pageable pageable) {
-        return ResponseEntity.ok().body(specimenService.getPageSpecimens(specimenName, patientName, receiveDate, deliveryDate, laboName, serviceName, status, pageable));
+        return ResponseEntity.ok().body(specimenService.getPageSpecimens(specimenName, patientName, receiveDate, usedDate, deliveryDate, laboName, serviceName, status, pageable));
     }
 
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.SPECIMEN_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.SPECIMEN_WRITE + "\")")
@@ -53,6 +55,19 @@ public class SpecimenController {
                                                        @RequestBody @Validated(SpecimensDTO.Update.class) SpecimensDTO specimensDTO) {
 
         return ResponseEntity.ok().body(specimenService.updateSpecimen(id, specimensDTO));
+    }
+
+    @PostMapping("use_specimen/{id}")
+    public ResponseEntity<Void> useSpecimen(@PathVariable Long id) {
+
+        specimenService.useSpecimen(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("report_specimen/{id}")
+    public ResponseEntity<SpecimensDTO> reportSpecimen(@PathVariable Long id,
+                                                       @RequestBody @Validated SpecimenHistoryDTO specimenHistoryDTO) {
+        return ResponseEntity.ok().body(specimenService.reportSpecimen(id, specimenHistoryDTO));
     }
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.SPECIMEN_WRITE + "\")")

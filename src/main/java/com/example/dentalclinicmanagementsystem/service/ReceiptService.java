@@ -77,13 +77,6 @@ public class ReceiptService {
         Receipt receipt = receiptMapper.toEntity(receiptDTO);
         receiptRepository.save(receipt);
 
-        WaitingRoom waitingRoom = waitingRoomRepository.findByPatientIdAndDateAndIsDeleted(patientId, LocalDate.now(), Boolean.FALSE);
-        if (Objects.nonNull(waitingRoom)) {
-            waitingRoom.setIsDeleted(Boolean.TRUE);
-            waitingRoomRepository.save(waitingRoom);
-        }
-
-
         return receiptMapper.toDto(receipt);
     }
 

@@ -59,10 +59,15 @@ public class UserController {
     }
 
     @PutMapping("change_password/{id}")
-    public ResponseEntity<Void> changePassword(@NotNull @PathVariable Long id,
+    public ResponseEntity<Void> changePassword(@RequestHeader("Authorization") String token,
                                                @RequestParam String oldPassword,
                                                @RequestParam String newPassword) {
-        userService.changePassword(id, oldPassword, newPassword);
+        userService.changePassword(token, oldPassword, newPassword);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("get_profile")
+    public ResponseEntity<UserDTO> getProfile(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok().body(userService.getProfile(token));
     }
 }
