@@ -19,6 +19,8 @@ public class MessageConstant {
         public static final String MATERIAL_NOT_FOUND = "material not found";
         public static final String MATERIAL_NAME_ALREADY_EXIST = "material name already exist";
 
+        public static final String NOT_ENOUGH_MATERIAL = "not enough material";
+
     }
 
     public static class MaterialImport{
