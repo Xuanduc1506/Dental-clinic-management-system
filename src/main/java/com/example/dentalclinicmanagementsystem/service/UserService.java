@@ -95,15 +95,17 @@ public class UserService extends AbstractService {
                     EntityName.User.USER);
         }
 
-        User userMail = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
-        if (Objects.nonNull(userMail)) {
-            throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
-        }
-
         User userDb = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
         if (Objects.isNull(userDb)) {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
                     EntityName.User.USER, EntityName.User.USER_ID);
+        }
+
+        if (!Objects.equals(userDb.getEmail(), userDTO.getEmail())) {
+            User userMail = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
+            if (Objects.nonNull(userMail)) {
+                throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
+            }
         }
 
         if (!Objects.equals(currentUser.getRole().getRoleId(), ADMIN) && !Objects.equals(userDTO.getRoleId(), userDb.getRole().getRoleId())) {
