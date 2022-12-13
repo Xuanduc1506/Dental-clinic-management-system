@@ -143,11 +143,15 @@ public class ReceiptService {
         }
         ReceiptDTO receiptDTO = receiptMapper.toDto(lastReceipt);
         receiptDTO.setPayment(null);
-        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit()) ? receiptDTO.getDebit() : 0);
+
         receiptDTO.setDate(LocalDate.now());
 
         List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);
         receiptDTO.setNewServices(treatmentServiceMapDTOS);
+
+        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit()) ? receiptDTO.getDebit()
+                : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
+                -> treatmentServiceMapDTO.getCurrentPrice()- treatmentServiceMapDTO.getDiscount()).sum());
         return receiptDTO;
     }
 
