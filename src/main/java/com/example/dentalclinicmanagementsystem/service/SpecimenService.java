@@ -56,6 +56,11 @@ public class SpecimenService {
                     EntityName.Specimen.SPECIMEN, EntityName.Specimen.SPECIMEN_ID);
         }
 
+        specimensDTO.setButtonUseEnable(Objects.equals(specimensDTO.getStatus(), StatusConstant.LABO_DELIVERY));
+
+        specimensDTO.setButtonReportEnable(Objects.equals(specimensDTO.getStatus(), StatusConstant.LABO_DELIVERY)
+                || Objects.equals(specimensDTO.getStatus(), StatusConstant.PATIENT_USED));
+
         return specimensDTO;
     }
 

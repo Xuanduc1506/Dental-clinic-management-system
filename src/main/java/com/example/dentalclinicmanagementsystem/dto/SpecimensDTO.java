@@ -53,6 +53,10 @@ public class SpecimensDTO {
 
     private Boolean isDeleted;
 
+    private boolean buttonUseEnable;
+
+    private boolean buttonReportEnable;
+
     public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Long patientRecordId, String patientName) {
         this.specimenId = specimenId;
         this.specimenName = specimenName;
