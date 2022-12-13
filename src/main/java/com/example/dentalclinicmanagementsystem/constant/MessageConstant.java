@@ -123,4 +123,11 @@ public class MessageConstant {
 
         public static final String WAITING_ROOM_NOT_FOUND = "waiting room not found";
     }
+
+    public static class Treatment {
+
+        private Treatment(){}
+
+        public static final String TREATMENT_NOT_FOUND = "treatment room not found";
+    }
 }

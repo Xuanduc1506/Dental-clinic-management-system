@@ -42,7 +42,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, s.receiveDate, " +
             "s.deliveryDate, s.amount, s.unitPrice, s.laboId, s.status, s.serviceId, ser.serviceName, s.patientRecordId, " +
-            "p.patientName, l.laboName, s.usedDate) " +
+            "p.patientName, l.laboName, s.usedDate, p.patientId) " +
             "FROM Specimen s JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
             "JOIN Service ser ON s.serviceId = ser.serviceId " +
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
@@ -59,7 +59,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, s.receiveDate, " +
             "s.deliveryDate, s.amount, s.unitPrice, s.laboId, s.status, s.serviceId, ser.serviceName, s.patientRecordId, " +
-            "p.patientName, l.laboName, s.usedDate) FROM Specimen s " +
+            "p.patientName, l.laboName, s.usedDate, p.patientId) FROM Specimen s " +
             "JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
             "JOIN Patient p ON t.patientId = p.patientId " +

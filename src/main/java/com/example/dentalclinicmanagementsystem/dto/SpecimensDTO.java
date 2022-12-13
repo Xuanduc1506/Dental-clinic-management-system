@@ -50,6 +50,7 @@ public class SpecimensDTO {
     private Long patientRecordId;
 
     private String patientName;
+    private Long patientId;
 
     private Boolean isDeleted;
 
@@ -69,7 +70,7 @@ public class SpecimensDTO {
         this.patientName = patientName;
     }
 
-    public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, Long patientRecordId, String patientName, String laboName, LocalDate usedDate) {
+    public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, Long patientRecordId, String patientName, String laboName, LocalDate usedDate, Long patientId) {
         this.specimenId = specimenId;
         this.specimenName = specimenName;
         this.receiveDate = receiveDate;
@@ -84,6 +85,7 @@ public class SpecimensDTO {
         this.patientName = patientName;
         this.laboName = laboName;
         this.usedDate = usedDate;
+        this.patientId = patientId;
     }
 
     public interface Create {
