@@ -13,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -104,5 +106,15 @@ public class LaboService {
 
         labo.setIsDeleted(Boolean.TRUE);
         laboRepository.save(labo);
+    }
+
+    public List<LaboDTO> getAllLabo(String name) {
+
+        if (StringUtils.hasLength(name)) {
+            name = "";
+        }
+        List<Labo> labos = laboRepository.findAllByLaboNameContainingAndIsDeletedOrderByLaboIdDesc(name, Boolean.FALSE);
+
+        return laboMapper.toDto(labos);
     }
 }

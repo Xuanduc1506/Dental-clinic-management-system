@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LaboRepository extends JpaRepository<Labo, Long> {
 
@@ -32,5 +34,7 @@ public interface LaboRepository extends JpaRepository<Labo, Long> {
     Labo findByLaboIdAndIsDeleted(Long id, Boolean isDelete);
 
     Labo findByLaboNameAndIsDeleted(String name, Boolean isDeleted);
+
+    List<Labo> findAllByLaboNameContainingAndIsDeletedOrderByLaboIdDesc(String name, Boolean isDeleted);
 }
 

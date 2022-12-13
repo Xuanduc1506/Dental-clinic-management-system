@@ -95,6 +95,11 @@ public class UserService extends AbstractService {
                     EntityName.User.USER);
         }
 
+        User userMail = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
+        if (Objects.nonNull(userMail)) {
+            throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
+        }
+
         User userDb = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
         if (Objects.isNull(userDb)) {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
@@ -106,8 +111,6 @@ public class UserService extends AbstractService {
                     EntityName.User.USER);
         }
 
-//        Set<Permission> permissions = permissionRepository.findAllByRoleId(userDTO.getRoleId());
-//        userDTO.setPermissions(permissions);
         Role role = roleRepository.findByRoleId(userDTO.getRoleId());
         userDTO.setRole(role);
         userDTO.setUserId(id);
@@ -167,12 +170,11 @@ public class UserService extends AbstractService {
     public UserDTO getProfile(String token) {
 
         Long id = getUserId(token);
-        User user = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
-        if (Objects.isNull(user)) {
-            throw new EntityNotFoundException(MessageConstant.User.USERNAME_NOT_FOUND,
-                    EntityName.User.USER, EntityName.User.USERNAME);
+        UserDTO userDTO = userRepository.getDetailUser(id);
+        if (Objects.isNull(userDTO)) {
+            throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
+                    EntityName.User.USER, EntityName.User.USER_ID);
         }
-
-        return userMapper.toDto(user);
+        return userDTO;
     }
 }
