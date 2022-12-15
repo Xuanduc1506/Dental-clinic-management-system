@@ -35,4 +35,23 @@ public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> 
 
     WaitingRoom findByPatientIdAndDateAndIsDeleted(Long patientId, LocalDate date, Boolean isDeleted);
 
+    WaitingRoom findByWaitingRoomIdAndStatusInAndAndIsDeleted(Long id, List<Integer> status, Boolean isDelete);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId, wr.date, wr.status, wr.note, p.patientName) " +
+            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId WHERE wr.isDeleted = FALSE " +
+            "AND (:patientName is null or p.patientName LIKE %:patientName%) " +
+            "AND wr.date >= :date")
+    Page<WaitingRoomDTO> getListSchedule(@Param("patientName") String patientName,
+                                         @Param("date") LocalDate date, Pageable pageable);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId, wr.date, wr.status, wr.note, p.patientName) " +
+            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId WHERE wr.isDeleted = FALSE " +
+            "AND (:patientName is null or p.patientName LIKE %:patientName%) " +
+            "AND wr.date = :date")
+    Page<WaitingRoomDTO> getListScheduleInDay(@Param("patientName") String patientName,
+                                         @Param("date") LocalDate date, Pageable pageable);
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId, wr.date, wr.status, wr.note, p.patientName) " +
+            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId " +
+            "WHERE wr.isDeleted = FALSE AND wr.waitingRoomId = :id")
+    WaitingRoomDTO getDetailSchedule(@Param("id") Long id);
 }
