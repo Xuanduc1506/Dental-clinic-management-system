@@ -29,7 +29,7 @@ import java.util.Objects;
 public class TimekeepingService extends AbstractService {
 
     public static final Long ADMIN = 1L;
-    public static final int TIME_POINT = 3;
+    public static final int TIME_POINT = 0;
 
     @Autowired
     private TimekeepingMapper timekeepingMapper;
