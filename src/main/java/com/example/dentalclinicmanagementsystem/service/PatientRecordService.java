@@ -3,15 +3,13 @@ package com.example.dentalclinicmanagementsystem.service;
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
-import com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO;
-import com.example.dentalclinicmanagementsystem.dto.PatientRecordDTO;
-import com.example.dentalclinicmanagementsystem.dto.PatientRecordInterfaceDTO;
-import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
+import com.example.dentalclinicmanagementsystem.dto.*;
 import com.example.dentalclinicmanagementsystem.entity.*;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
+import com.example.dentalclinicmanagementsystem.mapper.SpecimenMapper;
 import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -67,7 +65,13 @@ public class PatientRecordService extends AbstractService {
     private WaitingRoomRepository waitingRoomRepository;
 
     @Autowired
+    private LaboRepository laboRepository;
+
+    @Autowired
     private MaterialExportMapper materialExportMapper;
+
+    @Autowired
+    private SpecimenMapper specimenMapper;
 
 
     public Page<PatientRecordInterfaceDTO> getListPatientRecord(Long patientId, String reason, String diagnostic,
@@ -164,8 +168,33 @@ public class PatientRecordService extends AbstractService {
             insertMaterialExport(patientRecord.getPatientRecordId(), patientRecordDTO.getMaterialExportDTOs());
         }
 
+        if (!CollectionUtils.isEmpty(patientRecordDTO.getSpecimensDTOS())) {
+            insertLabo(patientRecordDTO.getSpecimensDTOS(), patientRecord.getPatientRecordId());
+        }
+
 
         return patientRecordMapper.toDto(patientRecord);
+    }
+
+    private void insertLabo(List<SpecimensDTO> specimensDTOS, Long patientRecordId) {
+        List<Long> laboIds = specimensDTOS.stream().map(SpecimensDTO::getLaboId).collect(Collectors.toList());
+
+        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(laboIds, Boolean.FALSE);
+
+        if (labos.size() < laboIds.size()) {
+            throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
+                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.Labo.LABO_ID);
+        }
+        List<Specimen> specimens = new ArrayList<>();
+        specimensDTOS.forEach(specimensDTO -> {
+            Specimen specimen = specimenMapper.toEntity(specimensDTO);
+            specimen.setPatientRecordId(patientRecordId);
+            specimen.setStatus(StatusConstant.PREPARE_SPECIMEN);
+            specimen.setIsDeleted(Boolean.FALSE);
+            specimens.add(specimen);
+        });
+
+        specimenRepository.saveAll(specimens);
     }
 
     public PatientRecordDTO updateRecord(Long id, PatientRecordDTO patientRecordDTO) {
@@ -229,8 +258,14 @@ public class PatientRecordService extends AbstractService {
         materials.forEach(material -> {
             Optional<MaterialExportDTO> materialExportDTOOptional = materialExportDTOS
                     .stream().filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
-            materialExportDTOOptional.ifPresent(materialExport ->
-                    material.setAmount(material.getAmount() - materialExport.getAmount()));
+            materialExportDTOOptional.ifPresent(materialExport -> {
+
+                if (material.getAmount() - materialExport.getAmount() >= 0) {
+                    material.setAmount(material.getAmount() - materialExport.getAmount());
+                } else {
+                    throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
+                }
+            });
         });
         materialRepository.saveAll(materials);
 

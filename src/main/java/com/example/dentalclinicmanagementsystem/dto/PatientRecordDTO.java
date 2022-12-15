@@ -58,6 +58,8 @@ public class PatientRecordDTO {
 
     private List<MaterialExportDTO> materialExportDTOs;
 
+    private List<SpecimensDTO> specimensDTOS;
+
     public interface Create {
     }
 

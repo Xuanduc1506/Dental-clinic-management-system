@@ -36,5 +36,7 @@ public interface LaboRepository extends JpaRepository<Labo, Long> {
     Labo findByLaboNameAndIsDeleted(String name, Boolean isDeleted);
 
     List<Labo> findAllByLaboNameContainingAndIsDeletedOrderByLaboIdDesc(String name, Boolean isDeleted);
+
+    List<Labo> findAllByLaboIdInAndIsDeleted(List<Long> laboIds, Boolean isDelete);
 }
 
