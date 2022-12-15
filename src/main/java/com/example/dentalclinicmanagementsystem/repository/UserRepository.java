@@ -62,8 +62,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(u.fullName, u.salary * count(t.timekeepingId)) " +
             "FROM User u JOIN Timekeeping t ON u.userId = t.userId " +
-            "WHERE MONTH(t.timeCheckin) = :month AND YEAR(t.timeCheckin) = :year " +
+            "WHERE t.timeCheckin is not null " +
+            "AND t.timeCheckout is not null " +
+            "AND MONTH(t.timeCheckin) = :month AND YEAR(t.timeCheckin) = :year " +
             "AND MONTH(t.timeCheckout) = :month AND YEAR(t.timeCheckout) = :year " +
+            "AND TIMESTAMPDIFF(HOUR, t.timeCheckout, t.timeCheckin) >= 3" +
             "GROUP BY u.userId")
     List<IncomeDetailDTO> findTotalSalary(@Param("month") Integer month,
                                           @Param("year") Integer year);

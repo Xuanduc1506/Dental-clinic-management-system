@@ -23,7 +23,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
                                 @Param("month")Integer month,
                                 @Param("year")Integer year);
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(l.laboName, s.receiveDate, s.unitPrice * s.amount) " +
-            "FROM Labo l JOIN Specimen s ON l.laboId = s.laboId WHERE s.isDeleted = FALSE ")
+            "FROM Labo l JOIN Specimen s ON l.laboId = s.laboId WHERE s.receiveDate is not null and s.isDeleted = FALSE ")
     List<IncomeDetailDTO> findTotalPrice(@Param("month")Integer month,
                                          @Param("year")Integer year);
 
