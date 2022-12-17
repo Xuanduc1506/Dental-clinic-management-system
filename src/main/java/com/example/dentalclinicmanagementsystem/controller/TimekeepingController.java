@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
+@CrossOrigin
 @RequestMapping("api/timekeeping")
 public class TimekeepingController {
 

@@ -14,15 +14,17 @@ public interface LaboRepository extends JpaRepository<Labo, Long> {
 
 
     @Query(value = "SELECT new com.example.dentalclinicmanagementsystem.dto.LaboDTO(l.laboId, l.laboName, l.phone," +
-            "CASE WHEN sum(s.price) is null THEN 0 ELSE sum(s.price) END)" +
+            "CASE WHEN sum(s.unitPrice) is null THEN 0 ELSE sum(s.unitPrice) END)" +
             "FROM Labo l LEFT JOIN Specimen s ON l.laboId = s.laboId WHERE l.isDeleted = FALSE " +
             "AND (:name is null or l.laboName like %:name%)" +
             "AND (:phone is null or l.phone like %:phone%)" +
-            "GROUP BY l.laboId",
+            "GROUP BY l.laboId " +
+            "ORDER BY l.laboId DESC",
             countQuery = "SELECT COUNT(l.laboId) FROM Labo l WHERE l.isDeleted = FALSE " +
                     "AND (:name is null or l.laboName like %:name%)" +
                     "AND (:phone is null or l.phone like %:phone%)" +
-                    "GROUP BY l.laboId")
+                    "GROUP BY l.laboId " +
+                    "ORDER BY l.laboId DESC")
     Page<LaboDTO> getListLabo(@Param("name") String name,
                               @Param("phone") String phone,
                               Pageable pageable);

@@ -3,16 +3,15 @@ package com.example.dentalclinicmanagementsystem.service;
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.ReceiptDTO;
+import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
 import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import com.example.dentalclinicmanagementsystem.entity.Treatment;
+import com.example.dentalclinicmanagementsystem.entity.WaitingRoom;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.mapper.ReceiptMapper;
-import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
-import com.example.dentalclinicmanagementsystem.repository.ReceiptRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentServiceMapRepository;
+import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -52,6 +51,9 @@ public class ReceiptService {
     @Autowired
     private TreatmentServiceMapRepository treatmentServiceMapRepository;
 
+    @Autowired
+    private WaitingRoomRepository waitingRoomRepository;
+
     public ReceiptDTO addReceipt(Long patientId, ReceiptDTO receiptDTO) {
 
         Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
@@ -64,7 +66,9 @@ public class ReceiptService {
         Treatment treatment = treatmentRepository.findFirstByPatientIdOrderByTreatmentIdDesc(patientId);
 
         Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatment.getTreatmentId());
-        Integer paid = receiptRepository.getPaidByTreatmentId(treatment.getTreatmentId()) + receiptDTO.getPayment();
+        Integer oldPaid = receiptRepository.getPaidByTreatmentId(treatment.getTreatmentId());
+
+        Integer paid = (Objects.nonNull(oldPaid) ? oldPaid : 0) + receiptDTO.getPayment();
 
         receiptDTO.setReceiptId(null);
         receiptDTO.setTreatmentId(treatment.getTreatmentId());
@@ -87,7 +91,7 @@ public class ReceiptService {
         }
 
         if (receiptDb.getDate().plusDays(1).isAfter(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.Receipt.RECEIPT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.Receipt.RECEIPT_OVER_DATE,
                     EntityName.Receipt.RECEIPT_ID);
         }
 
@@ -114,7 +118,7 @@ public class ReceiptService {
 
         Pageable pageable = PageRequest.of(FIRST_PAGE, LAST_TOW_RECORD, Sort.by(Sort.Direction.DESC, "receiptId"));
 
-        List<ReceiptDTO> receiptDTOS = receiptRepository.findLaseTowReceipt(id, pageable);
+        List<ReceiptDTO> receiptDTOS = receiptRepository.findLastTwoReceipt(id, pageable);
 
         List<Long> ids = receiptDTOS.stream().map(ReceiptDTO::getReceiptId).collect(Collectors.toList());
 
@@ -129,5 +133,31 @@ public class ReceiptService {
         }
 
         return receiptDTO;
+    }
+
+    public ReceiptDTO getNewReceipts(Long treatmentId) {
+
+        Receipt lastReceipt = receiptRepository.findFirstByTreatmentIdOrderByReceiptIdDesc(treatmentId);
+        if (Objects.isNull(lastReceipt)) {
+            lastReceipt = new Receipt();
+        }
+        ReceiptDTO receiptDTO = receiptMapper.toDto(lastReceipt);
+        receiptDTO.setPayment(null);
+        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit()) ? receiptDTO.getDebit() : 0);
+        receiptDTO.setDate(LocalDate.now());
+
+        List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);
+        receiptDTO.setNewServices(treatmentServiceMapDTOS);
+        return receiptDTO;
+    }
+
+    public List<ReceiptDTO> getListReceiptsByTreatmentId(Long treatmentId, String payment, String date, String debit) {
+
+        List<ReceiptDTO> receiptDTOS = receiptRepository.getListReceiptsByTreatmentId(treatmentId, payment, date, debit);
+
+        for (int i = 1; i < receiptDTOS.size(); i++) {
+            receiptDTOS.get(i).setOldDebit(receiptDTOS.get(i - 1).getDebit());
+        }
+        return receiptDTOS;
     }
 }

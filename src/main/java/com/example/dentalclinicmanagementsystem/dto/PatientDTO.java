@@ -3,10 +3,12 @@ package com.example.dentalclinicmanagementsystem.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @Data
 @AllArgsConstructor
@@ -15,9 +17,11 @@ public class PatientDTO {
 
     private Long patientId;
 
+    @Length(max = 255, groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     @NotBlank(groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String patientName;
 
+    @Length(max = 40, groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     @NotBlank(groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String birthdate;
 
@@ -26,15 +30,16 @@ public class PatientDTO {
 
     private String address;
 
+    @Positive
+    @Length(max = 10, groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     @NotBlank(groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String phone;
 
+    @Length(max = 255, groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String email;
 
-    @Email(groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String bodyPrehistory;
 
-    @Email(groups = {PatientDTO.Create.class, PatientDTO.Update.class})
     private String teethPrehistory;
 
     private Integer status;

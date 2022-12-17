@@ -2,13 +2,13 @@ package com.example.dentalclinicmanagementsystem.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class IncomeDTO {
 
-    private Integer totalIncome;
+    private Long totalIncome;
 
-    private Integer netIncome;
-
-    private Integer notReceived;
+    List<IncomeDetailDTO> incomeDetailDTOS;
 
 }

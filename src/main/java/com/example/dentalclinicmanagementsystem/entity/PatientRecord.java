@@ -45,6 +45,9 @@ public class PatientRecord {
     @Column(name = "prescription")
     private String prescription;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Column(name = "date", insertable = false, updatable = false)
     private String dateTemp;
 }

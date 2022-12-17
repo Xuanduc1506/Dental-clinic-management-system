@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -15,24 +14,27 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 
     List<Service> findAllByCategoryServiceId(Long id);
 
-    List<Service> findAllByServiceNameContainingIgnoreCase(String name);
+    List<Service> findAllByServiceNameContainingIgnoreCaseAndIsDeleted(String name, Boolean isDeleted);
 
-    Service findByServiceId(Long id);
+    Service findByServiceIdAndIsDeleted(Long id, Boolean isDeleted);
 
     Service findByServiceName(String name);
 
-    List<Service> findAllByServiceIdIn(List<Long> ids);
-
-    @Query("SELECT s FROM Service s JOIN TreatmentServiceMap tsm ON s.serviceId = tsm.serviceId " +
-            "JOIN Treatment t ON t.treatmentId = tsm.treatmentId " +
-            "JOIN Patient p ON p.patientId = t.patientId " +
-            "WHERE p.patientId = :patientId")
-    List<Service> findAllServiceNotPayingByPatientId(@PathVariable("patientId") Long patientId);
-
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName, prsm.status) " +
+            "FROM Service s JOIN PatientRecordServiceMap prsm ON s.serviceId = prsm.serviceId " +
+            "WHERE s.serviceId in :ids AND prsm.patientRecordId = :patientRecordId ")
+    List<ServiceDTO> findAllByServiceIdIn(List<Long> ids,
+                                          Long patientRecordId);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName," +
+//            "tsm.currentPrice, tsm.discount, " +
+            "prsm.status) " +
             "FROM PatientRecord pr " +
-            "JOIN PatientRecordServiceMap prsm ON pr.patientRecordId = prsm.patientRecordId " +
+            "JOIN PatientRecordServiceMap prsm ON pr.patientRecordId = prsm.patientRecordId AND prsm.status = 1" +
             "JOIN Service s ON prsm.serviceId = s.serviceId " +
-            "WHERE pr.patientRecordId = :patientRecordId AND prsm.status = 1")
+//            "JOIN TreatmentServiceMap  tsm ON tsm.treatmentId = pr.treatmentId AND tsm.serviceId = s.serviceId " +
+            "WHERE pr.patientRecordId = :patientRecordId ")
     List<ServiceDTO> findTreatingService(@Param("patientRecordId") Long patientRecordId);
+
+    List<Service> findAllByServiceNameContainingAndCategoryServiceIdAndIsDeletedOrderByServiceIdDesc(String name, Long categoryId, Boolean isDeleted);
 }

@@ -3,24 +3,28 @@ package com.example.dentalclinicmanagementsystem.service;
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
+import com.example.dentalclinicmanagementsystem.entity.Permission;
+import com.example.dentalclinicmanagementsystem.entity.Role;
 import com.example.dentalclinicmanagementsystem.entity.User;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
+import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.WrongPasswordException;
 import com.example.dentalclinicmanagementsystem.mapper.UserMapper;
+import com.example.dentalclinicmanagementsystem.repository.PermissionRepository;
+import com.example.dentalclinicmanagementsystem.repository.RoleRepository;
 import com.example.dentalclinicmanagementsystem.repository.UserRepository;
-import com.example.dentalclinicmanagementsystem.security.UserDetailImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,17 +40,14 @@ public class UserService extends AbstractService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private PermissionRepository permissionRepository;
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//
-//        User user = userRepository.findUsersByUserName(username);
-//        if (user == null) {
-//            throw new RuntimeException("user not found");
-//        }
-//
-//        return new UserDetailImpl(user);
-//    }
+    @Autowired
+    private RoleRepository roleRepository;
+
+    public static final Long ADMIN = 1L;
+
 
     public Page<UserDTO> getListUsers(String username,
                                       String phone,
@@ -69,16 +70,46 @@ public class UserService extends AbstractService {
         userDTO.setUserId(null);
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        User user = userRepository.findByEmailAndEnable(userDTO.getEmail(), Boolean.TRUE);
+        if (Objects.nonNull(user)) {
+            throw new DuplicateNameException(MessageConstant.User.EMAIL_ALREADY_EXIST, EntityName.User.EMAIL);
+        }
+        Role role = roleRepository.findByRoleId(userDTO.getRoleId());
+        userDTO.setRole(role);
 
         return saveUser(userDTO);
     }
 
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
+    public UserDTO updateUser(String token, Long id, UserDTO userDTO) {
+        userDTO.setUserId(id);
+        Long currentUserId = getUserId(token);
+
+        User currentUser = userRepository.findByUserIdAndEnable(currentUserId, Boolean.TRUE);
+        if (Objects.isNull(currentUser)) {
+            throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
+                    EntityName.User.USER, EntityName.User.USER_ID);
+        }
+
+        if (!Objects.equals(currentUser.getRole().getRoleId(), ADMIN) && !Objects.equals(currentUserId, id)) {
+            throw new AccessDenyException(MessageConstant.User.ACCESS_DENY,
+                    EntityName.User.USER);
+        }
+
         User userDb = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
         if (Objects.isNull(userDb)) {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
                     EntityName.User.USER, EntityName.User.USER_ID);
         }
+
+        if (!Objects.equals(currentUser.getRole().getRoleId(), ADMIN) && !Objects.equals(userDTO.getRoleId(), userDb.getRole().getRoleId())) {
+            throw new AccessDenyException(MessageConstant.User.CAN_NOT_CHANGE_ROLE,
+                    EntityName.User.USER);
+        }
+
+//        Set<Permission> permissions = permissionRepository.findAllByRoleId(userDTO.getRoleId());
+//        userDTO.setPermissions(permissions);
+        Role role = roleRepository.findByRoleId(userDTO.getRoleId());
+        userDTO.setRole(role);
         userDTO.setUserId(id);
         userDTO.setEnable(Boolean.TRUE);
         userDTO.setPassword(userDb.getPassword());
@@ -87,7 +118,6 @@ public class UserService extends AbstractService {
             userDTO.setEnable(Boolean.TRUE);
 
             User user = userMapper.toEntity(userDTO);
-            user.setPermissions(null);
             return userMapper.toDto(userRepository.save(user));
         } else {
             return saveUser(userDTO);
@@ -103,7 +133,6 @@ public class UserService extends AbstractService {
         userDTO.setEnable(Boolean.TRUE);
 
         User user = userMapper.toEntity(userDTO);
-        user.setPermissions(null);
         return userMapper.toDto(userRepository.save(user));
     }
 
@@ -118,7 +147,9 @@ public class UserService extends AbstractService {
         userRepository.save(user);
     }
 
-    public void changePassword(Long id, String oldPassword, String newPassword) {
+    public void changePassword(String token, String oldPassword, String newPassword) {
+
+        Long id = getUserId(token);
         User user = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
         if (Objects.isNull(user)) {
             throw new EntityNotFoundException(MessageConstant.User.USERNAME_NOT_FOUND,
@@ -133,4 +164,15 @@ public class UserService extends AbstractService {
     }
 
 
+    public UserDTO getProfile(String token) {
+
+        Long id = getUserId(token);
+        User user = userRepository.findByUserIdAndEnable(id, Boolean.TRUE);
+        if (Objects.isNull(user)) {
+            throw new EntityNotFoundException(MessageConstant.User.USERNAME_NOT_FOUND,
+                    EntityName.User.USER, EntityName.User.USERNAME);
+        }
+
+        return userMapper.toDto(user);
+    }
 }

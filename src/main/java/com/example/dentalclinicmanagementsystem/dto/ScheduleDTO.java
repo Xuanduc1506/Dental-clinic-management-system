@@ -15,4 +15,9 @@ public class ScheduleDTO {
 
     private Byte booked;
 
+    public interface Create {
+    }
+
+    public interface Update {
+    }
 }

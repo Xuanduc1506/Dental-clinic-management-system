@@ -8,6 +8,7 @@ public class EntityName {
         public static final String USER = "user";
         public static final String USER_ID = "userId";
         public static final String USERNAME = "username";
+        public static final String EMAIL = "email";
 
     }
 
@@ -94,5 +95,22 @@ public class EntityName {
 
         public static final String BILL = "bill";
         public static final String BILL_ID = "billId";
+    }
+
+    public static class Specimen {
+        private Specimen(){}
+
+        public static final String SPECIMEN = "specimen";
+        public static final String SPECIMEN_ID = "specimenId";
+        public static final String PATIENT_RECORD_NOT_FOUND = "patient record not found";
+        public static final String LABO_NOT_FOUND = "labo not found";
+
+    }
+
+    public static class WaitingRoom {
+        private WaitingRoom(){}
+
+        public static final String WAITING_ROOM = "waitingRoom";
+        public static final String WAITING_ROOM_ID = "waitingRoomId";
     }
 }

@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.repository;
 
+import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
 import com.example.dentalclinicmanagementsystem.dto.UserDTO;
 import com.example.dentalclinicmanagementsystem.entity.User;
 import org.springframework.data.domain.Page;
@@ -15,14 +16,15 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "select new com.example.dentalclinicmanagementsystem.dto.UserDTO(u.userId, u.fullName, u.userName, " +
-            "u.birthdate, u.phone, u.roleId, r.roleName, u.salary, u.email)" +
-            "from User u left join Role r on u.roleId = r.roleId " +
+            "u.birthdate, u.phone, u.role.roleId, r.roleName, u.salary, u.email)" +
+            "from User u left join Role r on u.role.roleId = r.roleId " +
             "where u.enable = true " +
             "AND (:username is null or u.userName like %:username%) " +
             "AND (:phone is null or u.phone like %:phone%) " +
-            "AND (:roleName is null or r.roleName like %:roleName%)",
+            "AND (:roleName is null or r.roleName like %:roleName%) " +
+            "ORDER BY u.userId DESC ",
             countQuery = "select count(u.userId)" +
-                    "from User u left join Role r on u.roleId = r.roleId " +
+                    "from User u left join Role r on u.role.roleId = r.roleId " +
                     "where u.enable = true " +
                     "AND (:username is null or u.userName like %:username%) " +
                     "AND (:phone is null or u.phone like %:phone%)" +
@@ -34,9 +36,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByUserIdAndEnable(Long id, Boolean enable);
 
+    User findByEmailAndEnable(String email, Boolean enable);
+
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.UserDTO(u.userId, u.fullName, u.userName," +
-            " u.birthdate, u.phone, u.roleId, r.roleName, u.salary, u.email)" +
-            " FROM User u JOIN Role r ON u.roleId = r.roleId WHERE u.userId = :id AND u.enable = TRUE")
+            " u.birthdate, u.phone, u.role.roleId, r.roleName, u.salary, u.email)" +
+            " FROM User u JOIN Role r ON u.role.roleId = r.roleId WHERE u.userId = :id AND u.enable = TRUE")
     UserDTO getDetailUser(Long id);
 
     List<User> findAllByUserNameContaining(String code);
@@ -55,4 +59,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     User findByUserNameAndAndEnable(String username, Boolean enable);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(u.fullName, u.salary * count(t.timekeepingId)) " +
+            "FROM User u JOIN Timekeeping t ON u.userId = t.userId " +
+            "WHERE MONTH(t.timeCheckin) = :month AND YEAR(t.timeCheckin) = :year " +
+            "AND MONTH(t.timeCheckout) = :month AND YEAR(t.timeCheckout) = :year " +
+            "GROUP BY u.userId")
+    List<IncomeDetailDTO> findTotalSalary(@Param("month") Integer month,
+                                          @Param("year") Integer year);
 }

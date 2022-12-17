@@ -7,8 +7,10 @@ public class MessageConstant {
 
         public static final String USER_NOT_FOUND = "user not found";
         public static final String USERNAME_NOT_FOUND = "username not found";
-
         public static final String WRONG_PASSWORD = "wrong password";
+        public static final String EMAIL_ALREADY_EXIST = "email already exist";
+        public static final String ACCESS_DENY = "access deny";
+        public static final String CAN_NOT_CHANGE_ROLE = "can not change role";
     }
 
     public static class Material{
@@ -49,6 +51,7 @@ public class MessageConstant {
 
         public static final String PATIENT_NOT_FOUND = "patient not found";
         public static final String PATIENT_HAVE_BEEN_USED = "patient have been use";
+        public static final String PATIENT_HAVE_ALREADY_IN_WAITING_ROOM = "patient have already in waiting room";
 
     }
 
@@ -103,5 +106,21 @@ public class MessageConstant {
 
         public static final String ACCESS_DENY = "access deny";
         public static final String TOKEN_EXPIRE = "Unauthorized. Token is expired";
+    }
+
+    public static class Specimen {
+
+        private Specimen(){}
+
+        public static final String SPECIMEN_NOT_FOUND = "specimen not found";
+        public static final String RECEIVE_DATE_MUST_BEFORE_DELIVERY_DATE = "receive date must before delivery date";
+        public static final String RECEIVE_DATE_MUST_NOT_BE_NULL = "receive date must not be null";
+    }
+
+    public static class WaitingRoom {
+
+        private WaitingRoom(){}
+
+        public static final String WAITING_ROOM_NOT_FOUND = "waiting room not found";
     }
 }

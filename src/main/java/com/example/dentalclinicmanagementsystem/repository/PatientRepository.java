@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
@@ -23,7 +25,8 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             "AND (:email is null or p.email like %:email%)" +
             "AND (:bodyPrehistory is null or p.bodyPrehistory like %:bodyPrehistory%)" +
             "AND (:teethPrehistory is null or p.teethPrehistory like %:teethPrehistory%)" +
-            "AND (:status = -1 or p.status = :status)")
+            "AND (:status = -1 or p.status = :status) " +
+            "ORDER BY p.patientId DESC")
     Page<PatientDTO> getListPatient(@Param("name") String name,
                                     @Param("birthdate") String birthdate,
                                     @Param("gender") Boolean gender,
@@ -37,4 +40,14 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
 
     Patient findByPatientIdAndIsDeleted(Long id, Boolean isDeleted);
+
+    @Query("SELECT distinct(p) FROM Patient p Join Treatment t ON p.patientId = t.patientId " +
+            "WHERE p.isDeleted = FALSE " +
+            "AND (:name is null or p.patientName like %:name%) ")
+    List<Patient> findAllByPatientNameContaining(@Param("name") String name);
+
+    @Query("SELECT p FROM Patient p JOIN Treatment t ON p.patientId = t.treatmentId " +
+            "JOIN PatientRecord pr ON t.treatmentId = pr.treatmentId " +
+            "WHERE pr.patientRecordId= :patientRecordId AND p.isDeleted = FALSE ")
+    Patient findByPatientRecordId(@Param("patientRecordId") Long patientRecordId);
 }

@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -53,6 +55,7 @@ public class MaterialService {
         }
 
         materialDTO.setMaterialId(null);
+        materialDTO.setAmount(0);
         Material material = materialMapper.toEntity(materialDTO);
         return materialMapper.toDto(materialRepository.save(material));
     }
@@ -85,5 +88,13 @@ public class MaterialService {
                     EntityName.Material.MATERIAL_ID);
         }
         materialRepository.delete(materialDb);
+    }
+
+    public List<MaterialDTO> getAllMaterial(String name) {
+
+        if (StringUtils.hasLength(name)) {
+            name = "";
+        }
+        return materialMapper.toDto(materialRepository.findAllByMaterialNameContaining(name));
     }
 }

@@ -16,7 +16,8 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     @Query("SELECT m FROM Material m WHERE (:name is null or m.materialName like %:name%)" +
             "AND (:unit is null or m.unit like %:unit%)" +
             "AND (:price is null or m.priceTemp like %:price%)" +
-            "AND (:amount is null or m.amountTemp like %:amount%)")
+            "AND (:amount is null or m.amountTemp like %:amount%) " +
+            "ORDER BY m.materialId DESC")
     Page<Material> findAndSearchAllByMaterial(@Param("name") String name,
                                               @Param("unit") String unit,
                                               @Param("price") String price,
@@ -28,4 +29,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     Material findByMaterialName(String name);
 
     List<Material> findAllByMaterialIdIn(List<Long> ids);
+
+    List<Material> findAllByMaterialNameContaining(String name);
 }

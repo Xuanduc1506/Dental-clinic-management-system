@@ -36,7 +36,7 @@ public class LaboService {
         return laboRepository.getListLabo(name, phone, pageable);
     }
 
-    public LaboDTO getDetailLabo(Long id, String statisticBy, Integer number) {
+    public LaboDTO getDetailLabo(Long id, Integer month, Integer year) {
 
         Labo labo = laboRepository.findByLaboIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(labo)) {
@@ -46,21 +46,14 @@ public class LaboService {
 
         LaboDTO laboDTO = laboMapper.toDto(labo);
 
-        if (Objects.equals(statisticBy, "month")) {
-            if (Objects.isNull(number)) {
-                number = LocalDate.now().getMonth().getValue();
-            }
-            laboDTO.setTotalMoney(specimenRepository.findTotalCostInMonthOfLabo(id, number));
 
+        if (Objects.nonNull(month) && Objects.isNull(year)) {
+            year = LocalDate.now().getYear();
         }
 
-        if (Objects.equals(statisticBy, "year")) {
-            if (Objects.isNull(number)) {
-                number = LocalDate.now().getYear();
-            }
-            laboDTO.setTotalMoney(specimenRepository.findTotalCostInYearOfLabo(id, number));
+        laboDTO.setTotalMoney(specimenRepository.findTotalCostInTime(id, month, year));
 
-        }
+        laboDTO.setSpecimensDTOS(specimenRepository.findAllByLaboIdInTime(id, month, year));
 
         return laboDTO;
     }

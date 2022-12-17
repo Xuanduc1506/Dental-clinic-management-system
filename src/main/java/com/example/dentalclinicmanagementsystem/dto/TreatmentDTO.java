@@ -23,12 +23,13 @@ public class TreatmentDTO {
 
     private List<TreatmentServiceMapDTO> treatmentServiceMapDTOList;
 
-    public TreatmentDTO(Long treatmentId, Long patientId, String patientName, String phone, Long totalPrice, Long totalDiscount) {
+    public TreatmentDTO(Long treatmentId, Long patientId, String patientName, String phone, Long totalPrice, Long totalDiscount, Long realCost) {
         this.treatmentId = treatmentId;
         this.patientId = patientId;
         this.patientName = patientName;
         this.phone = phone;
         this.totalPrice = totalPrice.intValue();
         this.totalDiscount = totalDiscount.intValue();
+        this.realCost = realCost.intValue();
     }
 }

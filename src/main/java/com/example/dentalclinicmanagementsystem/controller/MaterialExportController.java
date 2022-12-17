@@ -1,11 +1,13 @@
 package com.example.dentalclinicmanagementsystem.controller;
 
+import com.example.dentalclinicmanagementsystem.constant.PermissionConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO;
 import com.example.dentalclinicmanagementsystem.service.MaterialExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,19 +19,21 @@ public class MaterialExportController {
     @Autowired
     private MaterialExportService materialExportService;
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_WRITE + "\")")
     @GetMapping("/get_list_export")
     public ResponseEntity<Page<MaterialExportDTO>> getListExport(
             @RequestParam(required = false, defaultValue = "") String materialName,
             @RequestParam(required = false, defaultValue = "") String date,
             @RequestParam(required = false, defaultValue = "") String amount,
-            @RequestParam(required = false, defaultValue = "") String totalPrice,
+            @RequestParam(required = false, defaultValue = "") String unitPrice,
             @RequestParam(required = false, defaultValue = "") String patientName,
             Pageable pageable) {
 
         return ResponseEntity.ok().body(
-                materialExportService.getListExport(materialName, date, amount, totalPrice, patientName, pageable));
+                materialExportService.getListExport(materialName, date, amount, unitPrice, patientName, pageable));
     }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_WRITE + "\")")
     @GetMapping("/{id}")
     public ResponseEntity<MaterialExportDTO> getDetailMaterialExport(@PathVariable Long id) {
 
@@ -37,11 +41,13 @@ public class MaterialExportController {
 
     }
 
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_WRITE + "\")")
     @PostMapping()
     public ResponseEntity<MaterialExportDTO> addMaterialExport(@RequestBody MaterialExportDTO materialExportDTO) {
         return ResponseEntity.ok().body(materialExportService.addMaterialExport(materialExportDTO));
     }
 
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_WRITE + "\")")
     @PutMapping("/{id}")
     public ResponseEntity<MaterialExportDTO> updateMaterialExport(
             @PathVariable Long id,
@@ -50,6 +56,7 @@ public class MaterialExportController {
         return ResponseEntity.ok().body(materialExportService.updateMaterialExport(id, materialExportDTO));
     }
 
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_WRITE + "\")")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMaterialExport(@PathVariable Long id) {
 

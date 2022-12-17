@@ -5,8 +5,8 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
 import com.example.dentalclinicmanagementsystem.entity.MaterialImport;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialImportMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialImportRepository;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
@@ -32,9 +32,9 @@ public class MaterialImportService {
     @Autowired
     private MaterialRepository materialRepository;
 
-    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount,String totalPrice,
+    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount,String unitPrice,
                                                  String supplyName, Pageable pageable) {
-        return materialImportRepository.getListImport(materialName, date, amount,totalPrice, supplyName, pageable);
+        return materialImportRepository.getListImport(materialName, date, amount,unitPrice, supplyName, pageable);
     }
 
     public MaterialImportDTO getDetail(Long id) {
@@ -76,8 +76,8 @@ public class MaterialImportService {
                     EntityName.MaterialImport.MATERIAL_IMPORT, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
         }
 
-        if (oldMaterialImport.getDate().plusDays(1).isAfter(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+        if (oldMaterialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
+            throw new AccessDenyException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 
@@ -113,8 +113,8 @@ public class MaterialImportService {
                     EntityName.MaterialImport.MATERIAL_IMPORT_ID, EntityName.MaterialImport.MATERIAL_IMPORT_ID);
         }
 
-        if (materialImport.getDate().plusDays(1).isAfter(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+        if (materialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
+            throw new AccessDenyException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 

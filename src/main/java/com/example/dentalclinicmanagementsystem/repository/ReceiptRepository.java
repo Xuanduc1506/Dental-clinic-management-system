@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.repository;
 
+import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
 import com.example.dentalclinicmanagementsystem.dto.ReceiptDTO;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     Receipt findByReceiptId(Long id);
 
-    @Query(value = "SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.receiptId, r.payment, r.date, r.debit)" +
+    @Query(value = "SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.treatmentId, r.receiptId, r.payment, r.date, r.debit)" +
             "FROM Receipt r JOIN Treatment t ON r.treatmentId = t.treatmentId " +
             "WHERE t.patientId = :patientId " +
             "AND (:payment is null or r.paymentTemp like %:payment%) " +
@@ -38,10 +39,26 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
                                      Pageable pageable);
 
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.receiptId, r.payment, r.date, r.debit)" +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.treatmentId, r.receiptId, r.payment, r.date, r.debit)" +
             "FROM Receipt r WHERE r.receiptId <= :id")
-    List<ReceiptDTO> findLaseTowReceipt(Long id, Pageable pageable);
-//
-//    List<Receipt> findAllByReceiptIdLessThanEqual(Long id);
+    List<ReceiptDTO> findLastTwoReceipt(Long id, Pageable pageable);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(p.patientName, r.date, r.payment)" +
+            "FROM Receipt r JOIN Treatment t ON r.treatmentId = t.treatmentId JOIN Patient p ON t.patientId = p.patientId " +
+            "WHERE MONTH(r.date) = :month AND YEAR(r.date) = :year")
+    List<IncomeDetailDTO> findIncomeInTime(@Param("month") Integer month,
+                                           @Param("year") Integer year);
+
+    Receipt findFirstByTreatmentIdOrderByReceiptIdDesc(Long treatmentId);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ReceiptDTO(r.treatmentId, r.receiptId, r.payment, r.date, r.debit) " +
+            "FROM Receipt r WHERE r.treatmentId = :treatmentId " +
+            "AND (:payment is null or r.paymentTemp like %:payment%) " +
+            "AND (:date is null or r.dateTemp like %:date%) " +
+            "AND (:debit is null or r.debitTemp like %:debit%)")
+    List<ReceiptDTO> getListReceiptsByTreatmentId(@Param("treatmentId") Long treatmentId,
+                                                  @Param("payment") String payment,
+                                                  @Param("date") String date,
+                                                  @Param("debit") String debit);
 
 }

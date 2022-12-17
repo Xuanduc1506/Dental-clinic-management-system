@@ -11,9 +11,11 @@ import java.util.List;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    @Query("SELECT r FROM Role r JOIN User u ON r.roleId = u.roleId " +
+    @Query("SELECT r FROM Role r JOIN User u ON r.roleId = u.role.roleId " +
             "WHERE u.userName = :username")
     Role findRoleNameByUser(@Param("username")String username);
 
     List<Role> findAllByRoleNameContainingIgnoreCase(String name);
+
+    Role findByRoleId(Long roleId);
 }
