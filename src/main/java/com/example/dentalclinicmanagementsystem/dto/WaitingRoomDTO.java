@@ -29,6 +29,7 @@ public class WaitingRoomDTO {
     private String note;
 
     private String patientName;
+    private String phone;
 
     public WaitingRoomDTO(Long waitingRoomId, Long patientId, LocalDate date, String patientName, Integer status) {
         this.waitingRoomId = waitingRoomId;
@@ -39,13 +40,14 @@ public class WaitingRoomDTO {
     }
 
 
-    public WaitingRoomDTO(Long waitingRoomId, Long patientId, LocalDate date, Integer status, String note, String patientName) {
+    public WaitingRoomDTO(Long waitingRoomId, Long patientId, LocalDate date, Integer status, String note, String patientName, String phone) {
         this.waitingRoomId = waitingRoomId;
         this.patientId = patientId;
         this.date = date;
         this.status = status;
         this.note = note;
         this.patientName = patientName;
+        this.phone = phone;
     }
 
     public interface Create {
