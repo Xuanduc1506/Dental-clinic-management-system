@@ -4,14 +4,14 @@ import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.ReceiptDTO;
 import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
-import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import com.example.dentalclinicmanagementsystem.entity.Treatment;
-import com.example.dentalclinicmanagementsystem.entity.WaitingRoom;
-import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
+import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.ReceiptMapper;
-import com.example.dentalclinicmanagementsystem.repository.*;
+import com.example.dentalclinicmanagementsystem.repository.ReceiptRepository;
+import com.example.dentalclinicmanagementsystem.repository.TreatmentRepository;
+import com.example.dentalclinicmanagementsystem.repository.TreatmentServiceMapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -46,32 +46,25 @@ public class ReceiptService {
     private TreatmentRepository treatmentRepository;
 
     @Autowired
-    private PatientRepository patientRepository;
-
-    @Autowired
     private TreatmentServiceMapRepository treatmentServiceMapRepository;
 
-    @Autowired
-    private WaitingRoomRepository waitingRoomRepository;
 
-    public ReceiptDTO addReceipt(Long patientId, ReceiptDTO receiptDTO) {
+    public ReceiptDTO addReceipt(Long treatmentId, ReceiptDTO receiptDTO) {
 
-        Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
 
-        if (Objects.isNull(patient)) {
-            throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND, EntityName.Patient.PATIENT,
-                    EntityName.Patient.PATIENT_ID);
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId);
+        if(Objects.isNull(treatment)) {
+            throw new EntityNotFoundException(MessageConstant.Treatment.TREATMENT_NOT_FOUND, EntityName.Receipt.RECEIPT,
+                    EntityName.Receipt.TREATMENT_ID);
         }
 
-        Treatment treatment = treatmentRepository.findFirstByPatientIdOrderByTreatmentIdDesc(patientId);
-
-        Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatment.getTreatmentId());
-        Integer oldPaid = receiptRepository.getPaidByTreatmentId(treatment.getTreatmentId());
+        Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatmentId);
+        Integer oldPaid = receiptRepository.getPaidByTreatmentId(treatmentId);
 
         Integer paid = (Objects.nonNull(oldPaid) ? oldPaid : 0) + receiptDTO.getPayment();
 
         receiptDTO.setReceiptId(null);
-        receiptDTO.setTreatmentId(treatment.getTreatmentId());
+        receiptDTO.setTreatmentId(treatmentId);
         receiptDTO.setDebit(totalMoney - paid);
         receiptDTO.setDate(LocalDate.now());
         Receipt receipt = receiptMapper.toEntity(receiptDTO);
@@ -143,11 +136,15 @@ public class ReceiptService {
         }
         ReceiptDTO receiptDTO = receiptMapper.toDto(lastReceipt);
         receiptDTO.setPayment(null);
-        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit()) ? receiptDTO.getDebit() : 0);
+
         receiptDTO.setDate(LocalDate.now());
 
         List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);
         receiptDTO.setNewServices(treatmentServiceMapDTOS);
+
+        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit()) ? receiptDTO.getDebit()
+                : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
+                -> treatmentServiceMapDTO.getCurrentPrice()- treatmentServiceMapDTO.getDiscount()).sum());
         return receiptDTO;
     }
 

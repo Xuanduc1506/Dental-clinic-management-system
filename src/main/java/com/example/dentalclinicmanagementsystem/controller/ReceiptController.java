@@ -52,11 +52,11 @@ public class ReceiptController {
     }
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.RECEIPT_WRITE + "\")")
-    @PostMapping("{patientId}")
-    public ResponseEntity<ReceiptDTO> addReceipt(@PathVariable("patientId") Long patientId,
+    @PostMapping("{treatmentId}")
+    public ResponseEntity<ReceiptDTO> addReceipt(@PathVariable("treatmentId") Long treatmentId,
                                                  @Validated(ReceiptDTO.Create.class) @RequestBody ReceiptDTO receiptDTO) {
 
-        return ResponseEntity.ok().body( receiptService.addReceipt(patientId, receiptDTO));
+        return ResponseEntity.ok().body( receiptService.addReceipt(treatmentId, receiptDTO));
     }
 
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.RECEIPT_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.RECEIPT_WRITE + "\")")

@@ -35,4 +35,6 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
             "GROUP BY t.treatmentId")
     TreatmentDTO getTreatmentById(Long id);
 
+    Treatment findByTreatmentId(Long treatmentId);
+
 }

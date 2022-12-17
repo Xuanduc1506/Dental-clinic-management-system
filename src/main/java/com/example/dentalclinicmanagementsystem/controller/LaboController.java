@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -37,6 +38,11 @@ public class LaboController {
                                                  @RequestParam(required = false) Integer year) {
 
         return ResponseEntity.ok().body(laboService.getDetailLabo(id, month, year));
+    }
+
+    @GetMapping("get_all_labo")
+    public ResponseEntity<List<LaboDTO>> getAllLabo(@RequestParam(required = false, defaultValue = "") String name) {
+        return ResponseEntity.ok().body(laboService.getAllLabo(name));
     }
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.LABO_WRITE + "\")")
