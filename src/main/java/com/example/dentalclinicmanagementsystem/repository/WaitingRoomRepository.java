@@ -17,7 +17,7 @@ public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> 
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status) " +
             "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId " +
-            "WHERE wr.status <> 3 " +
+            "WHERE (wr.status = 1 OR wr.status = 2) " +
             "AND wr.isDeleted = FALSE " +
             "AND (:patientName is null or p.patientName like %:patientName%) " +
             "AND wr.date = :date " +
