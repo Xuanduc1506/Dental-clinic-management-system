@@ -21,10 +21,12 @@ public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
 
-//    @Scheduled(cron = "* 0/1 * * * *")
-//    public void sentNotifyToPatient() {
-//        System.out.println("hahaha");
-//    }
+    @Scheduled(cron = "* * 9 * * *")
+    public ResponseEntity<Void> sentNotifyToPatient() {
+        scheduleService.sentNotify();
+        System.out.println("hahaha");
+        return ResponseEntity.ok().build();
+    }
 
 
     @GetMapping("get_list_schedule")

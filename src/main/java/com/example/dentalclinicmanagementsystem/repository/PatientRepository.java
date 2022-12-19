@@ -50,4 +50,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             "JOIN PatientRecord pr ON t.treatmentId = pr.treatmentId " +
             "WHERE pr.patientRecordId= :patientRecordId AND p.isDeleted = FALSE ")
     Patient findByPatientRecordId(@Param("patientRecordId") Long patientRecordId);
+
+    List<Patient> findAllByPatientIdInAndIsDeleted(List<Long> patientIds, Boolean isDeleted);
 }
