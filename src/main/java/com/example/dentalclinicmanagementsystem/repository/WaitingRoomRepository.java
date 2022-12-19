@@ -60,4 +60,6 @@ public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> 
     @Query("SELECT wr.patientId FROM WaitingRoom wr " +
             "WHERE wr.isDeleted = FALSE AND wr.isBooked = TRUE AND wr.status = 0 AND wr.date = :date ")
     List<Long> getListPatientIdInDay(@Param("date") LocalDate date);
+
+    WaitingRoom findAllByWaitingRoomIdAndIsDeleted(Long id, Boolean isDelete);
 }

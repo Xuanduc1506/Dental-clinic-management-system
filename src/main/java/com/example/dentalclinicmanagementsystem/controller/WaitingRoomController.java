@@ -56,4 +56,10 @@ public class WaitingRoomController {
         return ResponseEntity.ok().body(waitingRoomService.getListConfirm());
     }
 
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+        waitingRoomService.deleteCustomer(id);
+        return ResponseEntity.ok().build();
+    }
+
 }
