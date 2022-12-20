@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -128,5 +130,34 @@ public class MaterialImportService {
         materialRepository.save(material);
         materialImport.setIsDelete(Boolean.TRUE);
         materialImportRepository.save(materialImport);
+    }
+
+    public void addListImport(List<MaterialImportDTO> materialImportDTOS) {
+
+        Set<Long> materialIds = materialImportDTOS.stream().map(MaterialImportDTO::getMaterialId).collect(Collectors.toSet());
+        List<Material> materials = materialRepository.findAllByMaterialIdIn(new ArrayList<>(materialIds));
+
+
+        if (materials.size() < materialIds.size()) {
+            throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
+                    EntityName.Material.MATERIAL_NAME);
+        }
+
+        Map<Long, Material> map = materials.stream().collect(Collectors.toMap(Material::getMaterialId, Function.identity()));
+        List<MaterialImport> materialImports = new ArrayList<>();
+        LocalDate currentDate = LocalDate.now();
+        materialImportDTOS.forEach(materialImportDTO -> {
+            MaterialImport materialImport = materialImportMapper.toEntity(materialImportDTO);
+            materialImport.setMaterialImportId(null);
+            materialImport.setIsDelete(Boolean.FALSE);
+            materialImport.setDate(currentDate);
+            materialImports.add(materialImport);
+
+            map.get(materialImportDTO.getMaterialId()).setAmount(map.get(materialImportDTO.getMaterialId()).getAmount() + materialImportDTO.getAmount());
+        });
+
+        materialImportRepository.saveAll(materialImports);
+        materialRepository.saveAll(map.values());
+
     }
 }
