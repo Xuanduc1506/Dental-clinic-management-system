@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -64,5 +65,13 @@ public class MaterialImportController {
         materialImportService.deleteImport(id);
         return ResponseEntity.ok().build();
     }
+
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.IMPORT_MATERIAL_WRITE + "\")")
+    @PostMapping("/add_list_import")
+    public ResponseEntity<Void> addListImport(@NotNull @RequestBody List<MaterialImportDTO> materialImportDTOS) {
+        materialImportService.addListImport(materialImportDTOS);
+        return ResponseEntity.ok().build();
+    }
+
 
 }

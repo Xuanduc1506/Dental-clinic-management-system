@@ -4,7 +4,6 @@ import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO;
-import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.WaitingRoom;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.WaitingRoomMapper;
@@ -75,5 +74,18 @@ public class WaitingRoomService {
 
     public List<WaitingRoomDTO> getListConfirm() {
         return waitingRoomRepository.findAllListConfirm();
+    }
+
+    public void deleteCustomer(Long id) {
+        WaitingRoom waitingRoom = waitingRoomRepository.findAllByWaitingRoomIdAndIsDeleted(id, Boolean.FALSE);
+
+        if (Objects.isNull(waitingRoom)) {
+            throw new EntityNotFoundException(MessageConstant.WaitingRoom.WAITING_ROOM_NOT_FOUND,
+                    EntityName.WaitingRoom.WAITING_ROOM, EntityName.WaitingRoom.WAITING_ROOM_ID);
+        }
+
+        waitingRoom.setIsDeleted(Boolean.TRUE);
+        waitingRoomRepository.save(waitingRoom);
+
     }
 }

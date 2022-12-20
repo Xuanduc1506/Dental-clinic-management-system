@@ -56,7 +56,7 @@ public class PatientRecordDTO {
 
     private Boolean isDeleted;
 
-    private List<MaterialExportDTO> materialExportDTOs;
+    private List<MaterialExportDTO> materialExportDTOS;
 
     private List<SpecimensDTO> specimensDTOS;
 

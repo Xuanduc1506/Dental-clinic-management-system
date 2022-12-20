@@ -164,8 +164,8 @@ public class PatientRecordService extends AbstractService {
             waitingRoomRepository.save(waitingRoom);
         }
 
-        if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOs())) {
-            insertMaterialExport(patientRecord.getPatientRecordId(), patientRecordDTO.getMaterialExportDTOs());
+        if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOS())) {
+            insertMaterialExport(patientRecord.getPatientRecordId(), patientRecordDTO.getMaterialExportDTOS());
         }
 
         if (!CollectionUtils.isEmpty(patientRecordDTO.getSpecimensDTOS())) {
@@ -238,8 +238,8 @@ public class PatientRecordService extends AbstractService {
         });
         materialRepository.saveAll(materials);
         materialExportRepository.deleteAll(materialExports);
-        if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOs())) {
-            insertMaterialExport(id, patientRecordDTO.getMaterialExportDTOs());
+        if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOS())) {
+            insertMaterialExport(id, patientRecordDTO.getMaterialExportDTOS());
         }
 
         return patientRecordMapper.toDto(patientRecord);
