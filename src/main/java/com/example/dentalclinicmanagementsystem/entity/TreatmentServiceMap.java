@@ -28,4 +28,7 @@ public class TreatmentServiceMap {
 
     @Column(name = "start_patient_record_id")
     private Long startRecordId;
+
+    @Column(name = "amount")
+    private Integer amount;
 }

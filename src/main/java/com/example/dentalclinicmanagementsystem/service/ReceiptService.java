@@ -2,19 +2,21 @@ package com.example.dentalclinicmanagementsystem.service;
 
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
+import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.ReceiptDTO;
+import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
+import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import com.example.dentalclinicmanagementsystem.entity.Treatment;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.ReceiptMapper;
-import com.example.dentalclinicmanagementsystem.repository.ReceiptRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentServiceMapRepository;
+import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -48,6 +50,15 @@ public class ReceiptService {
     @Autowired
     private TreatmentServiceMapRepository treatmentServiceMapRepository;
 
+    @Autowired
+    private PatientRecordRepository patientRecordRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private CategoryService categoryService;
+
 
     public ReceiptDTO addReceipt(Long treatmentId, ReceiptDTO receiptDTO) {
 
@@ -69,6 +80,18 @@ public class ReceiptService {
         receiptDTO.setDate(LocalDate.now());
         Receipt receipt = receiptMapper.toEntity(receiptDTO);
         receiptRepository.save(receipt);
+
+        Long patientId = treatmentRepository.findPatientIdByTreatmentId(treatmentId);
+        List<ServiceDTO> serviceDTOS = categoryService.getTreatingService(patientId);
+        if (CollectionUtils.isEmpty(serviceDTOS) && receipt.getDebit() == 0) {
+            Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+            if (Objects.isNull(patient)) {
+                throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
+                        EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
+            }
+            patient.setStatus(StatusConstant.DONE);
+            patientRepository.save(patient);
+        }
 
         return receiptMapper.toDto(receipt);
     }
@@ -142,9 +165,20 @@ public class ReceiptService {
         List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);
         receiptDTO.setNewServices(treatmentServiceMapDTOS);
 
-        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit()) ? receiptDTO.getDebit()
-                : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
-                -> treatmentServiceMapDTO.getCurrentPrice()- treatmentServiceMapDTO.getDiscount()).sum());
+        Integer countRecord = patientRecordRepository.countRecordByTreatmentId(treatmentId);
+        if (countRecord > 1) {
+            receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit())
+                    ? receiptDTO.getDebit()
+                    : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
+                    -> treatmentServiceMapDTO.getCurrentPrice()- treatmentServiceMapDTO.getDiscount()).sum());
+        } else {
+            receiptDTO.setDebit(0);
+        }
+
+//        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit())
+//                ? receiptDTO.getDebit()
+//                : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
+//                -> treatmentServiceMapDTO.getCurrentPrice()- treatmentServiceMapDTO.getDiscount()).sum());
         return receiptDTO;
     }
 
