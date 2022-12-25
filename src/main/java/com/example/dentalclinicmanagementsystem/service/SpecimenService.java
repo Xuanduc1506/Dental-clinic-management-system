@@ -24,7 +24,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -168,5 +170,31 @@ public class SpecimenService {
         specimen.setStatus(StatusConstant.SPECIMEN_ERROR);
         specimenRepository.save(specimen);
         return specimenMapper.toDto(specimen);
+    }
+
+    public void laboReceive(List<SpecimensDTO> specimensDTOS) {
+
+        List<SpecimensDTO> specimensDTOSReceived = specimensDTOS.stream()
+                .filter(specimensDTO -> Boolean.TRUE.equals(specimensDTO.getChecked()))
+                .peek(s -> {
+                    s.setReceiveDate(LocalDate.now());
+                    s.setStatus(StatusConstant.LABO_RECEIVE);
+                }).collect(Collectors.toList());
+
+        List<Specimen> specimens = specimenMapper.toEntity(specimensDTOSReceived);
+        specimenRepository.saveAll(specimens);
+    }
+
+    public void laboDelivery(List<SpecimensDTO> specimensDTOS) {
+
+        List<SpecimensDTO> specimensDTOSReceived = specimensDTOS.stream()
+                .filter(specimensDTO -> Boolean.TRUE.equals(specimensDTO.getChecked()))
+                .peek(s -> {
+                    s.setDeliveryDate(LocalDate.now());
+                    s.setStatus(StatusConstant.LABO_DELIVERY);
+                }).collect(Collectors.toList());
+
+        List<Specimen> specimens = specimenMapper.toEntity(specimensDTOSReceived);
+        specimenRepository.saveAll(specimens);
     }
 }

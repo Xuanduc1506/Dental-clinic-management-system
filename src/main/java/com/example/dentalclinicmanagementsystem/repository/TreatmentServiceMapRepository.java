@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -29,9 +30,9 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(s.serviceName, pr.date, tsm.currentPrice - tsm.discount) " +
             "FROM TreatmentServiceMap tsm JOIN Service s ON tsm.serviceId = s.serviceId " +
             "JOIN PatientRecord pr ON tsm.startRecordId = pr.patientRecordId " +
-            "WHERE MONTH(pr.date) = :month AND YEAR(pr.date) = :year")
-    List<IncomeDetailDTO> findAllServiceInTime(@Param("month") Integer month,
-                                               @Param("year")Integer year);
+            "WHERE pr.date BETWEEN :startDate AND :endDate ")
+    List<IncomeDetailDTO> findAllServiceInTime(@Param("startDate") LocalDate startDate,
+                                               @Param("endDate") LocalDate endDate);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.treatmentId, tsm.serviceId, tsm.currentPrice, " +
             "tsm.discount, s.serviceName)" +

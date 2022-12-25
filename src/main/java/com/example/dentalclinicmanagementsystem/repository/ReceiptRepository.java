@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -45,9 +46,9 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(p.patientName, r.date, r.payment)" +
             "FROM Receipt r JOIN Treatment t ON r.treatmentId = t.treatmentId JOIN Patient p ON t.patientId = p.patientId " +
-            "WHERE MONTH(r.date) = :month AND YEAR(r.date) = :year")
-    List<IncomeDetailDTO> findIncomeInTime(@Param("month") Integer month,
-                                           @Param("year") Integer year);
+            "WHERE r.date BETWEEN :startDate AND :endDate")
+    List<IncomeDetailDTO> findIncomeInTime(@Param("startDate") LocalDate startDate,
+                                           @Param("endDate") LocalDate endDate);
 
     Receipt findFirstByTreatmentIdOrderByReceiptIdDesc(Long treatmentId);
 

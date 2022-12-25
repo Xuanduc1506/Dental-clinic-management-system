@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -64,10 +66,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM User u JOIN Timekeeping t ON u.userId = t.userId " +
             "WHERE t.timeCheckin is not null " +
             "AND t.timeCheckout is not null " +
-            "AND MONTH(t.timeCheckin) = :month AND YEAR(t.timeCheckin) = :year " +
-            "AND MONTH(t.timeCheckout) = :month AND YEAR(t.timeCheckout) = :year " +
+            "AND t.timeCheckin BETWEEN :startDate AND :endDate " +
+            "AND t.timeCheckout BETWEEN :startDate AND :endDate " +
             "AND TIMESTAMPDIFF(HOUR, t.timeCheckout, t.timeCheckin) >= 3" +
             "GROUP BY u.userId")
-    List<IncomeDetailDTO> findTotalSalary(@Param("month") Integer month,
-                                          @Param("year") Integer year);
+    List<IncomeDetailDTO> findTotalSalary(@Param("startDate") LocalDateTime startDate,
+                                          @Param("endDate") LocalDateTime endDate);
 }

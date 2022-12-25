@@ -311,6 +311,8 @@ public class PatientRecordService extends AbstractService {
             patient.setStatus(StatusConstant.TREATING);
         }
 
+        patient.setBodyPrehistory(patientRecordDTO.getBodyPrehistory());
+        patient.setTeethPrehistory(patientRecordDTO.getTeethPrehistory());
         patientRepository.save(patient);
 
         patientRecordServiceMapRepository.saveAll(patientRecordServiceMaps);
