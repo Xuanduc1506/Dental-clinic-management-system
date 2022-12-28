@@ -7,4 +7,4 @@ FROM openjdk
 WORKDIR /app
 EXPOSE 80
 COPY --from=buildder /app/target/DentalClinicManagementSystem-0.0.1-SNAPSHOT.jar .
-#CMD java -jar DentalClinicManagementSystem-0.0.1-SNAPSHOT.jar
+CMD java -jar DentalClinicManagementSystem-0.0.1-SNAPSHOT.jar
