@@ -134,11 +134,8 @@ public class LaboService {
                     EntityName.Labo.LABO, EntityName.Labo.LABO_ID);
         }
 
-        List<Specimen> specimens = specimenRepository
-                .findAllByLaboIdAndStatusInAndIsDeleted(id, Arrays.asList(StatusConstant.PREPARE_SPECIMEN, StatusConstant.SPECIMEN_ERROR),
-                        Boolean.FALSE);
-
-        return specimenMapper.toDto(specimens);
+        return specimenRepository.findAllByLaboIdAndStatusInAndIsDeleted(id,
+                Arrays.asList(StatusConstant.PREPARE_SPECIMEN, StatusConstant.SPECIMEN_ERROR), Boolean.FALSE);
     }
 
     public List<SpecimensDTO> getListReceive(Long id) {
@@ -149,10 +146,8 @@ public class LaboService {
                     EntityName.Labo.LABO, EntityName.Labo.LABO_ID);
         }
 
-        List<Specimen> specimens = specimenRepository
-                .findAllByLaboIdAndStatusInAndIsDeleted(id, Arrays.asList(StatusConstant.LABO_RECEIVE),
+        return specimenRepository.findAllByLaboIdAndStatusInAndIsDeleted(id, Arrays.asList(StatusConstant.LABO_RECEIVE),
                         Boolean.FALSE);
 
-        return specimenMapper.toDto(specimens);
     }
 }

@@ -20,24 +20,24 @@ public class IncomeController {
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.INCOME_READ + "\")")
     @GetMapping()
-    public ResponseEntity<IncomeDTO> getIncome(@RequestParam(required = false) LocalDate startDate,
-                                               @RequestParam(required = false) LocalDate endDate) {
+    public ResponseEntity<IncomeDTO> getIncome(@RequestParam(required = false) String startDate,
+                                               @RequestParam(required = false) String endDate) {
 
         return ResponseEntity.ok().body(incomeService.getIncome(startDate, endDate));
     }
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.INCOME_READ + "\")")
     @GetMapping("net_income")
-    public ResponseEntity<IncomeDTO> getNetIncome(@RequestParam(required = false) LocalDate startDate,
-                                                  @RequestParam(required = false) LocalDate endDate) {
+    public ResponseEntity<IncomeDTO> getNetIncome(@RequestParam(required = false) String startDate,
+                                                  @RequestParam(required = false) String endDate) {
 
         return ResponseEntity.ok().body(incomeService.getNetIncome(startDate, endDate));
     }
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.INCOME_READ + "\")")
     @GetMapping("total_spend")
-    public ResponseEntity<IncomeDTO> getTotalSpend(@RequestParam(required = false) LocalDate startDate,
-                                                   @RequestParam(required = false) LocalDate endDate) {
+    public ResponseEntity<IncomeDTO> getTotalSpend(@RequestParam(required = false) String startDate,
+                                                   @RequestParam(required = false) String endDate) {
 
         return ResponseEntity.ok().body(incomeService.getTotalSpend(startDate, endDate));
     }

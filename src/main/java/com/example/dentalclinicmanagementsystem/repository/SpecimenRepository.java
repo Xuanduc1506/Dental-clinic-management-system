@@ -85,5 +85,12 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
                                         @Param("status") Integer status,
                                         Pageable pageable);
 
-    List<Specimen> findAllByLaboIdAndStatusInAndIsDeleted(Long id, List<Integer> status, Boolean isDeleted);
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, s.amount," +
+            " s.unitPrice, s.serviceId, s.specimenName, s.specimenName, s.status) " +
+            "FROM Specimen s JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
+            "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
+            "JOIN Patient p ON p.patientId = t.patientId " +
+            "JOIN Service ser ON s.serviceId = ser.serviceId " +
+            "WHERE s.laboId = :laboId AND s.status IN :status AND s.isDeleted = :isDeleted")
+    List<SpecimensDTO> findAllByLaboIdAndStatusInAndIsDeleted(Long laboId, List<Integer> status, Boolean isDeleted);
 }

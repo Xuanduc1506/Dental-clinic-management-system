@@ -90,6 +90,17 @@ public class SpecimensDTO {
         this.patientId = patientId;
     }
 
+    public SpecimensDTO(Long specimenId, String specimenName, Integer amount, Integer unitPrice, Long serviceId, String serviceName, String patientName, Integer status) {
+        this.specimenId = specimenId;
+        this.specimenName = specimenName;
+        this.amount = amount;
+        this.unitPrice = unitPrice;
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.patientName = patientName;
+        this.status = status;
+    }
+
     public interface Create {
     }
 
