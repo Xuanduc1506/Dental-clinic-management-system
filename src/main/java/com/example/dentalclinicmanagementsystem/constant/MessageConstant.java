@@ -19,6 +19,8 @@ public class MessageConstant {
         public static final String MATERIAL_NOT_FOUND = "material not found";
         public static final String MATERIAL_NAME_ALREADY_EXIST = "material name already exist";
 
+        public static final String NOT_ENOUGH_MATERIAL = "not enough material";
+
     }
 
     public static class MaterialImport{
@@ -122,5 +124,14 @@ public class MessageConstant {
         private WaitingRoom(){}
 
         public static final String WAITING_ROOM_NOT_FOUND = "waiting room not found";
+        public static final String DATE_MUST_BE_AFTER_CURRENT_DAY = "date must be after current day";
+        public static final String THIS_SCHEDULE_HAD_BEEN_CONFIRM = "this schedule had been confirm";
+    }
+
+    public static class Treatment {
+
+        private Treatment(){}
+
+        public static final String TREATMENT_NOT_FOUND = "treatment room not found";
     }
 }

@@ -29,4 +29,7 @@ public class WaitingRoom {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    @Column(name = "note")
+    private String note;
+
 }

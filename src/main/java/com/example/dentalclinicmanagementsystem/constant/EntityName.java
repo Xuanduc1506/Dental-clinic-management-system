@@ -82,6 +82,7 @@ public class EntityName {
 
         public static final String RECEIPT = "receipt";
         public static final String RECEIPT_ID = "receiptId";
+        public static final String TREATMENT_ID = "treatmentId";
     }
 
     public static class Timekeeping {

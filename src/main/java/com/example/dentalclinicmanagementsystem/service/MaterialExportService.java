@@ -81,6 +81,9 @@ public class MaterialExportService {
             materialRepository.save(oldMaterial);
 
             newMaterial.setAmount(newMaterial.getAmount() - materialExportDTO.getAmount());
+            if (newMaterial.getAmount() < 0) {
+                throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
+            }
         }
         materialRepository.save(newMaterial);
 
@@ -138,6 +141,9 @@ public class MaterialExportService {
         }
 
         material.setAmount(material.getAmount() - materialExportDTO.getAmount());
+        if (material.getAmount() < 0) {
+            throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
+        }
         materialRepository.save(material);
 
         MaterialExport materialExport = materialExportMapper.toEntity(materialExportDTO);
