@@ -7,8 +7,10 @@ import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -34,19 +36,21 @@ public class IncomeService {
     @Autowired
     private SpecimenRepository specimenRepository;
 
-    public IncomeDTO getIncome(Integer month, Integer year) {
+    public IncomeDTO getIncome(String startDate, String endDate) {
 
-        if (Objects.isNull(month)) {
-            month = LocalDate.now().getMonth().getValue();
+        LocalDate start;
+        LocalDate end;
+        if (StringUtils.hasLength(startDate) && StringUtils.hasLength(endDate)) {
+            start = convertToDate(startDate);
+            end = convertToDate(endDate);
+        } else {
+            start = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
+            end = LocalDate.now();
         }
 
-        if (Objects.isNull(year)) {
-            year = LocalDate.now().getYear();
-        }
+        List<IncomeDetailDTO> incomeDetailDTOS = treatmentServiceMapRepository.findAllServiceInTime(start, end);
 
-        List<IncomeDetailDTO> incomeDetailDTOS = treatmentServiceMapRepository.findAllServiceInTime(month, year);
-
-        incomeDetailDTOS.addAll(materialExportRepository.findAllMaterialExportInTime(month, year));
+        incomeDetailDTOS.addAll(materialExportRepository.findAllMaterialExportInTime(start, end));
 
         Collections.sort(incomeDetailDTOS);
         IncomeDTO incomeDTO = new IncomeDTO();
@@ -58,18 +62,20 @@ public class IncomeService {
         return incomeDTO;
     }
 
-    public IncomeDTO getNetIncome(Integer month, Integer year) {
+    public IncomeDTO getNetIncome(String startDate, String endDate) {
 
-        if (Objects.isNull(month)) {
-            month = LocalDate.now().getMonth().getValue();
+        LocalDate start;
+        LocalDate end;
+        if (StringUtils.hasLength(startDate) && StringUtils.hasLength(endDate)) {
+            start = convertToDate(startDate);
+            end = convertToDate(endDate);
+        } else {
+            start = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
+            end = LocalDate.now();
         }
 
-        if (Objects.isNull(year)) {
-            year = LocalDate.now().getYear();
-        }
-
-        List<IncomeDetailDTO> incomeDetailDTOS = receiptRepository.findIncomeInTime(month, year);
-        incomeDetailDTOS.addAll(materialExportRepository.findAllMaterialExportInTime(month, year));
+        List<IncomeDetailDTO> incomeDetailDTOS = receiptRepository.findIncomeInTime(start, end);
+        incomeDetailDTOS.addAll(materialExportRepository.findAllMaterialExportInTime(start, end));
 
         Collections.sort(incomeDetailDTOS);
         IncomeDTO incomeDTO = new IncomeDTO();
@@ -81,20 +87,22 @@ public class IncomeService {
         return incomeDTO;
     }
 
-    public IncomeDTO getTotalSpend(Integer month, Integer year) {
+    public IncomeDTO getTotalSpend(String startDate, String endDate) {
 
-        if (Objects.isNull(month)) {
-            month = LocalDate.now().getMonth().getValue();
+        LocalDate start;
+        LocalDate end;
+        if (StringUtils.hasLength(startDate) && StringUtils.hasLength(endDate)) {
+            start = convertToDate(startDate);
+            end = convertToDate(endDate);
+        } else {
+            start = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
+            end = LocalDate.now();
         }
-
-        if (Objects.isNull(year)) {
-            year = LocalDate.now().getYear();
-        }
-        final String dateDescription = "Lương tháng "+ month + "/" + year;
-        List<IncomeDetailDTO> incomeDetailDTOS = userRepository.findTotalSalary(month, year);
+        final String dateDescription = "Lương tháng "+ LocalDate.now().getMonth().getValue() + "/" + LocalDate.now().getYear();
+        List<IncomeDetailDTO> incomeDetailDTOS = userRepository.findTotalSalary(start.atStartOfDay(), end.atStartOfDay());
         incomeDetailDTOS.forEach(item -> item.setDate(dateDescription));
-        incomeDetailDTOS.addAll(specimenRepository.findTotalPrice(month, year));
-        incomeDetailDTOS.addAll(materialImportRepository.findAllPrice(month, year));
+        incomeDetailDTOS.addAll(specimenRepository.findTotalPrice(start, end));
+        incomeDetailDTOS.addAll(materialImportRepository.findAllPrice(start, end));
 
         Collections.sort(incomeDetailDTOS);
         IncomeDTO incomeDTO = new IncomeDTO();
@@ -104,5 +112,12 @@ public class IncomeService {
         incomeDetailDTOS.forEach(item -> incomeDTO.setTotalIncome(incomeDTO.getTotalIncome() + item.getPrice().longValue()));
 
         return incomeDTO;
+    }
+
+    private LocalDate convertToDate(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        //convert String to LocalDate
+        return LocalDate.parse(date, formatter);
     }
 }

@@ -58,6 +58,8 @@ public class SpecimensDTO {
 
     private boolean buttonReportEnable;
 
+    private Boolean checked;
+
     public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Long patientRecordId, String patientName) {
         this.specimenId = specimenId;
         this.specimenName = specimenName;
@@ -86,6 +88,17 @@ public class SpecimensDTO {
         this.laboName = laboName;
         this.usedDate = usedDate;
         this.patientId = patientId;
+    }
+
+    public SpecimensDTO(Long specimenId, String specimenName, Integer amount, Integer unitPrice, Long serviceId, String serviceName, String patientName, Integer status) {
+        this.specimenId = specimenId;
+        this.specimenName = specimenName;
+        this.amount = amount;
+        this.unitPrice = unitPrice;
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.patientName = patientName;
+        this.status = status;
     }
 
     public interface Create {

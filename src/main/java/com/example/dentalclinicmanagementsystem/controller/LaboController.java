@@ -2,6 +2,7 @@ package com.example.dentalclinicmanagementsystem.controller;
 
 import com.example.dentalclinicmanagementsystem.constant.PermissionConstant;
 import com.example.dentalclinicmanagementsystem.dto.LaboDTO;
+import com.example.dentalclinicmanagementsystem.dto.SpecimensDTO;
 import com.example.dentalclinicmanagementsystem.service.LaboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -68,7 +69,17 @@ public class LaboController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.LABO_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.LABO_WRITE + "\")")
+    @GetMapping("get_list_prepare/{id}")
+    public ResponseEntity<List<SpecimensDTO>> getListPrepare(@PathVariable Long id) {
+        return ResponseEntity.ok().body(laboService.getListPrepare(id));
+    }
 
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.LABO_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.LABO_WRITE + "\")")
+    @GetMapping("get_list_receive/{id}")
+    public ResponseEntity<List<SpecimensDTO>> getListReceive(@PathVariable Long id) {
+        return ResponseEntity.ok().body(laboService.getListReceive(id));
+    }
 
 
 
