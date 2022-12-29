@@ -2,6 +2,7 @@ package com.example.dentalclinicmanagementsystem.service;
 
 import com.example.dentalclinicmanagementsystem.dto.IncomeDTO;
 import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
+import com.example.dentalclinicmanagementsystem.dto.TotalIncomeDTO;
 import com.example.dentalclinicmanagementsystem.entity.TreatmentServiceMap;
 import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,5 +120,18 @@ public class IncomeService {
 
         //convert String to LocalDate
         return LocalDate.parse(date, formatter);
+    }
+
+    public List<TotalIncomeDTO> getListIncome(String startDate, String endDate) {
+        LocalDate start;
+        LocalDate end;
+        if (StringUtils.hasLength(startDate) && StringUtils.hasLength(endDate)) {
+            start = convertToDate(startDate);
+            end = convertToDate(endDate);
+        } else {
+            start = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), 1);
+            end = LocalDate.now();
+        }
+
     }
 }
