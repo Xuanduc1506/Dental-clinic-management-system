@@ -93,4 +93,14 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
             "JOIN Service ser ON s.serviceId = ser.serviceId " +
             "WHERE s.laboId = :laboId AND s.status IN :status AND s.isDeleted = :isDeleted")
     List<SpecimensDTO> findAllByLaboIdAndStatusInAndIsDeleted(Long laboId, List<Integer> status, Boolean isDeleted);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName," +
+            "pr.date, s.receiveDate, s.deliveryDate, s.usedDate,s.amount, s.unitPrice, s.laboId, s.status, s.serviceId, " +
+            "ser.serviceName, l.laboName) FROM Specimen s " +
+            "JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
+            "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
+            "JOIN Service ser ON s.serviceId = ser.serviceId " +
+            "JOIN Labo l ON s.laboId = l.laboId " +
+            "WHERE t.patientId = :patientId")
+    List<SpecimensDTO> findAllByPatientId(@Param("patientId") Long patientId);
 }

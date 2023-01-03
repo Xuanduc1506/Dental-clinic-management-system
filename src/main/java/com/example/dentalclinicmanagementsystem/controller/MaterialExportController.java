@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin
 @RequestMapping("api/material_export")
@@ -62,5 +64,11 @@ public class MaterialExportController {
 
         materialExportService.deleteMaterialExport(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.EXPORT_MATERIAL_WRITE + "\")")
+    @GetMapping("get_list_material_export_of_patient/{patientId}")
+    public ResponseEntity<List<MaterialExportDTO>> getListMaterialExportOfPatient(@PathVariable Long patientId) {
+        return ResponseEntity.ok().body(materialExportService.getListMaterialExportOfPatient(patientId));
     }
 }

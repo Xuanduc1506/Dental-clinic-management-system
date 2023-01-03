@@ -46,6 +46,8 @@ public class SpecimensDTO {
 
     private String laboName;
 
+    private LocalDate createdDate;
+
     @NotNull(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private Long patientRecordId;
 
@@ -59,6 +61,22 @@ public class SpecimensDTO {
     private boolean buttonReportEnable;
 
     private Boolean checked;
+
+    public SpecimensDTO(Long specimenId, String specimenName,LocalDate createdDate, LocalDate receiveDate, LocalDate deliveryDate, LocalDate usedDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, String laboName) {
+        this.specimenId = specimenId;
+        this.specimenName = specimenName;
+        this.createdDate = createdDate;
+        this.receiveDate = receiveDate;
+        this.deliveryDate = deliveryDate;
+        this.usedDate = usedDate;
+        this.amount = amount;
+        this.unitPrice = unitPrice;
+        this.laboId = laboId;
+        this.status = status;
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.laboName = laboName;
+    }
 
     public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Long patientRecordId, String patientName) {
         this.specimenId = specimenId;

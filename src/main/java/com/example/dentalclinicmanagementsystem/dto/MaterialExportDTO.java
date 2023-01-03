@@ -37,6 +37,16 @@ public class MaterialExportDTO {
 
     private Boolean isDelete;
 
+    public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date) {
+        this.materialExportId = materialExportId;
+        this.materialId = materialId;
+        this.amount = amount;
+        this.patientRecordId = patientRecordId;
+        this.unitPrice = unitPrice;
+        this.materialName = materialName;
+        this.date = date;
+    }
+
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date, String patientName) {
         this.materialExportId = materialExportId;
         this.materialId = materialId;

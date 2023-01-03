@@ -56,4 +56,11 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
             "WHERE me.unitPrice <> 0 AND pr.date BETWEEN :startDate AND :endDate")
     List<IncomeDetailDTO> findAllMaterialExportInTime(@Param("startDate") LocalDate startDate,
                                                       @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO(me.materialExportId, me.materialId, " +
+            "me.amount, me.patientRecordId, me.unitPrice, m.materialName, pr.date) FROM MaterialExport me " +
+            "JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "JOIN Treatment t ON pr.treatmentId = t.treatmentId JOIN Material m ON me.materialId = m.materialId " +
+            "WHERE t.patientId = :patientId")
+    List<MaterialExportDTO> getListMaterialExportOfPatient(@Param("patientId") Long patientId);
 }

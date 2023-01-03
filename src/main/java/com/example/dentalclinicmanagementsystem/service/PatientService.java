@@ -82,6 +82,7 @@ public class PatientService {
             throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND,
                     EntityName.Patient.PATIENT, EntityName.Patient.PATIENT_ID);
         }
+        patientDTO.setIsDeleted(Boolean.FALSE);
         Patient patient = patientMapper.toEntity(patientDTO);
         return patientMapper.toDto(patientRepository.save(patient));
     }
