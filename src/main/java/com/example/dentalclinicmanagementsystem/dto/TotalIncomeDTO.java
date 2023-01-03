@@ -7,10 +7,10 @@ public class TotalIncomeDTO {
 
     private String date;
 
-    private Long income;
+    private Integer income;
 
-    private Long netIncome;
+    private Integer netIncome;
 
-    private Long totalSpend;
+    private Integer totalSpend;
 
 }
