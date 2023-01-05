@@ -27,14 +27,20 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
                                           Long patientRecordId);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName," +
-//            "tsm.currentPrice, tsm.discount, " +
-            "prsm.status) " +
-            "FROM PatientRecord pr " +
-            "JOIN PatientRecordServiceMap prsm ON pr.patientRecordId = prsm.patientRecordId AND prsm.status = 1" +
+            "tsm.currentPrice, tsm.discount, prsm.status, prsm.startRecordId) " +
+            "FROM PatientRecordServiceMap prsm " +
             "JOIN Service s ON prsm.serviceId = s.serviceId " +
-//            "JOIN TreatmentServiceMap  tsm ON tsm.treatmentId = pr.treatmentId AND tsm.serviceId = s.serviceId " +
-            "WHERE pr.patientRecordId = :patientRecordId ")
+            "JOIN TreatmentServiceMap  tsm ON prsm.startRecordId = tsm.startRecordId AND prsm.serviceId = tsm.serviceId " +
+            "WHERE prsm.patientRecordId = :patientRecordId AND prsm.status = 1")
     List<ServiceDTO> findTreatingService(@Param("patientRecordId") Long patientRecordId);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName," +
+            "tsm.currentPrice, tsm.discount, prsm.status, prsm.startRecordId) " +
+            "FROM  PatientRecordServiceMap prsm " +
+            "JOIN Service s ON prsm.serviceId = s.serviceId " +
+            "JOIN TreatmentServiceMap  tsm ON prsm.startRecordId = tsm.startRecordId AND prsm.serviceId = tsm.serviceId " +
+            "WHERE prsm.patientRecordId = :patientRecordId ")
+    List<ServiceDTO> findAllByPatientRecordId(@Param("patientRecordId") Long patientRecordId);
 
     List<Service> findAllByServiceNameContainingAndCategoryServiceIdAndIsDeletedOrderByServiceIdDesc(String name, Long categoryId, Boolean isDeleted);
 }

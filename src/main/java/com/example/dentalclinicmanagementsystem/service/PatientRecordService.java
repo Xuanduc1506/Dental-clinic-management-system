@@ -11,6 +11,7 @@ import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
 import com.example.dentalclinicmanagementsystem.mapper.SpecimenMapper;
 import com.example.dentalclinicmanagementsystem.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,49 +30,36 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class PatientRecordService extends AbstractService {
 
-    @Autowired
-    private PatientRecordRepository patientRecordRepository;
+    private final PatientRecordRepository patientRecordRepository;
 
-    @Autowired
-    private PatientRecordMapper patientRecordMapper;
+    private final PatientRecordMapper patientRecordMapper;
 
-    @Autowired
-    private PatientRecordServiceMapRepository patientRecordServiceMapRepository;
+    private final PatientRecordServiceMapRepository patientRecordServiceMapRepository;
 
-    @Autowired
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
 
-    @Autowired
-    private TreatmentRepository treatmentRepository;
+    private final TreatmentRepository treatmentRepository;
 
-    @Autowired
-    private TreatmentServiceMapRepository treatmentServiceMapRepository;
+    private final TreatmentServiceMapRepository treatmentServiceMapRepository;
 
-    @Autowired
-    private MaterialExportRepository materialExportRepository;
+    private final MaterialExportRepository materialExportRepository;
 
-    @Autowired
-    private MaterialRepository materialRepository;
+    private final MaterialRepository materialRepository;
 
-    @Autowired
-    private ServiceRepository serviceRepository;
+    private final ServiceRepository serviceRepository;
 
-    @Autowired
-    private SpecimenRepository specimenRepository;
+    private final SpecimenRepository specimenRepository;
 
-    @Autowired
-    private WaitingRoomRepository waitingRoomRepository;
+    private final WaitingRoomRepository waitingRoomRepository;
 
-    @Autowired
-    private LaboRepository laboRepository;
+    private final LaboRepository laboRepository;
 
-    @Autowired
-    private MaterialExportMapper materialExportMapper;
+    private final MaterialExportMapper materialExportMapper;
 
-    @Autowired
-    private SpecimenMapper specimenMapper;
+    private final SpecimenMapper specimenMapper;
 
 
     public Page<PatientRecordInterfaceDTO> getListPatientRecord(Long patientId, String reason, String diagnostic,
@@ -105,21 +93,19 @@ public class PatientRecordService extends AbstractService {
         patientRecordDTO.setLaboName(patientRecordInterfaceDTO.getLaboName());
         patientRecordDTO.setPrescription(patientRecordInterfaceDTO.getPrescription());
         patientRecordDTO.setServiceName(patientRecordInterfaceDTO.getServices());
+        List<ServiceDTO> serviceDTOS = serviceRepository.findAllByPatientRecordId(id);
 
-        List<PatientRecordServiceMap> patientRecordServiceMaps = patientRecordServiceMapRepository.findAllByPatientRecordId(id);
-        List<Long> serviceIds = patientRecordServiceMaps.stream().map(PatientRecordServiceMap::getServiceId).collect(Collectors.toList());
-        List<ServiceDTO> serviceDTOS = serviceRepository.findAllByServiceIdIn(serviceIds, id);
-
-        List<Long> serviceIdNew = treatmentServiceMapRepository.findAllServiceIdByPatientRecordId(id);
         serviceDTOS.forEach(serviceDTO -> {
-            if (serviceIdNew.contains(serviceDTO.getServiceId())) {
+            if (Objects.equals(serviceDTO.getStartRecordId(), id)){
                 serviceDTO.setIsNew(Boolean.TRUE);
             }
         });
 
         patientRecordDTO.setServiceDTOS(serviceDTOS);
-        return patientRecordDTO;
+        patientRecordDTO.setMaterialExportDTOS(materialExportMapper.toDto(materialExportRepository.findAllByPatientRecordId(id)));
+        patientRecordDTO.setSpecimensDTOS(specimenMapper.toDto(specimenRepository.findAllByPatientRecordIdAndIsDeleted(id, Boolean.FALSE)));
 
+        return patientRecordDTO;
     }
 
 
@@ -156,6 +142,10 @@ public class PatientRecordService extends AbstractService {
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
+        if (CollectionUtils.isEmpty(patientRecordDTO.getServiceDTOS())) {
+            throw new AccessDenyException(MessageConstant.Service.SERVICE_CAN_NOT_BE_EMPTY, EntityName.Service.SERVICE);
+        }
+
         saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
 
         WaitingRoom waitingRoom = waitingRoomRepository.findByPatientIdAndDateAndIsDeleted(patientId, LocalDate.now(), Boolean.FALSE);
@@ -185,14 +175,14 @@ public class PatientRecordService extends AbstractService {
             throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.Labo.LABO_ID);
         }
-        List<Specimen> specimens = new ArrayList<>();
-        specimensDTOS.forEach(specimensDTO -> {
+        List<Specimen> specimens = specimensDTOS.stream().map(specimensDTO -> {
             Specimen specimen = specimenMapper.toEntity(specimensDTO);
             specimen.setPatientRecordId(patientRecordId);
             specimen.setStatus(StatusConstant.PREPARE_SPECIMEN);
             specimen.setIsDeleted(Boolean.FALSE);
-            specimens.add(specimen);
-        });
+
+            return specimen;
+        }).collect(Collectors.toList());
 
         specimenRepository.saveAll(specimens);
     }
@@ -226,16 +216,35 @@ public class PatientRecordService extends AbstractService {
 
         saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
 
+
         List<MaterialExport> materialExports = materialExportRepository.findAllByPatientRecordId(id);
+        List<Long> oldMaterialExportsIds = materialExports.stream().map(MaterialExport::getMaterialExportId).collect(Collectors.toList());
+        List<Long> newMaterialExportsIds = patientRecordDTO.getMaterialExportDTOS().stream()
+                .map(MaterialExportDTO::getMaterialExportId).collect(Collectors.toList());
+        oldMaterialExportsIds.removeAll(newMaterialExportsIds);
+        materialExportRepository.deleteAllById(oldMaterialExportsIds);
+
+        patientRecordDTO.getMaterialExportDTOS().forEach(materialExportDTO -> {
+
+            if (materialExportDTO.getStatus().equals("add")) {
+
+            }
+
+            if (materialExportDTO.getStatus().equals("edit")) {
+
+            }
+        });
+
+
+
         List<Long> materialIds = materialExports.stream().map(MaterialExport::getMaterialId).collect(Collectors.toList());
         List<Material> materials = materialRepository.findAllByMaterialIdIn(materialIds);
 
-        materials.forEach(material -> {
-            Optional<MaterialExport> materialExportOptional = materialExports
-                    .stream().filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
-            materialExportOptional.ifPresent(materialExport ->
-                    material.setAmount(material.getAmount() + materialExport.getAmount()));
-        });
+        materials.forEach(material ->
+            materialExports.stream()
+                    .filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId()))
+                    .findFirst()
+                    .ifPresent(materialExport -> material.setAmount(material.getAmount() + materialExport.getAmount())));
         materialRepository.saveAll(materials);
         materialExportRepository.deleteAll(materialExports);
         if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOS())) {
@@ -255,18 +264,18 @@ public class PatientRecordService extends AbstractService {
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.Material.MATERIAL_ID);
         }
 
-        materials.forEach(material -> {
-            Optional<MaterialExportDTO> materialExportDTOOptional = materialExportDTOS
-                    .stream().filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
-            materialExportDTOOptional.ifPresent(materialExport -> {
-
+        materials.forEach(material ->
+            materialExportDTOS.stream()
+                    .filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId()))
+                    .findFirst()
+                    .ifPresent(materialExport -> {
                 if (material.getAmount() - materialExport.getAmount() >= 0) {
                     material.setAmount(material.getAmount() - materialExport.getAmount());
                 } else {
                     throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
                 }
-            });
-        });
+            })
+        );
         materialRepository.saveAll(materials);
 
         materialExportDTOS.forEach(materialExport -> {
@@ -282,6 +291,13 @@ public class PatientRecordService extends AbstractService {
         List<PatientRecordServiceMap> patientRecordServiceMaps = new ArrayList<>();
 
         patientRecordDTO.getServiceDTOS().forEach(serviceDTO -> {
+            PatientRecordServiceMap patientRecordServiceMap = new PatientRecordServiceMap();
+            patientRecordServiceMap.setStartRecordId(serviceDTO.getStartRecordId());
+            patientRecordServiceMap.setPatientRecordServiceMapId(null);
+            patientRecordServiceMap.setPatientRecordId(patientRecord.getPatientRecordId());
+            patientRecordServiceMap.setServiceId(serviceDTO.getServiceId());
+            patientRecordServiceMap.setStatus(serviceDTO.getStatus());
+
             if (Objects.equals(serviceDTO.getIsNew(), Boolean.TRUE)) {
                 TreatmentServiceMap treatmentServiceMap = new TreatmentServiceMap();
                 treatmentServiceMap.setTreatmentServiceMapId(null);
@@ -291,13 +307,9 @@ public class PatientRecordService extends AbstractService {
                 treatmentServiceMap.setServiceId(serviceDTO.getServiceId());
                 treatmentServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
                 treatmentServiceMaps.add(treatmentServiceMap);
-            }
 
-            PatientRecordServiceMap patientRecordServiceMap = new PatientRecordServiceMap();
-            patientRecordServiceMap.setPatientRecordServiceMapId(null);
-            patientRecordServiceMap.setPatientRecordId(patientRecord.getPatientRecordId());
-            patientRecordServiceMap.setServiceId(serviceDTO.getServiceId());
-            patientRecordServiceMap.setStatus(serviceDTO.getStatus());
+                patientRecordServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
+            }
             patientRecordServiceMaps.add(patientRecordServiceMap);
         });
 
@@ -356,7 +368,7 @@ public class PatientRecordService extends AbstractService {
 
     public List<PatientRecordDTO> getAllRecord(Long patientId, String date) {
 
-        if (StringUtils.hasLength(date)) {
+        if (!StringUtils.hasLength(date)) {
             date = "";
         }
         return patientRecordMapper.toDto(patientRecordRepository.findRecordByPatientId(patientId, date));
