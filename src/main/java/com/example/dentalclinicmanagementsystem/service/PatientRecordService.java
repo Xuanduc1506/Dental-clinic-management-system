@@ -12,7 +12,6 @@ import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
 import com.example.dentalclinicmanagementsystem.mapper.SpecimenMapper;
 import com.example.dentalclinicmanagementsystem.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,10 +20,8 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -61,6 +58,10 @@ public class PatientRecordService extends AbstractService {
 
     private final SpecimenMapper specimenMapper;
 
+    private final String ADD = "add";
+
+    private final String EDIT = "edit";
+
 
     public Page<PatientRecordInterfaceDTO> getListPatientRecord(Long patientId, String reason, String diagnostic,
                                                                 String causal, String date, String treatment,
@@ -93,6 +94,7 @@ public class PatientRecordService extends AbstractService {
         patientRecordDTO.setLaboName(patientRecordInterfaceDTO.getLaboName());
         patientRecordDTO.setPrescription(patientRecordInterfaceDTO.getPrescription());
         patientRecordDTO.setServiceName(patientRecordInterfaceDTO.getServices());
+        patientRecordDTO.setTreatmentId(patientRecordInterfaceDTO.getTreatmentId());
         List<ServiceDTO> serviceDTOS = serviceRepository.findAllByPatientRecordId(id);
 
         serviceDTOS.forEach(serviceDTO -> {
@@ -187,9 +189,10 @@ public class PatientRecordService extends AbstractService {
         specimenRepository.saveAll(specimens);
     }
 
-    public PatientRecordDTO updateRecord(Long id, PatientRecordDTO patientRecordDTO) {
-
+    public PatientRecordDTO updateRecord(String token, Long id, PatientRecordDTO patientRecordDTO) {
+        Long userId = getUserId(token);
         patientRecordDTO.setPatientRecordId(id);
+        patientRecordDTO.setUserId(userId);
 
         Patient patient = patientRepository.findByPatientRecordId(id);
         if (Objects.isNull(patient)) {
@@ -208,6 +211,7 @@ public class PatientRecordService extends AbstractService {
                     EntityName.PatientRecord.PATIENT_RECORD);
         }
 
+        patientRecordDTO.setIsDeleted(Boolean.FALSE);
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
@@ -224,34 +228,114 @@ public class PatientRecordService extends AbstractService {
         oldMaterialExportsIds.removeAll(newMaterialExportsIds);
         materialExportRepository.deleteAllById(oldMaterialExportsIds);
 
-        patientRecordDTO.getMaterialExportDTOS().forEach(materialExportDTO -> {
-
-            if (materialExportDTO.getStatus().equals("add")) {
-
-            }
-
-            if (materialExportDTO.getStatus().equals("edit")) {
-
-            }
-        });
-
-
-
-        List<Long> materialIds = materialExports.stream().map(MaterialExport::getMaterialId).collect(Collectors.toList());
-        List<Material> materials = materialRepository.findAllByMaterialIdIn(materialIds);
-
-        materials.forEach(material ->
-            materialExports.stream()
-                    .filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId()))
-                    .findFirst()
-                    .ifPresent(materialExport -> material.setAmount(material.getAmount() + materialExport.getAmount())));
-        materialRepository.saveAll(materials);
-        materialExportRepository.deleteAll(materialExports);
         if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOS())) {
-            insertMaterialExport(id, patientRecordDTO.getMaterialExportDTOS());
+            updateMaterialExport(patientRecordDTO.getMaterialExportDTOS(), id);
+        }
+
+        List<Specimen> specimens = specimenRepository.findAllByPatientRecordIdAndIsDeleted(id, Boolean.FALSE);
+        List<Long> oldSpecimenIds = specimens.stream().map(Specimen::getSpecimenId).collect(Collectors.toList());
+        List<Long> newSpecimenIds = patientRecordDTO.getSpecimensDTOS().stream()
+                .map(SpecimensDTO::getSpecimenId).collect(Collectors.toList());
+        oldSpecimenIds.removeAll(newSpecimenIds);
+        specimenRepository.deleteAllById(oldSpecimenIds);
+
+        if (CollectionUtils.isEmpty(patientRecordDTO.getSpecimensDTOS())) {
+            updateSpecimen(patientRecordDTO.getSpecimensDTOS(), id);
         }
 
         return patientRecordMapper.toDto(patientRecord);
+    }
+
+    private void updateSpecimen(List<SpecimensDTO> specimensDTOS, Long recordId) {
+
+        List<Long> laboIds = specimensDTOS.stream().filter(specimensDTO -> Objects.equals(ADD, specimensDTO.getStatusChange())
+                        || Objects.equals(EDIT, specimensDTO.getStatusChange()))
+                .map(SpecimensDTO::getLaboId).collect(Collectors.toList());
+        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(laboIds, Boolean.FALSE);
+
+        if (labos.size() < laboIds.size()) {
+            throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
+                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.Labo.LABO_ID);
+        }
+        List<Long> editIds = specimensDTOS.stream().filter(specimensDTO -> Objects.equals(EDIT, specimensDTO.getStatusChange()))
+                .map(SpecimensDTO::getSpecimenId).collect(Collectors.toList());
+        List<Specimen> specimenEdit = specimenRepository.findAllBySpecimenIdInAndIsDeleted(editIds, Boolean.FALSE);
+
+        if (specimenEdit.size() < editIds.size()) {
+            throw new EntityNotFoundException(MessageConstant.Specimen.SPECIMEN_NOT_FOUND,
+                    EntityName.Specimen.SPECIMEN, EntityName.Specimen.SPECIMEN_ID);
+        }
+
+        Map<Long, Specimen> mapSpecimen = specimenEdit.stream()
+                .collect(Collectors.toMap(Specimen::getSpecimenId, Function.identity()));
+        specimensDTOS.stream()
+                .filter(specimensDTO -> Objects.equals(ADD, specimensDTO.getStatusChange())
+                        || Objects.equals(EDIT, specimensDTO.getStatusChange()))
+                .forEach(specimensDTO -> {
+
+                    if (specimensDTO.getStatusChange().equals(ADD)) {
+                        specimensDTO.setSpecimenId(null);
+                        specimensDTO.setStatus(StatusConstant.PREPARE_SPECIMEN);
+                    }
+
+                    if (specimensDTO.getStatusChange().equals(EDIT)) {
+                        specimensDTO.setStatus(mapSpecimen.get(specimensDTO.getSpecimenId()).getStatus());
+                    }
+                    specimensDTO.setPatientRecordId(recordId);
+                    specimensDTO.setIsDeleted(Boolean.FALSE);
+        });
+    }
+
+    private void updateMaterialExport(List<MaterialExportDTO> materialExportDTOS, Long recordId) {
+        List<Long> materialIds = materialExportDTOS.stream()
+                .filter(materialExportDTO -> Objects.equals(ADD, materialExportDTO.getStatusChange())
+                        || Objects.equals(EDIT, materialExportDTO.getStatusChange()))
+                .map(MaterialExportDTO::getMaterialId).collect(Collectors.toList());
+
+        Map<Long, Material> mapMaterial = materialRepository.findAllByMaterialIdIn(materialIds).stream()
+                .collect(Collectors.toMap(Material::getMaterialId, Function.identity()));
+
+        List<Long> exportEditIds = materialExportDTOS.stream()
+                .filter(materialExportDTO -> Objects.equals(EDIT, materialExportDTO.getStatusChange()))
+                .map(MaterialExportDTO::getMaterialExportId).collect(Collectors.toList());
+
+        List<MaterialExport> materialExportEdit = materialExportRepository.findAllByMaterialExportIdInAndIsDelete(exportEditIds, Boolean.FALSE);
+        if (exportEditIds.size() > materialExportEdit.size()) {
+            throw new EntityNotFoundException(MessageConstant.MaterialExport.MATERIAL_EXPORT_NOT_FOUND,
+                    EntityName.MaterialExport.MATERIAL_EXPORT, EntityName.MaterialExport.MATERIAL_EXPORT_ID);
+        }
+        Map<Long, MaterialExport> mapMaterialExport = materialExportEdit.stream()
+                .collect(Collectors.toMap(MaterialExport::getMaterialExportId, Function.identity()));
+
+        materialExportDTOS.stream()
+                .filter(materialExportDTO -> Objects.equals(ADD, materialExportDTO.getStatusChange())
+                        || Objects.equals(EDIT, materialExportDTO.getStatusChange()))
+                .forEach(materialExportDTO -> {
+
+                    if (materialExportDTO.getStatusChange().equals(ADD)) {
+                        materialExportDTO.setMaterialExportId(null);
+                        mapMaterial.get(materialExportDTO.getMaterialId())
+                                .setAmount(mapMaterial.get(materialExportDTO.getMaterialId()).getAmount() - materialExportDTO.getAmount());
+                    }
+
+                    if (materialExportDTO.getStatusChange().equals(EDIT)) {
+                        mapMaterial.get(materialExportDTO.getMaterialId())
+                                .setAmount(mapMaterial.get(materialExportDTO.getMaterialId()).getAmount()
+                                        + mapMaterialExport.get(materialExportDTO.getMaterialExportId()).getAmount()
+                                        - materialExportDTO.getAmount());
+                    }
+
+                    materialExportDTO.setIsDelete(Boolean.FALSE);
+                    materialExportDTO.setPatientRecordId(recordId);
+                });
+
+        List<Material> materialError = mapMaterial.values().stream().filter(material -> material.getAmount() < 0).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(materialError)) {
+            throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
+        }
+
+        materialRepository.saveAll(mapMaterial.values());
+        materialExportRepository.saveAll(materialExportMapper.toEntity(materialExportDTOS));
     }
 
     private void insertMaterialExport(Long patientRecordId, List<MaterialExportDTO> materialExportDTOS) {

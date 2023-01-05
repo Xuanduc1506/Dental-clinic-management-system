@@ -62,6 +62,8 @@ public class SpecimensDTO {
 
     private Boolean checked;
 
+    private String statusChange;
+
     public SpecimensDTO(Long specimenId, String specimenName,LocalDate createdDate, LocalDate receiveDate, LocalDate deliveryDate, LocalDate usedDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, String laboName) {
         this.specimenId = specimenId;
         this.specimenName = specimenName;

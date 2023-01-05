@@ -105,4 +105,6 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
     List<SpecimensDTO> findAllByPatientId(@Param("patientId") Long patientId);
 
     List<Specimen> findAllByPatientRecordIdAndIsDeleted(Long patientId, Boolean isDeleted);
+
+    List<Specimen> findAllBySpecimenIdInAndIsDeleted(List<Long> ids, Boolean isDeleted);
 }

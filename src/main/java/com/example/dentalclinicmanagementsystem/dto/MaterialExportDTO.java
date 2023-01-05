@@ -37,7 +37,7 @@ public class MaterialExportDTO {
 
     private Boolean isDelete;
 
-    private String status;
+    private String statusChange;
 
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date) {
         this.materialExportId = materialExportId;
