@@ -44,12 +44,11 @@ public class PatientService {
 
 
     public Page<PatientDTO> getListPatient(String name, String birthdate, Boolean gender, String address, String phone,
-                                           String email, String bodyPrehistory, String teethPrehistory, Integer status,
+                                           String email, Integer status,
                                            Pageable pageable) {
 
 
-        return patientRepository.getListPatient(name, birthdate, gender, address, phone, email, bodyPrehistory,
-                teethPrehistory, status, pageable);
+        return patientRepository.getListPatient(name, birthdate, gender, address, phone, email, status, pageable);
     }
 
     public PatientDTO getDetailPatient(Long id) {

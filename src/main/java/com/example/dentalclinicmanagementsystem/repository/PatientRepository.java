@@ -23,8 +23,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             "AND (:address is null or p.address like %:address%)" +
             "AND (:phone is null or p.phone like %:phone%)" +
             "AND (:email is null or p.email like %:email%)" +
-            "AND (:bodyPrehistory is null or p.bodyPrehistory like %:bodyPrehistory%)" +
-            "AND (:teethPrehistory is null or p.teethPrehistory like %:teethPrehistory%)" +
             "AND (:status = -1 or p.status = :status) " +
             "ORDER BY p.patientId DESC")
     Page<PatientDTO> getListPatient(@Param("name") String name,
@@ -33,8 +31,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
                                     @Param("address") String address,
                                     @Param("phone") String phone,
                                     @Param("email") String email,
-                                    @Param("bodyPrehistory") String bodyPrehistory,
-                                    @Param("teethPrehistory") String teethPrehistory,
                                     @Param("status") Integer status,
                                     Pageable pageable);
 

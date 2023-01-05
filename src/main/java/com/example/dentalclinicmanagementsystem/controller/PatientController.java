@@ -30,13 +30,10 @@ public class PatientController {
                                                            @RequestParam(required = false, defaultValue = "")String address,
                                                            @RequestParam(required = false, defaultValue = "")String phone,
                                                            @RequestParam(required = false, defaultValue = "")String email,
-                                                           @RequestParam(required = false, defaultValue = "")String bodyPrehistory,
-                                                           @RequestParam(required = false, defaultValue = "")String teethPrehistory,
                                                            @RequestParam(required = false, defaultValue = "-1")Integer status,
                                                            Pageable pageable) {
 
-        return ResponseEntity.ok().body(patientService.getListPatient(name, birthdate, gender, address, phone, email,
-                bodyPrehistory, teethPrehistory, status, pageable));
+        return ResponseEntity.ok().body(patientService.getListPatient(name, birthdate, gender, address, phone, email, status, pageable));
     }
 
     @PreAuthorize("hasAuthority(\"" + PermissionConstant.PATIENT_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.PATIENT_WRITE + "\")")
