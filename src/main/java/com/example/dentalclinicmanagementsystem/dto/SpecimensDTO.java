@@ -108,7 +108,7 @@ public class SpecimensDTO {
         this.patientId = patientId;
     }
 
-    public SpecimensDTO(Long specimenId, String specimenName, Integer amount, Integer unitPrice, Long serviceId, String serviceName, String patientName, Integer status) {
+    public SpecimensDTO(Long specimenId, String specimenName, Integer amount, Integer unitPrice, Long serviceId, String serviceName, String patientName, Integer status, Long laboId, Long patientRecordId) {
         this.specimenId = specimenId;
         this.specimenName = specimenName;
         this.amount = amount;
@@ -117,6 +117,8 @@ public class SpecimensDTO {
         this.serviceName = serviceName;
         this.patientName = patientName;
         this.status = status;
+        this.laboId = laboId;
+        this.patientRecordId = patientRecordId;
     }
 
     public interface Create {

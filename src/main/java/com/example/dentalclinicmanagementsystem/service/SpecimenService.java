@@ -175,6 +175,7 @@ public class SpecimenService {
                 .filter(specimensDTO -> Boolean.TRUE.equals(specimensDTO.getChecked()))
                 .peek(s -> {
                     s.setReceiveDate(LocalDate.now());
+                    s.setIsDeleted(Boolean.FALSE);
                     s.setStatus(StatusConstant.LABO_RECEIVE);
                 }).collect(Collectors.toList());
 
@@ -188,6 +189,7 @@ public class SpecimenService {
                 .filter(specimensDTO -> Boolean.TRUE.equals(specimensDTO.getChecked()))
                 .peek(s -> {
                     s.setDeliveryDate(LocalDate.now());
+                    s.setIsDeleted(Boolean.FALSE);
                     s.setStatus(StatusConstant.LABO_DELIVERY);
                 }).collect(Collectors.toList());
 
