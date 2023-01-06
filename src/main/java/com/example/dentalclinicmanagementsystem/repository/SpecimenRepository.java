@@ -86,7 +86,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
                                         Pageable pageable);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, s.amount," +
-            " s.unitPrice, s.serviceId, s.specimenName, s.specimenName, s.status, s.laboId, s.patientRecordId) " +
+            " s.unitPrice, s.serviceId, s.specimenName, s.specimenName, s.status, s.laboId, s.patientRecordId,s.receiveDate, s.deliveryDate, s.usedDate) " +
             "FROM Specimen s JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
             "JOIN Patient p ON p.patientId = t.patientId " +
