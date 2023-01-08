@@ -69,10 +69,11 @@ public class PatientRecordController {
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.PATIENT_RECORD_WRITE + "\")")
     @PutMapping("{id}")
     public ResponseEntity<PatientRecordDTO> updateRecord(
+            @RequestHeader("Authorization") String token,
             @NotNull @PathVariable Long id,
             @Validated(PatientRecordDTO.Create.class) @RequestBody PatientRecordDTO patientRecordDTO) {
 
-        return ResponseEntity.ok().body(patientRecordService.updateRecord(id, patientRecordDTO));
+        return ResponseEntity.ok().body(patientRecordService.updateRecord(token, id, patientRecordDTO));
     }
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.PATIENT_RECORD_WRITE + "\")")

@@ -22,4 +22,7 @@ public class PatientRecordServiceMap {
     @Column(name = "status")
     private Integer status;
 
+    @Column(name = "start_record_id")
+    private Long startRecordId;
+
 }

@@ -84,7 +84,8 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, Lo
             "pr.note," +
             "pr.prescription," +
             "group_concat(DISTINCT(l.labo_name) SEPARATOR ',') AS `laboName`," +
-            "group_concat(DISTINCT(se.service_name) SEPARATOR ',') AS `services` " +
+            "group_concat(DISTINCT(se.service_name) SEPARATOR ',') AS `services` ," +
+            "pr.treatment_id as treatmentId " +
             "FROM patient_records pr " +
             "LEFT JOIN patient_record_service_map prsm on prsm.patient_record_id = pr.patient_record_id " +
             "LEFT JOIN services se on prsm.service_id = se.service_id " +
