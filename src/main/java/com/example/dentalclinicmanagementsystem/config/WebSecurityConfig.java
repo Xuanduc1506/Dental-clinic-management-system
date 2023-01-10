@@ -59,6 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 antMatchers("/api/login").permitAll().
                 antMatchers("/api/forgot_password").permitAll().
                 antMatchers("/api/timekeeping/**").permitAll().
+                antMatchers("/waiting-room/**").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and()
                 .logout().permitAll().and().exceptionHandling()
@@ -83,6 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler();
     }
+
 
 
 }
