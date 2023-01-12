@@ -19,7 +19,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             "FROM Patient p WHERE p.isDeleted = FALSE " +
             "AND (:name is null or p.patientName like %:name%)" +
             "AND (:birthdate is null or p.birthdate like %:birthdate%)" +
-            "AND (:gender = '' or  p.gender = :gender)" +
+            "AND (:gender is null or  p.gender = :gender)" +
             "AND (:address is null or p.address like %:address%)" +
             "AND (:phone is null or p.phone like %:phone%)" +
             "AND (:email is null or p.email like %:email%)" +
