@@ -106,7 +106,7 @@ public interface PatientRecordRepository extends JpaRepository<PatientRecord, Lo
 
 
     @Query("SELECT MAX(pr.patientRecordId) FROM Treatment t join PatientRecord pr ON t.treatmentId = pr.treatmentId " +
-            "WHERE t.patientId = :patientId")
+            "WHERE t.patientId = :patientId AND pr.isDeleted = FALSE")
     Long getLastRecordId(@Param("patientId") Long patientId);
 
     @Query("SELECT COUNT(pr.patientRecordId) FROM PatientRecord pr WHERE pr.treatmentId = :treatmentId")
