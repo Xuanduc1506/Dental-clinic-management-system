@@ -45,6 +45,8 @@ public class ServiceDTO {
 
     private Long startRecordId;
 
+    private Integer amount;
+
     public ServiceDTO(Long serviceId, String serviceName,Integer price, Integer discount, Integer status, Long startRecordId) {
         this.serviceId = serviceId;
         this.serviceName = serviceName;

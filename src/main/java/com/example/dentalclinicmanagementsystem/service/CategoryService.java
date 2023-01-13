@@ -226,6 +226,7 @@ public class CategoryService {
                     .findFirst().ifPresent(i -> {
                         serviceDTO.setPrice(i.getCurrentPrice());
                         serviceDTO.setDiscount(i.getDiscount());
+                        serviceDTO.setAmount(i.getAmount());
                         treatmentServiceMaps.remove(i);
                     });
         });

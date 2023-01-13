@@ -390,6 +390,7 @@ public class PatientRecordService extends AbstractService {
                 treatmentServiceMap.setDiscount(Objects.nonNull(serviceDTO.getDiscount()) ? serviceDTO.getDiscount() : 0);
                 treatmentServiceMap.setServiceId(serviceDTO.getServiceId());
                 treatmentServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
+                treatmentServiceMap.setAmount(serviceDTO.getAmount());
                 treatmentServiceMaps.add(treatmentServiceMap);
 
                 patientRecordServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
@@ -398,18 +399,16 @@ public class PatientRecordService extends AbstractService {
         });
 
         // Update date status of patient when all service is done.
-        List<ServiceDTO> listServiceNotDone = patientRecordDTO.getServiceDTOS().stream()
-                .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.TREATING)).collect(Collectors.toList());
-
-        if (CollectionUtils.isEmpty(listServiceNotDone)) {
-            patient.setStatus(StatusConstant.DONE);
-        } else {
-            patient.setStatus(StatusConstant.TREATING);
-        }
-
-        patient.setBodyPrehistory(patientRecordDTO.getBodyPrehistory());
-        patient.setTeethPrehistory(patientRecordDTO.getTeethPrehistory());
-        patientRepository.save(patient);
+//        List<ServiceDTO> listServiceNotDone = patientRecordDTO.getServiceDTOS().stream()
+//                .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.TREATING)).collect(Collectors.toList());
+//
+//        if (CollectionUtils.isEmpty(listServiceNotDone)) {
+//            patient.setStatus(StatusConstant.DONE);
+//        } else {
+//            patient.setStatus(StatusConstant.TREATING);
+//        }
+//
+//        patientRepository.save(patient);
 
         patientRecordServiceMapRepository.saveAll(patientRecordServiceMaps);
         treatmentServiceMapRepository.saveAll(treatmentServiceMaps);
