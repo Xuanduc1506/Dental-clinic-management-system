@@ -284,6 +284,8 @@ public class PatientRecordService extends AbstractService {
                     specimensDTO.setPatientRecordId(recordId);
                     specimensDTO.setIsDeleted(Boolean.FALSE);
         });
+        List<Specimen> specimen = specimenMapper.toEntity(specimensDTOS);
+        specimenRepository.saveAll(specimen);
     }
 
     private void updateMaterialExport(List<MaterialExportDTO> materialExportDTOS, Long recordId) {
