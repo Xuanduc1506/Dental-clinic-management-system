@@ -390,7 +390,7 @@ public class PatientRecordService extends AbstractService {
                 treatmentServiceMap.setDiscount(Objects.nonNull(serviceDTO.getDiscount()) ? serviceDTO.getDiscount() : 0);
                 treatmentServiceMap.setServiceId(serviceDTO.getServiceId());
                 treatmentServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
-                treatmentServiceMap.setAmount(serviceDTO.getAmount());
+                treatmentServiceMap.setAmount(Objects.nonNull(serviceDTO.getAmount()) ? serviceDTO.getAmount() : 1);
                 treatmentServiceMaps.add(treatmentServiceMap);
 
                 patientRecordServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
