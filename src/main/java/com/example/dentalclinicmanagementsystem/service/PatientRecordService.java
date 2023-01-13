@@ -239,7 +239,7 @@ public class PatientRecordService extends AbstractService {
         oldSpecimenIds.removeAll(newSpecimenIds);
         specimenRepository.deleteAllById(oldSpecimenIds);
 
-        if (CollectionUtils.isEmpty(patientRecordDTO.getSpecimensDTOS())) {
+        if (!CollectionUtils.isEmpty(patientRecordDTO.getSpecimensDTOS())) {
             updateSpecimen(patientRecordDTO.getSpecimensDTOS(), id);
         }
 
