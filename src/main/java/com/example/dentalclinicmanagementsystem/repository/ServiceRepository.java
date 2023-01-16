@@ -27,7 +27,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
                                           Long patientRecordId);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName," +
-            "tsm.currentPrice, tsm.discount, prsm.status, prsm.startRecordId) " +
+            "tsm.currentPrice, tsm.discount, prsm.status, prsm.startRecordId, tsm.amount) " +
             "FROM PatientRecordServiceMap prsm " +
             "JOIN Service s ON prsm.serviceId = s.serviceId " +
             "JOIN TreatmentServiceMap  tsm ON prsm.startRecordId = tsm.startRecordId AND prsm.serviceId = tsm.serviceId " +
@@ -35,7 +35,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     List<ServiceDTO> findTreatingService(@Param("patientRecordId") Long patientRecordId);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.ServiceDTO(s.serviceId, s.serviceName," +
-            "tsm.currentPrice, tsm.discount, prsm.status, prsm.startRecordId) " +
+            "tsm.currentPrice, tsm.discount, prsm.status, prsm.startRecordId, tsm.amount) " +
             "FROM  PatientRecordServiceMap prsm " +
             "JOIN Service s ON prsm.serviceId = s.serviceId " +
             "JOIN TreatmentServiceMap  tsm ON prsm.startRecordId = tsm.startRecordId AND prsm.serviceId = tsm.serviceId " +

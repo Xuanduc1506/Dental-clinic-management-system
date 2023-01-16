@@ -30,6 +30,8 @@ public class ReceiptDTO {
 
     private List<TreatmentServiceMapDTO> newServices;
 
+    private List<MaterialExportDTO> newMaterialExports;
+
     public ReceiptDTO(Long treatmentId, Long receiptId, Integer payment, LocalDate date, Integer debit) {
         this.treatmentId = treatmentId;
         this.receiptId = receiptId;
