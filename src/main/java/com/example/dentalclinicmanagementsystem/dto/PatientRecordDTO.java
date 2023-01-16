@@ -39,6 +39,10 @@ public class PatientRecordDTO {
     @Length(max = 255, groups = {PatientRecordDTO.Create.class, PatientRecordDTO.Update.class})
     private String marrowRecord;
 
+    private String bodyPrehistory;
+
+    private String teethPrehistory;
+
     private String note;
 
     private Long treatmentId;

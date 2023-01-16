@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -42,8 +43,8 @@ public interface MaterialImportRepository extends JpaRepository<MaterialImport, 
     MaterialImport findByMaterialImportIdAndIsDelete(Long id, Boolean isDelete);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(m.materialName, mi.date, mi.unitPrice * mi.amount) " +
-            "FROM MaterialImport mi JOIN Material m ON mi.materialId = m.materialId")
-    List<IncomeDetailDTO> findAllPrice(@Param("month") Integer month,
-                                       @Param("year") Integer year);
+            "FROM MaterialImport mi JOIN Material m ON mi.materialId = m.materialId WHERE mi.date BETWEEN :startDate AND :endDate")
+    List<IncomeDetailDTO> findAllPrice(@Param("startDate") LocalDate startDate,
+                                       @Param("endDate") LocalDate endDate);
 
 }

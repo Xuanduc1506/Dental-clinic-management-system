@@ -5,6 +5,7 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
 import com.example.dentalclinicmanagementsystem.entity.MaterialExport;
+import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
@@ -12,6 +13,7 @@ import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialExportRepository;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
 import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
+import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -36,6 +39,9 @@ public class MaterialExportService {
 
     @Autowired
     private MaterialRepository materialRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
 
     public Page<MaterialExportDTO> getListExport(String materialName, String date, String amount, String unitPrice,
                                                  String patientName, Pageable pageable) {
@@ -151,5 +157,17 @@ public class MaterialExportService {
         materialExportRepository.save(materialExport);
 
         return materialExportMapper.toDto(materialExport);
+    }
+
+    public List<MaterialExportDTO> getListMaterialExportOfPatient(Long patientId) {
+
+        Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+
+        if (Objects.isNull(patient)) {
+            throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND,
+                    EntityName.Patient.PATIENT, EntityName.Patient.PATIENT_ID);
+        }
+
+        return materialExportRepository.getListMaterialExportOfPatient(patientId);
     }
 }

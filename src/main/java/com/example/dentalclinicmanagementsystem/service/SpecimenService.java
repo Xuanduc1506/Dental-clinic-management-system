@@ -5,18 +5,12 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.SpecimenHistoryDTO;
 import com.example.dentalclinicmanagementsystem.dto.SpecimensDTO;
-import com.example.dentalclinicmanagementsystem.entity.Labo;
-import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
-import com.example.dentalclinicmanagementsystem.entity.Specimen;
-import com.example.dentalclinicmanagementsystem.entity.SpecimenHistory;
+import com.example.dentalclinicmanagementsystem.entity.*;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.SpecimenHistoryMapper;
 import com.example.dentalclinicmanagementsystem.mapper.SpecimenMapper;
-import com.example.dentalclinicmanagementsystem.repository.LaboRepository;
-import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
-import com.example.dentalclinicmanagementsystem.repository.SpecimenHistoryRepository;
-import com.example.dentalclinicmanagementsystem.repository.SpecimenRepository;
+import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -35,6 +31,9 @@ public class SpecimenService {
 
     @Autowired
     private PatientRecordRepository patientRecordRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
 
     @Autowired
     private LaboRepository laboRepository;
@@ -168,5 +167,53 @@ public class SpecimenService {
         specimen.setStatus(StatusConstant.SPECIMEN_ERROR);
         specimenRepository.save(specimen);
         return specimenMapper.toDto(specimen);
+    }
+
+    public void laboReceive(List<SpecimensDTO> specimensDTOS) {
+
+        List<SpecimensDTO> specimensDTOSReceived = specimensDTOS.stream()
+                .filter(specimensDTO -> Boolean.TRUE.equals(specimensDTO.getChecked()))
+                .peek(s -> {
+                    s.setReceiveDate(LocalDate.now());
+                    s.setIsDeleted(Boolean.FALSE);
+                    s.setStatus(StatusConstant.LABO_RECEIVE);
+                }).collect(Collectors.toList());
+
+        List<Specimen> specimens = specimenMapper.toEntity(specimensDTOSReceived);
+        specimenRepository.saveAll(specimens);
+    }
+
+    public void laboDelivery(List<SpecimensDTO> specimensDTOS) {
+
+        List<SpecimensDTO> specimensDTOSReceived = specimensDTOS.stream()
+                .filter(specimensDTO -> Boolean.TRUE.equals(specimensDTO.getChecked()))
+                .peek(s -> {
+                    s.setDeliveryDate(LocalDate.now());
+                    s.setIsDeleted(Boolean.FALSE);
+                    s.setStatus(StatusConstant.LABO_DELIVERY);
+                }).collect(Collectors.toList());
+
+        List<Specimen> specimens = specimenMapper.toEntity(specimensDTOSReceived);
+        specimenRepository.saveAll(specimens);
+    }
+
+    public List<SpecimensDTO> getListSpecimenOfPatient(Long patientId) {
+
+        Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+
+        if (Objects.isNull(patient)) {
+            throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND,
+                    EntityName.Patient.PATIENT, EntityName.Patient.PATIENT_ID);
+        }
+
+        List<SpecimensDTO> specimensDTOS = specimenRepository.findAllByPatientId(patientId);
+
+        specimensDTOS.forEach(specimensDTO -> {
+            specimensDTO.setButtonUseEnable(Objects.equals(specimensDTO.getStatus(), StatusConstant.LABO_DELIVERY));
+
+            specimensDTO.setButtonReportEnable(Objects.equals(specimensDTO.getStatus(), StatusConstant.LABO_DELIVERY)
+                    || Objects.equals(specimensDTO.getStatus(), StatusConstant.PATIENT_USED));
+        });
+        return specimensDTOS;
     }
 }

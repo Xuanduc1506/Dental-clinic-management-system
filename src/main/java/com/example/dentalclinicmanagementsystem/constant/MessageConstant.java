@@ -44,6 +44,7 @@ public class MessageConstant {
 
         public static final String SERVICE_NOT_FOUND = "service not found";
         public static final String SERVICE_NAME_ALREADY_EXIST = "service name already exist";
+        public static final String SERVICE_CAN_NOT_BE_EMPTY = "service can not be empty";
 
     }
 

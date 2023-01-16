@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin
 @RequestMapping("api/specimens")
@@ -78,5 +80,24 @@ public class SpecimenController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.SPECIMEN_WRITE + "\")")
+    @PutMapping("labo_receive")
+    public ResponseEntity<Void> laboReceive(@RequestBody List<SpecimensDTO> specimensDTOS) {
+        specimenService.laboReceive(specimensDTOS);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.SPECIMEN_WRITE + "\")")
+    @PutMapping("labo_delivery")
+    public ResponseEntity<Void> laboDelivery(@RequestBody List<SpecimensDTO> specimensDTOS) {
+        specimenService.laboDelivery(specimensDTOS);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAuthority(\"" + PermissionConstant.SPECIMEN_READ + "\") or hasAnyAuthority(\"" + PermissionConstant.SPECIMEN_WRITE + "\")")
+    @GetMapping("get_list_specimens_of_patient/{patientId}")
+    public ResponseEntity<List<SpecimensDTO>> getListSpecimenOfPatient(@PathVariable Long patientId) {
+        return ResponseEntity.ok().body(specimenService.getListSpecimenOfPatient(patientId));
+    }
 
 }

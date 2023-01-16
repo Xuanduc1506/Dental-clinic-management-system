@@ -44,12 +44,11 @@ public class PatientService {
 
 
     public Page<PatientDTO> getListPatient(String name, String birthdate, Boolean gender, String address, String phone,
-                                           String email, String bodyPrehistory, String teethPrehistory, Integer status,
+                                           String email, Integer status,
                                            Pageable pageable) {
 
 
-        return patientRepository.getListPatient(name, birthdate, gender, address, phone, email, bodyPrehistory,
-                teethPrehistory, status, pageable);
+        return patientRepository.getListPatient(name, birthdate, gender, address, phone, email, status, pageable);
     }
 
     public PatientDTO getDetailPatient(Long id) {
@@ -82,6 +81,7 @@ public class PatientService {
             throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND,
                     EntityName.Patient.PATIENT, EntityName.Patient.PATIENT_ID);
         }
+        patientDTO.setIsDeleted(Boolean.FALSE);
         Patient patient = patientMapper.toEntity(patientDTO);
         return patientMapper.toDto(patientRepository.save(patient));
     }

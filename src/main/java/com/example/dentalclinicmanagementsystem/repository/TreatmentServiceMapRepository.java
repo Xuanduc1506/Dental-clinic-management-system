@@ -8,33 +8,35 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentServiceMap, Long> {
 
-    @Query("SELECT sum(tsm.currentPrice) - sum(tsm.discount) FROM TreatmentServiceMap tsm " +
+    @Query("SELECT sum(tsm.currentPrice * tsm.amount) - sum(tsm.discount) FROM TreatmentServiceMap tsm " +
             "WHERE tsm.treatmentId = :treatmentId")
     Integer getTotalMoney(@Param("treatmentId") Long treatmentId);
 
     void deleteAllByStartRecordId(Long patientRecordId);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.treatmentId, tsm.serviceId, tsm.currentPrice, tsm.discount, s.serviceName) FROM TreatmentServiceMap tsm " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.treatmentId, tsm.serviceId, tsm.currentPrice, " +
+            "tsm.discount, s.serviceName, tsm.amount) FROM TreatmentServiceMap tsm " +
             "JOIN Service s ON tsm.serviceId = s.serviceId WHERE tsm.treatmentId = :id")
     List<TreatmentServiceMapDTO> findAllByTreatmentId(Long id);
 
     @Query("SELECT tsm.serviceId FROM TreatmentServiceMap tsm WHERE tsm.startRecordId = :patientRecordId")
     List<Long> findAllServiceIdByPatientRecordId(@Param("patientRecordId")Long patientRecordId);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(s.serviceName, pr.date, tsm.currentPrice - tsm.discount) " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO(s.serviceName, pr.date, tsm.currentPrice * tsm.amount - tsm.discount) " +
             "FROM TreatmentServiceMap tsm JOIN Service s ON tsm.serviceId = s.serviceId " +
             "JOIN PatientRecord pr ON tsm.startRecordId = pr.patientRecordId " +
-            "WHERE MONTH(pr.date) = :month AND YEAR(pr.date) = :year")
-    List<IncomeDetailDTO> findAllServiceInTime(@Param("month") Integer month,
-                                               @Param("year")Integer year);
+            "WHERE pr.date BETWEEN :startDate AND :endDate ")
+    List<IncomeDetailDTO> findAllServiceInTime(@Param("startDate") LocalDate startDate,
+                                               @Param("endDate") LocalDate endDate);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(tsm.treatmentId, tsm.serviceId, tsm.currentPrice, " +
-            "tsm.discount, s.serviceName)" +
+            "tsm.discount, s.serviceName, tsm.amount)" +
             " FROM TreatmentServiceMap tsm JOIN Service s ON tsm.serviceId = s.serviceId" +
             " WHERE tsm.treatmentId = :treatmentId " +
             "AND tsm.startRecordId = " +

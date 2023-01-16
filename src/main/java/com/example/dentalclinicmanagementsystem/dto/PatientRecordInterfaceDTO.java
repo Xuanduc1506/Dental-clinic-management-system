@@ -16,5 +16,6 @@ public interface PatientRecordInterfaceDTO {
     String getPrescription();
     String getLaboName();
     String getServices();
+    Long getTreatmentId();
 
 }

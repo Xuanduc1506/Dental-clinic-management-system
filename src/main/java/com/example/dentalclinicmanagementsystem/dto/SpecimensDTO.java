@@ -46,6 +46,8 @@ public class SpecimensDTO {
 
     private String laboName;
 
+    private LocalDate createdDate;
+
     @NotNull(groups = {SpecimensDTO.Create.class, SpecimensDTO.Update.class})
     private Long patientRecordId;
 
@@ -57,6 +59,26 @@ public class SpecimensDTO {
     private boolean buttonUseEnable;
 
     private boolean buttonReportEnable;
+
+    private Boolean checked;
+
+    private String statusChange;
+
+    public SpecimensDTO(Long specimenId, String specimenName,LocalDate createdDate, LocalDate receiveDate, LocalDate deliveryDate, LocalDate usedDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, String laboName) {
+        this.specimenId = specimenId;
+        this.specimenName = specimenName;
+        this.createdDate = createdDate;
+        this.receiveDate = receiveDate;
+        this.deliveryDate = deliveryDate;
+        this.usedDate = usedDate;
+        this.amount = amount;
+        this.unitPrice = unitPrice;
+        this.laboId = laboId;
+        this.status = status;
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.laboName = laboName;
+    }
 
     public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Long patientRecordId, String patientName) {
         this.specimenId = specimenId;
@@ -86,6 +108,22 @@ public class SpecimensDTO {
         this.laboName = laboName;
         this.usedDate = usedDate;
         this.patientId = patientId;
+    }
+
+    public SpecimensDTO(Long specimenId, String specimenName, Integer amount, Integer unitPrice, Long serviceId, String serviceName, String patientName, Integer status, Long laboId, Long patientRecordId, LocalDate receiveDate, LocalDate deliveryDate, LocalDate usedDate) {
+        this.specimenId = specimenId;
+        this.specimenName = specimenName;
+        this.amount = amount;
+        this.unitPrice = unitPrice;
+        this.serviceId = serviceId;
+        this.serviceName = serviceName;
+        this.patientName = patientName;
+        this.status = status;
+        this.laboId = laboId;
+        this.patientRecordId = patientRecordId;
+        this.receiveDate = receiveDate;
+        this.deliveryDate = deliveryDate;
+        this.usedDate = usedDate;
     }
 
     public interface Create {
