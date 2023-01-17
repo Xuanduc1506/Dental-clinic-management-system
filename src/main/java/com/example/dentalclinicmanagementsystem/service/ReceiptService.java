@@ -170,7 +170,7 @@ public class ReceiptService {
             receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit())
                     ? receiptDTO.getDebit()
                     : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
-                    -> treatmentServiceMapDTO.getCurrentPrice()- treatmentServiceMapDTO.getDiscount()).sum());
+                    -> treatmentServiceMapDTO.getCurrentPrice() * treatmentServiceMapDTO.getAmount() - treatmentServiceMapDTO.getDiscount()).sum());
         } else {
             receiptDTO.setDebit(0);
         }
