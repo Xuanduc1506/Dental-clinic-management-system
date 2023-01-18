@@ -86,6 +86,8 @@ public class MessageConstant {
 
         public static final String RECEIPT_NOT_FOUND = "bill not found";
         public static final String RECEIPT_OVER_DATE = "bill over date";
+
+        public static final String OVER_PAYMENT = "over payment";
     }
 
     public static class Timekeeping{
@@ -134,5 +136,12 @@ public class MessageConstant {
         private Treatment(){}
 
         public static final String TREATMENT_NOT_FOUND = "treatment room not found";
+    }
+
+    public static class Notify {
+
+        private Notify(){}
+
+        public static final String Notify_NOT_FOUND = "notify room not found";
     }
 }

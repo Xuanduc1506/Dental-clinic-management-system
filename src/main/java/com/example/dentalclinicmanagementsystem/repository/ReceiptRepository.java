@@ -62,4 +62,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
                                                   @Param("date") String date,
                                                   @Param("debit") String debit);
 
+    @Query("SELECT tsm FROM TreatmentServiceMap tsm WHERE tsm.treatmentId = :treatmentId " +
+            "ORDER BY tsm.treatmentServiceMapId DESC ")
+    List<Integer> getDebit(@Param("treatmentId") Long treatmentId);
 }

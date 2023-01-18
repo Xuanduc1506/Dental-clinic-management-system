@@ -58,6 +58,10 @@ public class PatientRecordService extends AbstractService {
 
     private final SpecimenMapper specimenMapper;
 
+    private final NotifyRepository notifyRepository;
+
+    private final ReceiptRepository receiptRepository;
+
     private final String ADD = "add";
 
     private final String EDIT = "edit";
@@ -164,6 +168,11 @@ public class PatientRecordService extends AbstractService {
             insertLabo(patientRecordDTO.getSpecimensDTOS(), patientRecord.getPatientRecordId());
         }
 
+        Notify notify = new Notify();
+        notify.setTreatmentId(patientRecord.getTreatmentId());
+        notify.setIsRead(Boolean.FALSE);
+
+        notifyRepository.save(notify);
 
         return patientRecordMapper.toDto(patientRecord);
     }
@@ -401,16 +410,17 @@ public class PatientRecordService extends AbstractService {
         });
 
         // Update date status of patient when all service is done.
-//        List<ServiceDTO> listServiceNotDone = patientRecordDTO.getServiceDTOS().stream()
-//                .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.TREATING)).collect(Collectors.toList());
-//
-//        if (CollectionUtils.isEmpty(listServiceNotDone)) {
-//            patient.setStatus(StatusConstant.DONE);
-//        } else {
-//            patient.setStatus(StatusConstant.TREATING);
-//        }
-//
-//        patientRepository.save(patient);
+        List<ServiceDTO> listServiceNotDone = patientRecordDTO.getServiceDTOS().stream()
+                .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.TREATING)).collect(Collectors.toList());
+
+        Integer getDebit = receiptRepository.getDebit(patientRecordDTO.getTreatmentId()).stream().findFirst().orElse(0);
+        if (CollectionUtils.isEmpty(listServiceNotDone) && getDebit == 0) {
+            patient.setStatus(StatusConstant.DONE);
+        } else {
+            patient.setStatus(StatusConstant.TREATING);
+        }
+
+        patientRepository.save(patient);
 
         patientRecordServiceMapRepository.saveAll(patientRecordServiceMaps);
         treatmentServiceMapRepository.saveAll(treatmentServiceMaps);

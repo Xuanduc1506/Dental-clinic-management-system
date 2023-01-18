@@ -77,6 +77,9 @@ public class ReceiptService {
         receiptDTO.setReceiptId(null);
         receiptDTO.setTreatmentId(treatmentId);
         receiptDTO.setDebit(totalMoney - paid);
+        if (receiptDTO.getDebit() < 0) {
+            throw new AccessDenyException(MessageConstant.Receipt.OVER_PAYMENT, EntityName.Receipt.RECEIPT);
+        }
         receiptDTO.setDate(LocalDate.now());
         Receipt receipt = receiptMapper.toEntity(receiptDTO);
         receiptRepository.save(receipt);
