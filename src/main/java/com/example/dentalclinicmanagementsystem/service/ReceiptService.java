@@ -9,6 +9,7 @@ import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
 import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.Receipt;
 import com.example.dentalclinicmanagementsystem.entity.Treatment;
+import com.example.dentalclinicmanagementsystem.entity.TreatmentServiceMap;
 import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.ReceiptMapper;
@@ -64,7 +65,7 @@ public class ReceiptService {
 
 
         Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId);
-        if(Objects.isNull(treatment)) {
+        if (Objects.isNull(treatment)) {
             throw new EntityNotFoundException(MessageConstant.Treatment.TREATMENT_NOT_FOUND, EntityName.Receipt.RECEIPT,
                     EntityName.Receipt.TREATMENT_ID);
         }
@@ -95,6 +96,12 @@ public class ReceiptService {
             patient.setStatus(StatusConstant.DONE);
             patientRepository.save(patient);
         }
+
+        List<TreatmentServiceMap> treatmentServiceMaps = treatmentServiceMapRepository.findAllByTreatmentIdAndIsShow(treatmentId, Boolean.FALSE);
+        treatmentServiceMaps.forEach(e ->
+            e.setIsShow(Boolean.TRUE)
+        );
+        treatmentServiceMapRepository.saveAll(treatmentServiceMaps);
 
         return receiptMapper.toDto(receipt);
     }
@@ -165,23 +172,14 @@ public class ReceiptService {
 
         receiptDTO.setDate(LocalDate.now());
 
-        List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllServiceInLastRecord(treatmentId);
+        List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllByTreatmentIdAndIsShow(treatmentId);
         receiptDTO.setNewServices(treatmentServiceMapDTOS);
 
-        Integer countRecord = patientRecordRepository.countRecordByTreatmentId(treatmentId);
-        if (countRecord > 1) {
-            receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit())
-                    ? receiptDTO.getDebit()
-                    : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
-                    -> treatmentServiceMapDTO.getCurrentPrice() * treatmentServiceMapDTO.getAmount() - treatmentServiceMapDTO.getDiscount()).sum());
-        } else {
-            receiptDTO.setDebit(0);
-        }
+        receiptDTO.setOldDebit(Objects.nonNull(lastReceipt.getDebit()) ? lastReceipt.getDebit() : 0);
+        receiptDTO.setDebit(treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
+                -> treatmentServiceMapDTO.getCurrentPrice() * treatmentServiceMapDTO.getAmount() - treatmentServiceMapDTO.getDiscount()).sum()
+                + receiptDTO.getOldDebit());
 
-//        receiptDTO.setDebit(Objects.nonNull(receiptDTO.getDebit())
-//                ? receiptDTO.getDebit()
-//                : treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
-//                -> treatmentServiceMapDTO.getCurrentPrice()- treatmentServiceMapDTO.getDiscount()).sum());
         return receiptDTO;
     }
 

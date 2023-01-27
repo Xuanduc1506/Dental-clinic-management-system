@@ -31,4 +31,7 @@ public class TreatmentServiceMap {
 
     @Column(name = "amount")
     private Integer amount;
+
+    @Column(name = "is_show")
+    private Boolean isShow;
 }

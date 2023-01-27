@@ -39,9 +39,10 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
             "tsm.discount, s.serviceName, tsm.amount)" +
             " FROM TreatmentServiceMap tsm JOIN Service s ON tsm.serviceId = s.serviceId" +
             " WHERE tsm.treatmentId = :treatmentId " +
-            "AND tsm.startRecordId = " +
-            "(SELECT MAX(tsm2.startRecordId) FROM TreatmentServiceMap tsm2 WHERE tsm2.treatmentId = :treatmentId) ")
-    List<TreatmentServiceMapDTO> findAllServiceInLastRecord(@Param("treatmentId") Long treatmentId);
+            "AND tsm.isShow = FALSE ")
+    List<TreatmentServiceMapDTO> findAllByTreatmentIdAndIsShow(@Param("treatmentId") Long treatmentId);
+
+    List<TreatmentServiceMap> findAllByTreatmentIdAndIsShow(Long treatmentId, Boolean isShow);
 
 
     @Query("SELECT tsm FROM TreatmentServiceMap tsm JOIN Treatment t ON tsm.treatmentId = t.treatmentId " +

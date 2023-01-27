@@ -23,7 +23,7 @@ public class NotifyService {
     private NotifyMapper notifyMapper;
 
     public List<NotifyDTO> getListNotify() {
-        return notifyMapper.toDto(notifyRepository.getListNotify());
+        return notifyRepository.getListNotify();
     }
 
     public void readNotify(Long id) {
