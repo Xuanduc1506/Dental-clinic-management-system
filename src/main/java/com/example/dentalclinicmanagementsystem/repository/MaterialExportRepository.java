@@ -65,4 +65,8 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
     List<MaterialExportDTO> getListMaterialExportOfPatient(@Param("patientId") Long patientId);
 
     List<MaterialExport> findAllByMaterialExportIdInAndIsDelete(List<Long> exportIds, Boolean isDeleted);
+
+    @Query("SELECT me FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "WHERE pr.treatmentId = :treatmentId")
+    List<MaterialExport> findAllByTreatmentId(@Param("treatmentId")Long treatmentId);
 }

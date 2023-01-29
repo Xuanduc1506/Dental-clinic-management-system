@@ -39,6 +39,8 @@ public class MaterialExportDTO {
 
     private String statusChange;
 
+    private Boolean isShow;
+
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date) {
         this.materialExportId = materialExportId;
         this.materialId = materialId;

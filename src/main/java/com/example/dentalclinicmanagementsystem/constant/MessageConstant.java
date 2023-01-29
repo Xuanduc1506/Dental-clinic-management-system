@@ -129,6 +129,7 @@ public class MessageConstant {
         public static final String WAITING_ROOM_NOT_FOUND = "waiting room not found";
         public static final String DATE_MUST_BE_AFTER_CURRENT_DAY = "date must be after current day";
         public static final String THIS_SCHEDULE_HAD_BEEN_CONFIRM = "this schedule had been confirm";
+        public static final String THIS_SCHEDULE_HAD_BOOKED = "this schedule had booked";
     }
 
     public static class Treatment {

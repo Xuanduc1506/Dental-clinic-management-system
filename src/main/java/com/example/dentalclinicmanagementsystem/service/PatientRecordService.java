@@ -178,9 +178,9 @@ public class PatientRecordService extends AbstractService {
     }
 
     private void insertLabo(List<SpecimensDTO> specimensDTOS, Long patientRecordId) {
-        List<Long> laboIds = specimensDTOS.stream().map(SpecimensDTO::getLaboId).collect(Collectors.toList());
+        Set<Long> laboIds = specimensDTOS.stream().map(SpecimensDTO::getLaboId).collect(Collectors.toSet());
 
-        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(laboIds, Boolean.FALSE);
+        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(new ArrayList<>(laboIds), Boolean.FALSE);
 
         if (labos.size() < laboIds.size()) {
             throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
@@ -257,10 +257,10 @@ public class PatientRecordService extends AbstractService {
 
     private void updateSpecimen(List<SpecimensDTO> specimensDTOS, Long recordId) {
 
-        List<Long> laboIds = specimensDTOS.stream().filter(specimensDTO -> Objects.equals(ADD, specimensDTO.getStatusChange())
+        Set<Long> laboIds = specimensDTOS.stream().filter(specimensDTO -> Objects.equals(ADD, specimensDTO.getStatusChange())
                         || Objects.equals(EDIT, specimensDTO.getStatusChange()))
-                .map(SpecimensDTO::getLaboId).collect(Collectors.toList());
-        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(laboIds, Boolean.FALSE);
+                .map(SpecimensDTO::getLaboId).collect(Collectors.toSet());
+        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(new ArrayList<>(laboIds), Boolean.FALSE);
 
         if (labos.size() < laboIds.size()) {
             throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
@@ -377,6 +377,7 @@ public class PatientRecordService extends AbstractService {
             materialExport.setMaterialExportId(null);
             materialExport.setIsDelete(Boolean.FALSE);
             materialExport.setPatientRecordId(patientRecordId);
+            materialExport.setIsShow(Boolean.FALSE);
         });
         materialExportRepository.saveAll(materialExportMapper.toEntity(materialExportDTOS));
     }

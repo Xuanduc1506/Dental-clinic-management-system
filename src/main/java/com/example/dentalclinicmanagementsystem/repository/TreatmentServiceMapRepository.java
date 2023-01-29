@@ -3,6 +3,7 @@ package com.example.dentalclinicmanagementsystem.repository;
 import com.example.dentalclinicmanagementsystem.dto.IncomeDetailDTO;
 import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
 import com.example.dentalclinicmanagementsystem.entity.TreatmentServiceMap;
+import org.hibernate.sql.Select;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +18,10 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
     @Query("SELECT sum(tsm.currentPrice * tsm.amount) - sum(tsm.discount) FROM TreatmentServiceMap tsm " +
             "WHERE tsm.treatmentId = :treatmentId")
     Integer getTotalMoney(@Param("treatmentId") Long treatmentId);
+
+    @Query("SELECT sum(me.unitPrice * me.amount) FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "WHERE pr.treatmentId = :treatmentId")
+    Integer getTotalMoneyOfMaterialExport(@Param("treatmentId") Long treatmentId);
 
     void deleteAllByStartRecordId(Long patientRecordId);
 
@@ -41,6 +46,13 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
             " WHERE tsm.treatmentId = :treatmentId " +
             "AND tsm.isShow = FALSE ")
     List<TreatmentServiceMapDTO> findAllByTreatmentIdAndIsShow(@Param("treatmentId") Long treatmentId);
+
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(pr.treatmentId, m.materialId, " +
+            "me.unitPrice, 0, m.materialName, m.amount) " +
+            "FROM MaterialExport me JOIN Material m ON me.materialId = m.materialId " +
+            "JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "WHERE pr.treatmentId = :treatmentId AND me.isShow = FALSE ")
+    List<TreatmentServiceMapDTO> findAllMaterialExportByTreatment(@Param("treatmentId") Long treatmentId);
 
     List<TreatmentServiceMap> findAllByTreatmentIdAndIsShow(Long treatmentId, Boolean isShow);
 

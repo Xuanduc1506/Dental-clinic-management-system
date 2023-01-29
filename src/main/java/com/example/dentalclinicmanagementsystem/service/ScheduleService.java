@@ -62,6 +62,13 @@ public class ScheduleService {
             throw new AccessDenyException(MessageConstant.WaitingRoom.DATE_MUST_BE_AFTER_CURRENT_DAY, EntityName.WaitingRoom.WAITING_ROOM);
         }
 
+        WaitingRoom waitingRoomDb = waitingRoomRepository.findAllByPatientIdAndDateAndIsBooked(
+                waitingRoomDTO.getPatientId(), waitingRoomDTO.getDate(), Boolean.TRUE);
+
+        if (Objects.nonNull(waitingRoomDb)) {
+            throw new AccessDenyException(MessageConstant.WaitingRoom.THIS_SCHEDULE_HAD_BOOKED, EntityName.WaitingRoom.WAITING_ROOM);
+        }
+
         waitingRoomDTO.setIsBooked(Boolean.TRUE);
         waitingRoomDTO.setStatus(StatusConstant.NOT_COMING);
         waitingRoomDTO.setIsDeleted(Boolean.FALSE);
