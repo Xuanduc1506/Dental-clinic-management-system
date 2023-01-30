@@ -7,6 +7,9 @@ spring:
     url: jdbc:mysql://34.124.230.31:3306/dental_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
     username: root
     password: Nxduc1506
+#    url: jdbc:mysql://localhost:3306/dental_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+#    username: root
+#    password: Nxduc1506@
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com
@@ -22,6 +25,17 @@ spring:
             required: true
     protocol: smtp
     test-connection: true
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: dental
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 server:
   port: 8080

@@ -2,20 +2,27 @@ package com.example.dentalclinicmanagementsystem.service;
 
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
+import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.LaboDTO;
+import com.example.dentalclinicmanagementsystem.dto.SpecimensDTO;
 import com.example.dentalclinicmanagementsystem.entity.Labo;
+import com.example.dentalclinicmanagementsystem.entity.Specimen;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
 import com.example.dentalclinicmanagementsystem.mapper.LaboMapper;
+import com.example.dentalclinicmanagementsystem.mapper.SpecimenMapper;
 import com.example.dentalclinicmanagementsystem.repository.LaboRepository;
 import com.example.dentalclinicmanagementsystem.repository.SpecimenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -31,12 +38,15 @@ public class LaboService {
     @Autowired
     private LaboMapper laboMapper;
 
+    @Autowired
+    private SpecimenMapper specimenMapper;
+
     public Page<LaboDTO> getListLabo(String name, String phone, Pageable pageable) {
 
         return laboRepository.getListLabo(name, phone, pageable);
     }
 
-    public LaboDTO getDetailLabo(Long id, String statisticBy, Integer number) {
+    public LaboDTO getDetailLabo(Long id, Integer month, Integer year) {
 
         Labo labo = laboRepository.findByLaboIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(labo)) {
@@ -46,21 +56,14 @@ public class LaboService {
 
         LaboDTO laboDTO = laboMapper.toDto(labo);
 
-        if (Objects.equals(statisticBy, "month")) {
-            if (Objects.isNull(number)) {
-                number = LocalDate.now().getMonth().getValue();
-            }
-            laboDTO.setTotalMoney(specimenRepository.findTotalCostInMonthOfLabo(id, number));
 
+        if (Objects.nonNull(month) && Objects.isNull(year)) {
+            year = LocalDate.now().getYear();
         }
 
-        if (Objects.equals(statisticBy, "year")) {
-            if (Objects.isNull(number)) {
-                number = LocalDate.now().getYear();
-            }
-            laboDTO.setTotalMoney(specimenRepository.findTotalCostInYearOfLabo(id, number));
+        laboDTO.setTotalMoney(specimenRepository.findTotalCostInTime(id, month, year));
 
-        }
+        laboDTO.setSpecimensDTOS(specimenRepository.findAllByLaboIdInTime(id, month, year));
 
         return laboDTO;
     }
@@ -111,5 +114,40 @@ public class LaboService {
 
         labo.setIsDeleted(Boolean.TRUE);
         laboRepository.save(labo);
+    }
+
+    public List<LaboDTO> getAllLabo(String name) {
+
+        if (StringUtils.hasLength(name)) {
+            name = "";
+        }
+        List<Labo> labos = laboRepository.findAllByLaboNameContainingAndIsDeletedOrderByLaboIdDesc(name, Boolean.FALSE);
+
+        return laboMapper.toDto(labos);
+    }
+
+    public List<SpecimensDTO> getListPrepare(Long id) {
+
+        Labo labo = laboRepository.findByLaboIdAndIsDeleted(id, Boolean.FALSE);
+        if (Objects.isNull(labo)) {
+            throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
+                    EntityName.Labo.LABO, EntityName.Labo.LABO_ID);
+        }
+
+        return specimenRepository.findAllByLaboIdAndStatusInAndIsDeleted(id,
+                Arrays.asList(StatusConstant.PREPARE_SPECIMEN, StatusConstant.SPECIMEN_ERROR), Boolean.FALSE);
+    }
+
+    public List<SpecimensDTO> getListReceive(Long id) {
+
+        Labo labo = laboRepository.findByLaboIdAndIsDeleted(id, Boolean.FALSE);
+        if (Objects.isNull(labo)) {
+            throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
+                    EntityName.Labo.LABO, EntityName.Labo.LABO_ID);
+        }
+
+        return specimenRepository.findAllByLaboIdAndStatusInAndIsDeleted(id, Arrays.asList(StatusConstant.LABO_RECEIVE),
+                        Boolean.FALSE);
+
     }
 }

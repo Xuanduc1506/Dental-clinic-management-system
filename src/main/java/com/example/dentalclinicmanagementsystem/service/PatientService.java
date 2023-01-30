@@ -6,19 +6,22 @@ import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.PatientDTO;
 import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
+import com.example.dentalclinicmanagementsystem.entity.WaitingRoom;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
+import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.PatientMapper;
 import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
 import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
+import com.example.dentalclinicmanagementsystem.repository.WaitingRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,16 +37,18 @@ public class PatientService {
     private PatientRecordRepository patientRecordRepository;
 
     @Autowired
+    private WaitingRoomRepository waitingRoomRepository;
+
+    @Autowired
     private PatientMapper patientMapper;
 
 
     public Page<PatientDTO> getListPatient(String name, String birthdate, Boolean gender, String address, String phone,
-                                           String email, String bodyPrehistory, String teethPrehistory, Integer status,
+                                           String email, Integer status,
                                            Pageable pageable) {
 
 
-        return patientRepository.getListPatient(name, birthdate, gender, address, phone, email, bodyPrehistory,
-                teethPrehistory, status, pageable);
+        return patientRepository.getListPatient(name, birthdate, gender, address, phone, email, status, pageable);
     }
 
     public PatientDTO getDetailPatient(Long id) {
@@ -76,6 +81,7 @@ public class PatientService {
             throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND,
                     EntityName.Patient.PATIENT, EntityName.Patient.PATIENT_ID);
         }
+        patientDTO.setIsDeleted(Boolean.FALSE);
         Patient patient = patientMapper.toEntity(patientDTO);
         return patientMapper.toDto(patientRepository.save(patient));
     }
@@ -91,7 +97,7 @@ public class PatientService {
 
         List<PatientRecord> patientRecords = patientRecordRepository.getAllByPatientId(id);
         if (!CollectionUtils.isEmpty(patientRecords)) {
-            throw new UsingEntityException(MessageConstant.Patient.PATIENT_HAVE_BEEN_USED, EntityName.Patient.PATIENT);
+            throw new AccessDenyException(MessageConstant.Patient.PATIENT_HAVE_BEEN_USED, EntityName.Patient.PATIENT);
         }
         patient.setIsDeleted(Boolean.TRUE);
 
@@ -100,5 +106,38 @@ public class PatientService {
 
     public List<PatientDTO> getAllPatient(String name) {
         return patientMapper.toDto(patientRepository.findAllByPatientNameContaining(name));
+    }
+
+    public void addPatientToWaitingRoom(Long patientId) {
+
+        Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+
+        if (Objects.isNull(patient)) {
+            throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND,
+                    EntityName.Patient.PATIENT, EntityName.Patient.PATIENT_ID);
+        }
+
+        WaitingRoom waitingRoom = waitingRoomRepository.findByPatientIdAndDateAndIsDeleted(patientId, LocalDate.now(), Boolean.FALSE);
+
+        if (Objects.isNull(waitingRoom)) {
+            WaitingRoom waitingRoom1 = new WaitingRoom();
+            waitingRoom1.setWaitingRoomId(null);
+            waitingRoom1.setPatientId(patientId);
+            waitingRoom1.setDate(LocalDate.now());
+            waitingRoom1.setStatus(StatusConstant.WAITING);
+            waitingRoom1.setIsBooked(Boolean.FALSE);
+            waitingRoom1.setIsDeleted(Boolean.FALSE);
+            waitingRoomRepository.save(waitingRoom1);
+        } else {
+
+            if (Objects.equals(waitingRoom.getStatus(), StatusConstant.WAITING)) {
+                throw new DuplicateNameException(MessageConstant.Patient.PATIENT_HAVE_ALREADY_IN_WAITING_ROOM, EntityName.Patient.PATIENT);
+            }
+
+            if (Objects.equals(waitingRoom.getIsBooked(), Boolean.TRUE)) {
+                waitingRoom.setStatus(StatusConstant.WAITING);
+                waitingRoomRepository.save(waitingRoom);
+            }
+        }
     }
 }

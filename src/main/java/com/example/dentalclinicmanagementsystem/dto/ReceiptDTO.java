@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +16,7 @@ public class ReceiptDTO {
 
     private Long receiptId;
 
+    @Positive
     @NotNull(groups = {ReceiptDTO.Create.class, ReceiptDTO.Update.class})
     private Integer payment;
 
@@ -25,7 +28,12 @@ public class ReceiptDTO {
 
     private Integer oldDebit;
 
-    public ReceiptDTO(Long receiptId, Integer payment, LocalDate date, Integer debit) {
+    private List<TreatmentServiceMapDTO> newServices;
+
+    private List<MaterialExportDTO> newMaterialExports;
+
+    public ReceiptDTO(Long treatmentId, Long receiptId, Integer payment, LocalDate date, Integer debit) {
+        this.treatmentId = treatmentId;
         this.receiptId = receiptId;
         this.payment = payment;
         this.date = date;

@@ -7,7 +7,7 @@ import com.example.dentalclinicmanagementsystem.dto.TimekeepingWithButtonDTO;
 import com.example.dentalclinicmanagementsystem.entity.Timekeeping;
 import com.example.dentalclinicmanagementsystem.entity.User;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.mapper.TimekeepingMapper;
 import com.example.dentalclinicmanagementsystem.repository.TimekeepingRepository;
 import com.example.dentalclinicmanagementsystem.repository.UserRepository;
@@ -29,7 +29,7 @@ import java.util.Objects;
 public class TimekeepingService extends AbstractService {
 
     public static final Long ADMIN = 1L;
-    public static final int TIME_POINT = 3;
+    public static final int TIME_POINT = 0;
 
     @Autowired
     private TimekeepingMapper timekeepingMapper;
@@ -50,7 +50,7 @@ public class TimekeepingService extends AbstractService {
             timekeeping.setTimeCheckin(LocalDateTime.now());
             timekeepingRepository.save(timekeeping);
         } else {
-            throw new UsingEntityException(MessageConstant.Timekeeping.CHECKOUT_NOTABLE,
+            throw new AccessDenyException(MessageConstant.Timekeeping.CHECKOUT_NOTABLE,
                     EntityName.Timekeeping.TIMEKEEPING);
         }
     }
@@ -66,7 +66,7 @@ public class TimekeepingService extends AbstractService {
             lastTimekeeping.setTimeCheckout(LocalDateTime.now());
             timekeepingRepository.save(lastTimekeeping);
         } else {
-            throw new UsingEntityException(MessageConstant.Timekeeping.CHECKIN_NOTABLE,
+            throw new AccessDenyException(MessageConstant.Timekeeping.CHECKIN_NOTABLE,
                     EntityName.Timekeeping.TIMEKEEPING);
         }
     }
@@ -84,7 +84,7 @@ public class TimekeepingService extends AbstractService {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
                     EntityName.User.USER, EntityName.User.USER_ID);
         }
-        if (Objects.equals(user.getRoleId(), ADMIN)) {
+        if (Objects.equals(user.getRole().getRoleId(), ADMIN)) {
             timekeepingWithButtonDTO.setTimekeepingDTOS(timekeepingRepository.
                     getListTimeKeepingOfAdmin(startTime, endTime, fullName, pageable));
             timekeepingWithButtonDTO.setCheckinEnable(Boolean.FALSE);
@@ -106,12 +106,17 @@ public class TimekeepingService extends AbstractService {
             timekeepingWithButtonDTO.setCheckoutEnable(Boolean.FALSE);
         } else {
             TimekeepingDTO lastTimeKeeping = timekeepingMapper.toDto(timekeepingRepository
-                    .findFirstByUserIdOrderByTimekeepingIdAsc(userId));
+                    .findFirstByUserIdOrderByTimekeepingIdDesc(userId));
             if (Objects.nonNull(lastTimeKeeping.getTimeCheckin())
                     && Objects.isNull(lastTimeKeeping.getTimeCheckout())
                     && lastTimeKeeping.getTimeCheckin().plusHours(TIME_POINT).isBefore(LocalDateTime.now())) {
                 timekeepingWithButtonDTO.setCheckinEnable(Boolean.FALSE);
                 timekeepingWithButtonDTO.setCheckoutEnable(Boolean.TRUE);
+            } else if (Objects.nonNull(lastTimeKeeping.getTimeCheckin())
+                    && Objects.isNull(lastTimeKeeping.getTimeCheckout())
+                    && lastTimeKeeping.getTimeCheckin().plusHours(TIME_POINT).isAfter(LocalDateTime.now())) {
+                timekeepingWithButtonDTO.setCheckinEnable(Boolean.FALSE);
+                timekeepingWithButtonDTO.setCheckoutEnable(Boolean.FALSE);
             } else {
                 timekeepingWithButtonDTO.setCheckinEnable(Boolean.TRUE);
                 timekeepingWithButtonDTO.setCheckoutEnable(Boolean.TRUE);

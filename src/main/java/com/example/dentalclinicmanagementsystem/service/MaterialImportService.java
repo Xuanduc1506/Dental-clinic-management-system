@@ -5,8 +5,8 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialImportDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
 import com.example.dentalclinicmanagementsystem.entity.MaterialImport;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialImportMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialImportRepository;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,9 +34,9 @@ public class MaterialImportService {
     @Autowired
     private MaterialRepository materialRepository;
 
-    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount,String totalPrice,
+    public Page<MaterialImportDTO> getListImport(String materialName, String date, String amount,String unitPrice,
                                                  String supplyName, Pageable pageable) {
-        return materialImportRepository.getListImport(materialName, date, amount,totalPrice, supplyName, pageable);
+        return materialImportRepository.getListImport(materialName, date, amount,unitPrice, supplyName, pageable);
     }
 
     public MaterialImportDTO getDetail(Long id) {
@@ -77,7 +79,7 @@ public class MaterialImportService {
         }
 
         if (oldMaterialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 
@@ -114,7 +116,7 @@ public class MaterialImportService {
         }
 
         if (materialImport.getDate().plusDays(1).isBefore(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.MaterialImport.MATERIAL_IMPORT_OVER_DATE,
                     EntityName.MaterialImport.MATERIAL_IMPORT);
         }
 
@@ -128,5 +130,34 @@ public class MaterialImportService {
         materialRepository.save(material);
         materialImport.setIsDelete(Boolean.TRUE);
         materialImportRepository.save(materialImport);
+    }
+
+    public void addListImport(List<MaterialImportDTO> materialImportDTOS) {
+
+        Set<Long> materialIds = materialImportDTOS.stream().map(MaterialImportDTO::getMaterialId).collect(Collectors.toSet());
+        List<Material> materials = materialRepository.findAllByMaterialIdIn(new ArrayList<>(materialIds));
+
+
+        if (materials.size() < materialIds.size()) {
+            throw new EntityNotFoundException(MessageConstant.Material.MATERIAL_NOT_FOUND, EntityName.Material.MATERIAL,
+                    EntityName.Material.MATERIAL_NAME);
+        }
+
+        Map<Long, Material> map = materials.stream().collect(Collectors.toMap(Material::getMaterialId, Function.identity()));
+        List<MaterialImport> materialImports = new ArrayList<>();
+        LocalDate currentDate = LocalDate.now();
+        materialImportDTOS.forEach(materialImportDTO -> {
+            MaterialImport materialImport = materialImportMapper.toEntity(materialImportDTO);
+            materialImport.setMaterialImportId(null);
+            materialImport.setIsDelete(Boolean.FALSE);
+            materialImport.setDate(currentDate);
+            materialImports.add(materialImport);
+
+            map.get(materialImportDTO.getMaterialId()).setAmount(map.get(materialImportDTO.getMaterialId()).getAmount() + materialImportDTO.getAmount());
+        });
+
+        materialImportRepository.saveAll(materialImports);
+        materialRepository.saveAll(map.values());
+
     }
 }

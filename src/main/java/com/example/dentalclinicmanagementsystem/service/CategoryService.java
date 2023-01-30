@@ -5,14 +5,16 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.CategoryServiceDTO;
 import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
 import com.example.dentalclinicmanagementsystem.entity.CategoryServiceEntity;
+import com.example.dentalclinicmanagementsystem.entity.TreatmentServiceMap;
 import com.example.dentalclinicmanagementsystem.exception.DuplicateNameException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.mapper.CategoryMapper;
 import com.example.dentalclinicmanagementsystem.mapper.ServiceMapper;
 import com.example.dentalclinicmanagementsystem.repository.CategoryRepository;
 import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
 import com.example.dentalclinicmanagementsystem.repository.ServiceRepository;
+import com.example.dentalclinicmanagementsystem.repository.TreatmentServiceMapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +45,12 @@ public class CategoryService {
     @Autowired
     private PatientRecordRepository patientRecordRepository;
 
+    @Autowired
+    private TreatmentServiceMapRepository treatmentServiceMapRepository;
+
     public Page<CategoryServiceDTO> getListService(String name, Pageable pageable) {
 
-        return categoryRepository.findAllByCategoryServiceNameContainingIgnoreCase(name, pageable).map(
+        return categoryRepository.findAllByCategoryServiceNameContainingIgnoreCaseOrderByCategoryServiceIdDesc(name, pageable).map(
                 entity -> categoryMapper.toDto(entity));
     }
 
@@ -84,7 +89,7 @@ public class CategoryService {
     public List<CategoryServiceDTO> displayAllService(String name) {
 
         List<CategoryServiceDTO> categoryServiceDTOS = categoryMapper.toDto(categoryRepository.findAll());
-        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCase(name));
+        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCaseAndIsDeleted(name, Boolean.FALSE));
 
         categoryServiceDTOS.forEach(categoryServiceDTO -> {
             List<ServiceDTO> serviceOfCategory = serviceDTOS
@@ -133,7 +138,7 @@ public class CategoryService {
                 serviceRepository.findAllByCategoryServiceId(id);
 
         if (!CollectionUtils.isEmpty(services)) {
-            throw new UsingEntityException(MessageConstant.CategoryService.CATEGORY_HAVE_BEEN_USED,
+            throw new AccessDenyException(MessageConstant.CategoryService.CATEGORY_HAVE_BEEN_USED,
                     EntityName.CategoryService.CATEGORY_NAME);
         }
 
@@ -142,7 +147,7 @@ public class CategoryService {
 
     public ServiceDTO getDetailService(Long serviceId) {
 
-        com.example.dentalclinicmanagementsystem.entity.Service service = serviceRepository.findByServiceId(serviceId);
+        com.example.dentalclinicmanagementsystem.entity.Service service = serviceRepository.findByServiceIdAndIsDeleted(serviceId, Boolean.FALSE);
         if (Objects.isNull(service)) {
             throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND, EntityName.Service.SERVICE,
                     EntityName.Service.SERVICE_ID);
@@ -169,6 +174,7 @@ public class CategoryService {
                     EntityName.Service.SERVICE, EntityName.CategoryService.CATEGORY_ID);
         }
 
+        serviceDTO.setIsDeleted(Boolean.FALSE);
         com.example.dentalclinicmanagementsystem.entity.Service service = serviceMapper.toEntity(serviceDTO);
         return serviceMapper.toDto(serviceRepository.save(service));
     }
@@ -176,7 +182,7 @@ public class CategoryService {
     public ServiceDTO updateService(Long serviceId, ServiceDTO serviceDTO) {
 
         serviceDTO.setServiceId(serviceId);
-        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceId(serviceId);
+        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceIdAndIsDeleted(serviceId, Boolean.FALSE);
         if (Objects.isNull(serviceDb)) {
             throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND, EntityName.Service.SERVICE,
                     EntityName.Service.SERVICE_ID);
@@ -192,30 +198,65 @@ public class CategoryService {
             }
         }
 
-        CategoryServiceEntity categoryServiceEntity =
-                categoryRepository.findByCategoryServiceId(serviceDTO.getCategoryServiceId());
-        if (Objects.isNull(categoryServiceEntity)) {
-            throw new EntityNotFoundException(MessageConstant.CategoryService.CATEGORY_NOT_FOUND,
-                    EntityName.Service.SERVICE, EntityName.CategoryService.CATEGORY_ID);
-        }
-
+        serviceDTO.setIsDeleted(Boolean.FALSE);
         com.example.dentalclinicmanagementsystem.entity.Service service = serviceMapper.toEntity(serviceDTO);
         return serviceMapper.toDto(serviceRepository.save(service));
     }
 
-
     public void deleteService(Long serviceId) {
 
-        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceId(serviceId);
+        com.example.dentalclinicmanagementsystem.entity.Service serviceDb = serviceRepository.findByServiceIdAndIsDeleted(serviceId, Boolean.FALSE);
         if (Objects.isNull(serviceDb)) {
             throw new EntityNotFoundException(MessageConstant.Service.SERVICE_NOT_FOUND, EntityName.Service.SERVICE,
                     EntityName.Service.SERVICE_ID);
         }
 
-        serviceRepository.delete(serviceDb);
+        serviceDb.setIsDeleted(Boolean.TRUE);
+
+        serviceRepository.save(serviceDb);
     }
 
     public List<ServiceDTO> getTreatingService(Long patientId) {
-        return serviceRepository.findTreatingService(patientRecordRepository.getLastRecordId(patientId));
+        List<ServiceDTO> serviceDTOS = serviceRepository.findTreatingService(patientRecordRepository.getLastRecordId(patientId));
+        List<Long> serviceIds = serviceDTOS.stream().map(ServiceDTO::getServiceId).collect(Collectors.toList());
+        List<TreatmentServiceMap> treatmentServiceMaps = treatmentServiceMapRepository.findAllByPatientId(patientId, serviceIds);
+        serviceDTOS.forEach(serviceDTO -> {
+            treatmentServiceMaps.stream()
+                    .filter(item -> Objects.equals(serviceDTO.getServiceId(), item.getServiceId()))
+                    .findFirst().ifPresent(i -> {
+                        serviceDTO.setPrice(i.getCurrentPrice());
+                        serviceDTO.setDiscount(i.getDiscount());
+                        serviceDTO.setAmount(i.getAmount());
+                        treatmentServiceMaps.remove(i);
+                    });
+        });
+        return serviceDTOS;
+
+    }
+
+    public List<ServiceDTO> getAllService(String name) {
+
+        if (Objects.isNull(name)) {
+            name = "";
+        }
+
+        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingIgnoreCaseAndIsDeleted(name, Boolean.FALSE));
+    }
+
+    public List<ServiceDTO> getAllServiceByCategoryId(Long categoryId, String name) {
+
+        if (Objects.isNull(name)) {
+            name = "";
+        }
+
+        return serviceMapper.toDto(serviceRepository.findAllByServiceNameContainingAndCategoryServiceIdAndIsDeletedOrderByServiceIdDesc(name, categoryId, Boolean.FALSE));
+    }
+
+    public List<CategoryServiceDTO> getAllCategory(String name) {
+
+        if (Objects.isNull(name)) {
+            name = "";
+        }
+        return categoryMapper.toDto(categoryRepository.findAllByCategoryServiceNameContainingIgnoreCase(name));
     }
 }

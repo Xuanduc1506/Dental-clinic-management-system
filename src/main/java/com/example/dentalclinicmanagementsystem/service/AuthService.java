@@ -70,9 +70,9 @@ public class AuthService {
         }
     }
 
-    public void resetPassword(UserDTO userDTO) {
+    public void resetPassword(String username) {
 
-        User user = userRepository.findByUserNameAndAndEnable(userDTO.getUserName(), Boolean.TRUE);
+        User user = userRepository.findByUserNameAndAndEnable(username, Boolean.TRUE);
         if (Objects.isNull(user)) {
             throw new EntityNotFoundException(MessageConstant.User.USER_NOT_FOUND,
                     EntityName.User.USER, EntityName.User.USER_ID);

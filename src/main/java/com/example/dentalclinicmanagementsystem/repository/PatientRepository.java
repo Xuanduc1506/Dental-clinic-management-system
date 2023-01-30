@@ -23,25 +23,29 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             "AND (:address is null or p.address like %:address%)" +
             "AND (:phone is null or p.phone like %:phone%)" +
             "AND (:email is null or p.email like %:email%)" +
-            "AND (:bodyPrehistory is null or p.bodyPrehistory like %:bodyPrehistory%)" +
-            "AND (:teethPrehistory is null or p.teethPrehistory like %:teethPrehistory%)" +
-            "AND (:status = -1 or p.status = :status)")
+            "AND (:status = -1 or p.status = :status) " +
+            "ORDER BY p.patientId DESC")
     Page<PatientDTO> getListPatient(@Param("name") String name,
                                     @Param("birthdate") String birthdate,
                                     @Param("gender") Boolean gender,
                                     @Param("address") String address,
                                     @Param("phone") String phone,
                                     @Param("email") String email,
-                                    @Param("bodyPrehistory") String bodyPrehistory,
-                                    @Param("teethPrehistory") String teethPrehistory,
                                     @Param("status") Integer status,
                                     Pageable pageable);
 
 
     Patient findByPatientIdAndIsDeleted(Long id, Boolean isDeleted);
 
-    @Query("SELECT p FROM Patient p JOIN Treatment t ON t.patientId = p.patientId " +
+    @Query("SELECT distinct(p) FROM Patient p Join Treatment t ON p.patientId = t.patientId " +
             "WHERE p.isDeleted = FALSE " +
             "AND (:name is null or p.patientName like %:name%) ")
     List<Patient> findAllByPatientNameContaining(@Param("name") String name);
+
+    @Query("SELECT p FROM Patient p JOIN Treatment t ON p.patientId = t.patientId " +
+            "JOIN PatientRecord pr ON t.treatmentId = pr.treatmentId " +
+            "WHERE pr.patientRecordId= :patientRecordId AND p.isDeleted = FALSE ")
+    Patient findByPatientRecordId(@Param("patientRecordId") Long patientRecordId);
+
+    List<Patient> findAllByPatientIdInAndIsDeleted(List<Long> patientIds, Boolean isDeleted);
 }

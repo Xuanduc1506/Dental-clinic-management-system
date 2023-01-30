@@ -20,8 +20,8 @@ public class MaterialExport {
     @Column(name = "amount")
     private Integer amount;
 
-    @Column(name = "total_price")
-    private Integer totalPrice;
+    @Column(name = "unit_price")
+    private Integer unitPrice;
 
     @Column(name = "patient_record_id")
     private Long patientRecordId;
@@ -29,9 +29,12 @@ public class MaterialExport {
     @Column(name = "is_delete")
     private Boolean isDelete;
 
+    @Column(name = "is_show")
+    private Boolean isShow;
+
     @Column(name = "amount", insertable = false, updatable = false)
     private String amountTemp;
 
-    @Column(name = "total_price", insertable = false, updatable = false)
-    private String totalPriceTemp;
+    @Column(name = "unit_price", insertable = false, updatable = false)
+    private String unitPriceTemp;
 }

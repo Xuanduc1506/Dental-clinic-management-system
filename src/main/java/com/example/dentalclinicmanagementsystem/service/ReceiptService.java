@@ -2,20 +2,19 @@ package com.example.dentalclinicmanagementsystem.service;
 
 import com.example.dentalclinicmanagementsystem.constant.EntityName;
 import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
+import com.example.dentalclinicmanagementsystem.constant.StatusConstant;
 import com.example.dentalclinicmanagementsystem.dto.ReceiptDTO;
-import com.example.dentalclinicmanagementsystem.entity.Patient;
-import com.example.dentalclinicmanagementsystem.entity.Receipt;
-import com.example.dentalclinicmanagementsystem.entity.Treatment;
+import com.example.dentalclinicmanagementsystem.dto.ServiceDTO;
+import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
+import com.example.dentalclinicmanagementsystem.entity.*;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.ReceiptMapper;
-import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
-import com.example.dentalclinicmanagementsystem.repository.ReceiptRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentRepository;
-import com.example.dentalclinicmanagementsystem.repository.TreatmentServiceMapRepository;
+import com.example.dentalclinicmanagementsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -47,32 +46,66 @@ public class ReceiptService {
     private TreatmentRepository treatmentRepository;
 
     @Autowired
+    private TreatmentServiceMapRepository treatmentServiceMapRepository;
+
+    @Autowired
     private PatientRepository patientRepository;
 
     @Autowired
-    private TreatmentServiceMapRepository treatmentServiceMapRepository;
+    private CategoryService categoryService;
 
-    public ReceiptDTO addReceipt(Long patientId, ReceiptDTO receiptDTO) {
+    @Autowired
+    private MaterialExportRepository materialExportRepository;
 
-        Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+    public ReceiptDTO addReceipt(Long treatmentId, ReceiptDTO receiptDTO) {
 
-        if (Objects.isNull(patient)) {
-            throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND, EntityName.Patient.PATIENT,
-                    EntityName.Patient.PATIENT_ID);
+
+        Treatment treatment = treatmentRepository.findByTreatmentId(treatmentId);
+        if (Objects.isNull(treatment)) {
+            throw new EntityNotFoundException(MessageConstant.Treatment.TREATMENT_NOT_FOUND, EntityName.Receipt.RECEIPT,
+                    EntityName.Receipt.TREATMENT_ID);
         }
 
-        Treatment treatment = treatmentRepository.findFirstByPatientIdOrderByTreatmentIdDesc(patientId);
+        Integer totalMaterialMoney = treatmentServiceMapRepository.getTotalMoneyOfMaterialExport(treatmentId);
 
-        Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatment.getTreatmentId());
-        Integer paid = receiptRepository.getPaidByTreatmentId(treatment.getTreatmentId()) + receiptDTO.getPayment();
+        Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatmentId) +
+                (Objects.nonNull(totalMaterialMoney) ? totalMaterialMoney : 0);
+
+        Integer oldPaid = receiptRepository.getPaidByTreatmentId(treatmentId);
+
+        Integer paid = (Objects.nonNull(oldPaid) ? oldPaid : 0) + receiptDTO.getPayment();
 
         receiptDTO.setReceiptId(null);
-        receiptDTO.setTreatmentId(treatment.getTreatmentId());
+        receiptDTO.setTreatmentId(treatmentId);
         receiptDTO.setDebit(totalMoney - paid);
+        if (receiptDTO.getDebit() < 0) {
+            throw new AccessDenyException(MessageConstant.Receipt.OVER_PAYMENT, EntityName.Receipt.RECEIPT);
+        }
         receiptDTO.setDate(LocalDate.now());
         Receipt receipt = receiptMapper.toEntity(receiptDTO);
         receiptRepository.save(receipt);
 
+        Long patientId = treatmentRepository.findPatientIdByTreatmentId(treatmentId);
+        List<ServiceDTO> serviceDTOS = categoryService.getTreatingService(patientId);
+        if (CollectionUtils.isEmpty(serviceDTOS) && receipt.getDebit() == 0) {
+            Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+            if (Objects.isNull(patient)) {
+                throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
+                        EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
+            }
+            patient.setStatus(StatusConstant.DONE);
+            patientRepository.save(patient);
+        }
+
+        List<TreatmentServiceMap> treatmentServiceMaps = treatmentServiceMapRepository.findAllByTreatmentIdAndIsShow(treatmentId, Boolean.FALSE);
+        treatmentServiceMaps.forEach(e ->
+            e.setIsShow(Boolean.TRUE)
+        );
+        treatmentServiceMapRepository.saveAll(treatmentServiceMaps);
+
+        List<MaterialExport> materialExports = materialExportRepository.findAllByTreatmentId(treatmentId);
+        materialExports.forEach(e -> e.setIsShow(Boolean.TRUE));
+        materialExportRepository.saveAll(materialExports);
         return receiptMapper.toDto(receipt);
     }
 
@@ -87,7 +120,7 @@ public class ReceiptService {
         }
 
         if (receiptDb.getDate().plusDays(1).isAfter(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.Receipt.RECEIPT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.Receipt.RECEIPT_OVER_DATE,
                     EntityName.Receipt.RECEIPT_ID);
         }
 
@@ -114,7 +147,7 @@ public class ReceiptService {
 
         Pageable pageable = PageRequest.of(FIRST_PAGE, LAST_TOW_RECORD, Sort.by(Sort.Direction.DESC, "receiptId"));
 
-        List<ReceiptDTO> receiptDTOS = receiptRepository.findLaseTowReceipt(id, pageable);
+        List<ReceiptDTO> receiptDTOS = receiptRepository.findLastTwoReceipt(id, pageable);
 
         List<Long> ids = receiptDTOS.stream().map(ReceiptDTO::getReceiptId).collect(Collectors.toList());
 
@@ -129,5 +162,38 @@ public class ReceiptService {
         }
 
         return receiptDTO;
+    }
+
+    public ReceiptDTO getNewReceipts(Long treatmentId) {
+
+        Receipt lastReceipt = receiptRepository.findFirstByTreatmentIdOrderByReceiptIdDesc(treatmentId);
+        if (Objects.isNull(lastReceipt)) {
+            lastReceipt = new Receipt();
+        }
+        ReceiptDTO receiptDTO = receiptMapper.toDto(lastReceipt);
+        receiptDTO.setPayment(null);
+
+        receiptDTO.setDate(LocalDate.now());
+
+        List<TreatmentServiceMapDTO> treatmentServiceMapDTOS = treatmentServiceMapRepository.findAllByTreatmentIdAndIsShow(treatmentId);
+        treatmentServiceMapDTOS.addAll(treatmentServiceMapRepository.findAllMaterialExportByTreatment(treatmentId));
+        receiptDTO.setNewServices(treatmentServiceMapDTOS);
+
+        receiptDTO.setOldDebit(Objects.nonNull(lastReceipt.getDebit()) ? lastReceipt.getDebit() : 0);
+        receiptDTO.setDebit(treatmentServiceMapDTOS.stream().mapToInt(treatmentServiceMapDTO
+                -> treatmentServiceMapDTO.getCurrentPrice() * treatmentServiceMapDTO.getAmount() - treatmentServiceMapDTO.getDiscount()).sum()
+                + receiptDTO.getOldDebit());
+
+        return receiptDTO;
+    }
+
+    public List<ReceiptDTO> getListReceiptsByTreatmentId(Long treatmentId, String payment, String date, String debit) {
+
+        List<ReceiptDTO> receiptDTOS = receiptRepository.getListReceiptsByTreatmentId(treatmentId, payment, date, debit);
+
+        for (int i = 1; i < receiptDTOS.size(); i++) {
+            receiptDTOS.get(i).setOldDebit(receiptDTOS.get(i - 1).getDebit());
+        }
+        return receiptDTOS;
     }
 }

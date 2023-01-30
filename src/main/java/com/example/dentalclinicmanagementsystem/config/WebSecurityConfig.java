@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 //@EnableGlobalMethodSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = false, securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -54,20 +54,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-//        http.cors().and().csrf().disable()
-//                .authorizeRequests().
-//                antMatchers("/api/login").permitAll().
-//                // all other requests need to be authenticated
-//                        anyRequest().authenticated().and()
-//                .logout().permitAll().and().exceptionHandling()
-//                .authenticationEntryPoint(unauthorizedEntryPoint())
-//                .accessDeniedHandler(accessDeniedHandler()).and().
-//                sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//
-//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.cors().and().csrf().disable()
+                .authorizeRequests().
+                antMatchers("/api/login").permitAll().
+                antMatchers("/api/forgot_password").permitAll().
+                antMatchers("/api/timekeeping/**").permitAll().
+                antMatchers("/waiting-room/**").permitAll().
+                // all other requests need to be authenticated
+                        anyRequest().authenticated().and()
+                .logout().permitAll().and().exceptionHandling()
+                .authenticationEntryPoint(unauthorizedEntryPoint())
+                .accessDeniedHandler(accessDeniedHandler()).and().
+                sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/api/**").permitAll();
-        http.httpBasic();
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+//        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/api/**").permitAll();
+//        http.httpBasic();
 
     }
 
@@ -81,6 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler();
     }
+
 
 
 }

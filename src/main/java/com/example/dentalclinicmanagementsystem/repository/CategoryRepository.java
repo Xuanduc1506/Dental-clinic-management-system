@@ -6,13 +6,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryServiceEntity, Long> {
 
-    Page<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCase(
+    Page<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCaseOrderByCategoryServiceIdDesc(
             String CategoryServiceName, Pageable pageable);
 
     CategoryServiceEntity findByCategoryServiceName(String name);
 
     CategoryServiceEntity findByCategoryServiceId(Long id);
+
+    List<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCase(String name);
 }

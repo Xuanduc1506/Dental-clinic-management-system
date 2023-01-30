@@ -1,5 +1,6 @@
 package com.example.dentalclinicmanagementsystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -35,8 +36,8 @@ public class User implements Serializable {
     @Column(name = "salary")
     private Integer salary;
 
-    @Column(name = "role_id")
-    private Long roleId;
+//    @Column(name = "role_id")
+//    private Long roleId;
 
     @Column(name = "enable")
     private Boolean enable;
@@ -44,13 +45,14 @@ public class User implements Serializable {
     @Column(name = "email")
     private String email;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "role_permission_map",
-            joinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "role_id") },
-            inverseJoinColumns = { @JoinColumn(name = "permission_id", referencedColumnName = "permission_id") }
-    )
-    private Set<Permission> permissions = new HashSet<>();
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    @JsonBackReference
+//    @JoinTable(
+//            name = "role",
+//            joinColumns = { @JoinColumn(name = "role_id", referencedColumnName = "role_id") },
+//            inverseJoinColumns = { @JoinColumn(name = "permission_id", referencedColumnName = "permission_id") }
+//    )
+//    private Set<Permission> permissions = new HashSet<>();
+    private Role role;
 }

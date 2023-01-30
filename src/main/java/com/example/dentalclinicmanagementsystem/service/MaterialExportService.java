@@ -5,13 +5,15 @@ import com.example.dentalclinicmanagementsystem.constant.MessageConstant;
 import com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO;
 import com.example.dentalclinicmanagementsystem.entity.Material;
 import com.example.dentalclinicmanagementsystem.entity.MaterialExport;
+import com.example.dentalclinicmanagementsystem.entity.Patient;
 import com.example.dentalclinicmanagementsystem.entity.PatientRecord;
+import com.example.dentalclinicmanagementsystem.exception.AccessDenyException;
 import com.example.dentalclinicmanagementsystem.exception.EntityNotFoundException;
-import com.example.dentalclinicmanagementsystem.exception.UsingEntityException;
 import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.repository.MaterialExportRepository;
 import com.example.dentalclinicmanagementsystem.repository.MaterialRepository;
 import com.example.dentalclinicmanagementsystem.repository.PatientRecordRepository;
+import com.example.dentalclinicmanagementsystem.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -37,9 +40,12 @@ public class MaterialExportService {
     @Autowired
     private MaterialRepository materialRepository;
 
-    public Page<MaterialExportDTO> getListExport(String materialName, String date, String amount, String totalPrice,
+    @Autowired
+    private PatientRepository patientRepository;
+
+    public Page<MaterialExportDTO> getListExport(String materialName, String date, String amount, String unitPrice,
                                                  String patientName, Pageable pageable) {
-        return materialExportRepository.getListMaterialExport(materialName, date, amount, totalPrice, patientName, pageable);
+        return materialExportRepository.getListMaterialExport(materialName, date, amount, unitPrice, patientName, pageable);
     }
 
     public MaterialExportDTO getDetailMaterialExport(Long id) {
@@ -65,7 +71,7 @@ public class MaterialExportService {
                     EntityName.Material.MATERIAL_NAME);
         }
 
-        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExportDTO.getPatientRecordId());
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordIdAndIsDeleted(materialExportDTO.getPatientRecordId(), Boolean.FALSE);
         if (Objects.isNull(patientRecord)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
@@ -81,6 +87,9 @@ public class MaterialExportService {
             materialRepository.save(oldMaterial);
 
             newMaterial.setAmount(newMaterial.getAmount() - materialExportDTO.getAmount());
+            if (newMaterial.getAmount() < 0) {
+                throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
+            }
         }
         materialRepository.save(newMaterial);
 
@@ -114,10 +123,10 @@ public class MaterialExportService {
                     EntityName.MaterialExport.MATERIAL_EXPORT, EntityName.MaterialExport.MATERIAL_EXPORT_ID);
         }
 
-        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExport.getPatientRecordId());
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordIdAndIsDeleted(materialExport.getPatientRecordId(), Boolean.FALSE);
 
         if (patientRecord.getDate().plusDays(1).isBefore(LocalDate.now())) {
-            throw new UsingEntityException(MessageConstant.MaterialExport.MATERIAL_EXPORT_OVER_DATE,
+            throw new AccessDenyException(MessageConstant.MaterialExport.MATERIAL_EXPORT_OVER_DATE,
                     EntityName.MaterialExport.MATERIAL_EXPORT);
         }
     }
@@ -131,13 +140,16 @@ public class MaterialExportService {
                     EntityName.Material.MATERIAL_NAME);
         }
 
-        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordId(materialExportDTO.getPatientRecordId());
+        PatientRecord patientRecord = patientRecordRepository.findByPatientRecordIdAndIsDeleted(materialExportDTO.getPatientRecordId(), Boolean.FALSE);
         if (Objects.isNull(patientRecord)) {
             throw new EntityNotFoundException(MessageConstant.PatientRecord.PATIENT_RECORD_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.PatientRecord.PATIENT_RECORD_ID);
         }
 
         material.setAmount(material.getAmount() - materialExportDTO.getAmount());
+        if (material.getAmount() < 0) {
+            throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
+        }
         materialRepository.save(material);
 
         MaterialExport materialExport = materialExportMapper.toEntity(materialExportDTO);
@@ -145,5 +157,17 @@ public class MaterialExportService {
         materialExportRepository.save(materialExport);
 
         return materialExportMapper.toDto(materialExport);
+    }
+
+    public List<MaterialExportDTO> getListMaterialExportOfPatient(Long patientId) {
+
+        Patient patient = patientRepository.findByPatientIdAndIsDeleted(patientId, Boolean.FALSE);
+
+        if (Objects.isNull(patient)) {
+            throw new EntityNotFoundException(MessageConstant.Patient.PATIENT_NOT_FOUND,
+                    EntityName.Patient.PATIENT, EntityName.Patient.PATIENT_ID);
+        }
+
+        return materialExportRepository.getListMaterialExportOfPatient(patientId);
     }
 }
