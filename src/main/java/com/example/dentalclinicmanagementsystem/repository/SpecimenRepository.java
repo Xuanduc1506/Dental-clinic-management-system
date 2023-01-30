@@ -30,7 +30,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
                                          @Param("endDate")LocalDate endDate);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, " +
-            "s.receiveDate, s.deliveryDate, s.amount, s.unitPrice, s.laboId, pr.patientRecordId, p.patientName) " +
+            "s.receiveDate, s.deliveryDate, s.amount, s.unitPrice, s.laboId, pr.patientRecordId, p.patientName, s.status) " +
             "FROM Specimen s JOIN Labo l ON s.laboId = l.laboId " +
             "JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +

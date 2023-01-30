@@ -80,7 +80,7 @@ public class SpecimensDTO {
         this.laboName = laboName;
     }
 
-    public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Long patientRecordId, String patientName) {
+    public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Long patientRecordId, String patientName, Integer status) {
         this.specimenId = specimenId;
         this.specimenName = specimenName;
         this.receiveDate = receiveDate;
@@ -90,6 +90,7 @@ public class SpecimensDTO {
         this.laboId = laboId;
         this.patientRecordId = patientRecordId;
         this.patientName = patientName;
+        this.status = status;
     }
 
     public SpecimensDTO(Long specimenId, String specimenName, LocalDate receiveDate, LocalDate deliveryDate, Integer amount, Integer unitPrice, Long laboId, Integer status, Long serviceId, String serviceName, Long patientRecordId, String patientName, String laboName, LocalDate usedDate, Long patientId) {
