@@ -48,7 +48,7 @@ public interface TreatmentServiceMapRepository extends JpaRepository<TreatmentSe
     List<TreatmentServiceMapDTO> findAllByTreatmentIdAndIsShow(@Param("treatmentId") Long treatmentId);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO(pr.treatmentId, m.materialId, " +
-            "me.unitPrice, 0, m.materialName, m.amount) " +
+            "me.unitPrice, 0, m.materialName, me.amount) " +
             "FROM MaterialExport me JOIN Material m ON me.materialId = m.materialId " +
             "JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
             "WHERE pr.treatmentId = :treatmentId AND me.isShow = FALSE ")
