@@ -66,7 +66,10 @@ public class ReceiptService {
                     EntityName.Receipt.TREATMENT_ID);
         }
 
-        Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatmentId) + treatmentServiceMapRepository.getTotalMoneyOfMaterialExport(treatmentId);
+        Integer totalMaterialMoney = treatmentServiceMapRepository.getTotalMoneyOfMaterialExport(treatmentId);
+
+        Integer totalMoney = treatmentServiceMapRepository.getTotalMoney(treatmentId) +
+                (Objects.nonNull(totalMaterialMoney) ? totalMaterialMoney : 0);
 
         Integer oldPaid = receiptRepository.getPaidByTreatmentId(treatmentId);
 
