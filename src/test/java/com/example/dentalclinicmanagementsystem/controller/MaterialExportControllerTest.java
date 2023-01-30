@@ -17,8 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -52,7 +51,7 @@ class MaterialExportControllerTest {
             material.setAmount(10);
 
             when(materialRepository.findByMaterialId(anyLong())).thenReturn(material);
-            when(patientRecordRepository.findByPatientRecordId(anyLong())).thenReturn(new PatientRecord());
+            when(patientRecordRepository.findByPatientRecordIdAndIsDeleted(anyLong(), anyBoolean())).thenReturn(new PatientRecord());
 
             when(materialRepository.save(any(Material.class))).thenReturn(material);
             when(materialExportRepository.save(any(MaterialExport.class))).thenReturn(new MaterialExport());
@@ -104,7 +103,7 @@ class MaterialExportControllerTest {
         void patientRecordNotFound() throws Exception {
 
             when(materialRepository.findByMaterialId(anyLong())).thenReturn(new Material());
-            when(patientRecordRepository.findByPatientRecordId(anyLong())).thenReturn(null);
+            when(patientRecordRepository.findByPatientRecordIdAndIsDeleted(anyLong(), anyBoolean())).thenReturn(null);
 
             String requestBody = "{\n" +
                     "    \"materialId\": 1,\n" +
