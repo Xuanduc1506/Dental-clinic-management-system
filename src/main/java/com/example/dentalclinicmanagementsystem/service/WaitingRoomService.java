@@ -21,7 +21,7 @@ import java.util.Objects;
 
 @Service
 @Transactional
-public class WaitingRoomService {
+public class WaitingRoomService extends AbstractService {
 
     @Autowired
     private PatientRepository patientRepository;
@@ -32,7 +32,7 @@ public class WaitingRoomService {
     @Autowired
     private WaitingRoomMapper waitingRoomMapper;
 
-    public void callPatient(Long id) {
+    public Long callPatient(Long id, String token) {
 
         WaitingRoom waitingRoom = waitingRoomRepository.findByWaitingRoomIdAndStatus(id, StatusConstant.WAITING);
         if (Objects.isNull(waitingRoom)) {
@@ -42,6 +42,7 @@ public class WaitingRoomService {
 
         waitingRoom.setStatus(StatusConstant.CONFIRMING);
         waitingRoomRepository.save(waitingRoom);
+        return getUserId(token);
 
     }
 

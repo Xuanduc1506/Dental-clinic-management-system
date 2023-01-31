@@ -28,11 +28,12 @@ public class WaitingRoomController {
     private SimpMessagingTemplate template;
 
     @PostMapping("call-patient/{id}")
-    public ResponseEntity<Void> callPatient(@PathVariable Long id) {
-        waitingRoomService.callPatient(id);
+    public ResponseEntity<Long> callPatient(@RequestHeader("Authorization") String token
+            ,@PathVariable Long id) {
+        Long userId = waitingRoomService.callPatient(id, token);
         System.out.println("sending via kafka listener..");
-        template.convertAndSend("/topic/group", id);
-        return ResponseEntity.ok().build();
+        template.convertAndSend("/topic/group", userId);
+        return ResponseEntity.ok().body(userId);
 
     }
 
