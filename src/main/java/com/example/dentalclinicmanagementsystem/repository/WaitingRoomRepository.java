@@ -28,8 +28,10 @@ public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> 
 
     WaitingRoom findByWaitingRoomIdAndStatus(Long id, Integer status);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status) " +
-            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId WHERE wr.status = 3 AND wr.isDeleted = FALSE ")
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status, u.userId, u.fullName) " +
+            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId " +
+            "LEFT JOIN User u ON wr.userId = u.userId " +
+            "WHERE wr.status = 3 AND wr.isDeleted = FALSE ")
     List<WaitingRoomDTO> findAllListConfirm();
 
 

@@ -32,7 +32,7 @@ public class WaitingRoomService extends AbstractService {
     @Autowired
     private WaitingRoomMapper waitingRoomMapper;
 
-    public Long callPatient(Long id, String token) {
+    public void callPatient(Long id, String token) {
 
         WaitingRoom waitingRoom = waitingRoomRepository.findByWaitingRoomIdAndStatus(id, StatusConstant.WAITING);
         if (Objects.isNull(waitingRoom)) {
@@ -41,8 +41,8 @@ public class WaitingRoomService extends AbstractService {
         }
 
         waitingRoom.setStatus(StatusConstant.CONFIRMING);
+        waitingRoom.setUserId(getUserId(token));
         waitingRoomRepository.save(waitingRoom);
-        return getUserId(token);
 
     }
 
