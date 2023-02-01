@@ -22,7 +22,7 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
             "JOIN TreatmentServiceMap tsm ON t.treatmentId = tsm.treatmentId " +
             "JOIN PatientRecord pr ON pr.treatmentId = t.treatmentId " +
             "LEFT JOIN MaterialExport me ON me.patientRecordId = pr.patientRecordId " +
-            "AND (:patientName is null or p.patientName like %:patientName%)" +
+            "WHERE (:patientName is null or p.patientName like %:patientName%)" +
             "AND (:phone is null or p.phone like %:phone%)" +
             "GROUP BY t.treatmentId " +
             "ORDER BY t.treatmentId DESC ")
