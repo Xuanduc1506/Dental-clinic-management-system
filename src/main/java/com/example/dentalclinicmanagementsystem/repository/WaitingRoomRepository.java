@@ -38,7 +38,7 @@ public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> 
 
     WaitingRoom findByPatientIdAndDateAndIsDeleted(Long patientId, LocalDate date, Boolean isDeleted);
 
-    WaitingRoom findByWaitingRoomIdAndStatusAndAndIsDeleted(Long id, Integer status, Boolean isDelete);
+    WaitingRoom findByWaitingRoomIdAndStatusAndIsDeleted(Long id, Integer status, Boolean isDelete);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId, wr.date, wr.status, wr.note, p.patientName, p.phone) " +
             "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId WHERE wr.isDeleted = FALSE " +
