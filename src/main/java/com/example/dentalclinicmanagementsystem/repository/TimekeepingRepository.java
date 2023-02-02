@@ -20,7 +20,8 @@ public interface TimekeepingRepository extends JpaRepository<Timekeeping, Long> 
             "FROM Timekeeping t JOIN User u ON t.userId = u.userId " +
             "WHERE (:startTime is null or t.timeCheckin >= :startTime) " +
             "AND (:endTime is null or t.timeCheckout <= :endTime) " +
-            "AND (:fullName is null or u.fullName like %:fullName%)")
+            "AND (:fullName is null or u.fullName like %:fullName%) " +
+            "ORDER BY t.timeCheckin DESC ")
     Page<TimekeepingDTO> getListTimeKeepingOfAdmin(@Param("startTime")LocalDate startTime,
                                                    @Param("endTime")LocalDate endTime,
                                                    @Param("fullName")String fullName,
@@ -29,7 +30,7 @@ public interface TimekeepingRepository extends JpaRepository<Timekeeping, Long> 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.TimekeepingDTO(t.timekeepingId, t.userId, t.timeCheckin, t.timeCheckout) " +
             "FROM Timekeeping t " +
             "WHERE t.userId = :userId " +
-            "AND MONTH(t.timeCheckin) = :month")
+            "AND MONTH(t.timeCheckin) = :month ORDER BY t.timeCheckin DESC ")
     Page<TimekeepingDTO> getListTimeKeepingOfUser(@Param("month")Integer month,
                                                    @Param("userId")Long userId,
                                                    Pageable pageable);

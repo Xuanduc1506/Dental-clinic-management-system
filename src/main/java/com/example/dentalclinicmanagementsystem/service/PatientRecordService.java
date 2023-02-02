@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -171,6 +172,7 @@ public class PatientRecordService extends AbstractService {
         Notify notify = new Notify();
         notify.setTreatmentId(patientRecord.getTreatmentId());
         notify.setIsRead(Boolean.FALSE);
+        notify.setTime(LocalDateTime.now());
 
         notifyRepository.save(notify);
 
@@ -434,9 +436,23 @@ public class PatientRecordService extends AbstractService {
 
         List<Long> startRecordIds = treatmentServiceMapRepository.findAllStartRecordByTreatmentIdAndListServiceId(patientRecord.getTreatmentId(), serviceIdsDone);
         List<Specimen> specimens = specimenRepository.findAllByPatientRecordIdInAndServiceIdInAndIsDeleted(startRecordIds, serviceIdsDone, Boolean.FALSE);
+
         specimens.forEach(specimen -> {
-            specimen.setStatus(StatusConstant.SPECIMEN_COMPLETED);
-            specimen.setUsedDate(LocalDate.now());
+            if (specimen.getStatus().equals(StatusConstant.LABO_RECEIVE)) {
+                specimen.setStatus(StatusConstant.SPECIMEN_COMPLETED);
+                specimen.setUsedDate(LocalDate.now());
+            }
+
+            if (specimen.getStatus().equals(StatusConstant.PREPARE_SPECIMEN)
+                    || specimen.getStatus().equals(StatusConstant.LABO_RECEIVE)
+                    || specimen.getStatus().equals(StatusConstant.SPECIMEN_ERROR)) {
+                specimen.setIsDeleted(Boolean.TRUE);
+            }
+
+            if (specimen.getStatus().equals(StatusConstant.PATIENT_USED)) {
+                specimen.setStatus(StatusConstant.SPECIMEN_COMPLETED);
+            }
+
         });
         specimenRepository.saveAll(specimens);
 
