@@ -50,7 +50,7 @@ public class CategoryService {
 
     public Page<CategoryServiceDTO> getListService(String name, Pageable pageable) {
 
-        return categoryRepository.findAllByCategoryServiceNameContainingIgnoreCaseOrderByCategoryServiceIdDesc(name, pageable).map(
+        return categoryRepository.findAllByCategoryServiceNameContainingIgnoreCaseAndIsDeletedOrderByCategoryServiceIdDesc(name, Boolean.FALSE, pageable).map(
                 entity -> categoryMapper.toDto(entity));
     }
 
@@ -65,6 +65,7 @@ public class CategoryService {
                     EntityName.CategoryService.CATEGORY_NAME);
         }
 
+        categoryServiceDTO.setIsDeleted(Boolean.FALSE);
         CategoryServiceEntity categoryServiceEntity = categoryMapper.toEntity(categoryServiceDTO);
         return categoryMapper.toDto(categoryRepository.save(categoryServiceEntity));
 
@@ -72,7 +73,7 @@ public class CategoryService {
 
     public CategoryServiceDTO getDetailCategory(Long id) {
 
-        CategoryServiceEntity categoryService = categoryRepository.findByCategoryServiceId(id);
+        CategoryServiceEntity categoryService = categoryRepository.findByCategoryServiceIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(categoryService)) {
             throw new EntityNotFoundException(MessageConstant.CategoryService.CATEGORY_NOT_FOUND,
                     EntityName.CategoryService.CATEGORY, EntityName.CategoryService.CATEGORY_ID);
@@ -80,7 +81,7 @@ public class CategoryService {
 
         CategoryServiceDTO categoryServiceDTO = categoryMapper.toDto(categoryService);
 
-        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByCategoryServiceId(id));
+        List<ServiceDTO> serviceDTOS = serviceMapper.toDto(serviceRepository.findAllByCategoryServiceIdAndIsDeleted(id, Boolean.FALSE));
         categoryServiceDTO.setServiceDTOS(serviceDTOS);
 
         return categoryServiceDTO;
@@ -107,7 +108,7 @@ public class CategoryService {
 
         categoryServiceDTO.setCategoryServiceId(id);
 
-        CategoryServiceEntity categoryService = categoryRepository.findByCategoryServiceId(id);
+        CategoryServiceEntity categoryService = categoryRepository.findByCategoryServiceIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(categoryService)) {
             throw new EntityNotFoundException(MessageConstant.CategoryService.CATEGORY_NOT_FOUND,
                     EntityName.CategoryService.CATEGORY, EntityName.CategoryService.CATEGORY_ID);
@@ -122,27 +123,29 @@ public class CategoryService {
             }
         }
 
+        categoryServiceDTO.setIsDeleted(Boolean.FALSE);
         CategoryServiceEntity entity = categoryMapper.toEntity(categoryServiceDTO);
         return categoryMapper.toDto(categoryRepository.save(entity));
     }
 
     public void deleteCategory(Long id) {
 
-        CategoryServiceEntity categoryService = categoryRepository.findByCategoryServiceId(id);
+        CategoryServiceEntity categoryService = categoryRepository.findByCategoryServiceIdAndIsDeleted(id, Boolean.FALSE);
         if (Objects.isNull(categoryService)) {
             throw new EntityNotFoundException(MessageConstant.CategoryService.CATEGORY_NOT_FOUND,
                     EntityName.CategoryService.CATEGORY, EntityName.CategoryService.CATEGORY_ID);
         }
 
         List<com.example.dentalclinicmanagementsystem.entity.Service> services =
-                serviceRepository.findAllByCategoryServiceId(id);
+                serviceRepository.findAllByCategoryServiceIdAndIsDeleted(id, Boolean.FALSE);
 
         if (!CollectionUtils.isEmpty(services)) {
             throw new AccessDenyException(MessageConstant.CategoryService.CATEGORY_HAVE_BEEN_USED,
                     EntityName.CategoryService.CATEGORY_NAME);
         }
 
-        categoryRepository.delete(categoryService);
+        categoryService.setIsDeleted(Boolean.TRUE);
+        categoryRepository.save(categoryService);
     }
 
     public ServiceDTO getDetailService(Long serviceId) {
@@ -168,7 +171,7 @@ public class CategoryService {
         }
 
         CategoryServiceEntity categoryServiceEntity =
-                categoryRepository.findByCategoryServiceId(serviceDTO.getCategoryServiceId());
+                categoryRepository.findByCategoryServiceIdAndIsDeleted(serviceDTO.getCategoryServiceId(), Boolean.FALSE);
         if (Objects.isNull(categoryServiceEntity)) {
             throw new EntityNotFoundException(MessageConstant.CategoryService.CATEGORY_NOT_FOUND,
                     EntityName.Service.SERVICE, EntityName.CategoryService.CATEGORY_ID);
@@ -257,6 +260,6 @@ public class CategoryService {
         if (Objects.isNull(name)) {
             name = "";
         }
-        return categoryMapper.toDto(categoryRepository.findAllByCategoryServiceNameContainingIgnoreCase(name));
+        return categoryMapper.toDto(categoryRepository.findAllByCategoryServiceNameContainingIgnoreCaseAndIsDeleted(name, Boolean.FALSE));
     }
 }

@@ -11,12 +11,12 @@ import java.util.List;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryServiceEntity, Long> {
 
-    Page<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCaseOrderByCategoryServiceIdDesc(
-            String CategoryServiceName, Pageable pageable);
+    Page<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCaseAndIsDeletedOrderByCategoryServiceIdDesc(
+            String CategoryServiceName,Boolean isDeleted, Pageable pageable);
 
     CategoryServiceEntity findByCategoryServiceName(String name);
 
-    CategoryServiceEntity findByCategoryServiceId(Long id);
+    CategoryServiceEntity findByCategoryServiceIdAndIsDeleted(Long id, Boolean isDeleted);
 
-    List<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCase(String name);
+    List<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCaseAndIsDeleted(String name, Boolean isDeleted);
 }

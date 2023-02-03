@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
-    List<Service> findAllByCategoryServiceId(Long id);
+    List<Service> findAllByCategoryServiceIdAndIsDeleted(Long id, Boolean isDelete);
 
     List<Service> findAllByServiceNameContainingIgnoreCaseAndIsDeleted(String name, Boolean isDeleted);
 

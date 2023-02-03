@@ -15,6 +15,8 @@ public class CategoryServiceDTO {
     @NotBlank(groups = {CategoryServiceDTO.Create.class, CategoryServiceDTO.Update.class})
     private String categoryServiceName;
 
+    private Boolean isDeleted;
+
     private List<ServiceDTO> serviceDTOS;
 
     public interface Create {
