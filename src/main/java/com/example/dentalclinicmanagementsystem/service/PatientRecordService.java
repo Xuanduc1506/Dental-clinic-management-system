@@ -234,6 +234,17 @@ public class PatientRecordService extends AbstractService {
         List<Long> newMaterialExportsIds = patientRecordDTO.getMaterialExportDTOS().stream()
                 .map(MaterialExportDTO::getMaterialExportId).collect(Collectors.toList());
         oldMaterialExportsIds.removeAll(newMaterialExportsIds);
+        List<MaterialExport> materialExportDeleted = materialExports.stream()
+                .filter(e -> oldMaterialExportsIds.contains(e.getMaterialExportId())).collect(Collectors.toList());
+        Set<Long> materialIds = materialExportDeleted.stream().map(MaterialExport::getMaterialId).collect(Collectors.toSet());
+        List<Material> materials = materialRepository.findAllByMaterialIdIn(new ArrayList<>(materialIds));
+        materials.forEach(m -> {
+            int minusAmount = materialExportDeleted.stream()
+                    .filter(me -> Objects.equals(me.getMaterialId(), m.getMaterialId())).mapToInt(MaterialExport::getAmount).sum();
+            m.setAmount(m.getAmount() + minusAmount);
+        });
+
+        materialRepository.saveAll(materials);
         materialExportRepository.deleteAllById(oldMaterialExportsIds);
 
         if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOS())) {
