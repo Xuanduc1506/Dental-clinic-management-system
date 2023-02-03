@@ -109,7 +109,7 @@ public class PatientRecordService extends AbstractService {
         });
 
         patientRecordDTO.setServiceDTOS(serviceDTOS);
-        patientRecordDTO.setMaterialExportDTOS(materialExportMapper.toDto(materialExportRepository.findAllByPatientRecordId(id)));
+        patientRecordDTO.setMaterialExportDTOS(materialExportRepository.findAllDTOByPatientRecordId(id));
         patientRecordDTO.setSpecimensDTOS(specimenMapper.toDto(specimenRepository.findAllByPatientRecordIdAndIsDeleted(id, Boolean.FALSE)));
 
         return patientRecordDTO;
@@ -327,6 +327,7 @@ public class PatientRecordService extends AbstractService {
 
                     if (materialExportDTO.getStatusChange().equals(ADD)) {
                         materialExportDTO.setMaterialExportId(null);
+                        materialExportDTO.setIsShow(Boolean.FALSE);
                         mapMaterial.get(materialExportDTO.getMaterialId())
                                 .setAmount(mapMaterial.get(materialExportDTO.getMaterialId()).getAmount() - materialExportDTO.getAmount());
                     }

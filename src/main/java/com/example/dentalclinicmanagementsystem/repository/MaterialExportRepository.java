@@ -39,6 +39,11 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
 
     MaterialExport findByMaterialExportIdAndIsDelete(Long id, Boolean isDelete);
 
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO(me.materialExportId,m.materialId," +
+            " me.amount, me.patientRecordId, me.unitPrice, m.materialName, me.isShow) " +
+            "FROM MaterialExport me JOIN Material m ON me.materialId = m.materialId WHERE me.patientRecordId = :patientRecordId")
+    List<MaterialExportDTO> findAllDTOByPatientRecordId(Long patientRecordId);
+
     List<MaterialExport> findAllByPatientRecordId(Long patientRecordId);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO(me.materialExportId, me.materialId, " +

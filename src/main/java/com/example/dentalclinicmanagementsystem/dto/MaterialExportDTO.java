@@ -51,6 +51,16 @@ public class MaterialExportDTO {
         this.date = date;
     }
 
+    public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, Boolean isShow) {
+        this.materialExportId = materialExportId;
+        this.materialId = materialId;
+        this.amount = amount;
+        this.patientRecordId = patientRecordId;
+        this.unitPrice = unitPrice;
+        this.materialName = materialName;
+        this.isShow = isShow;
+    }
+
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date, String patientName) {
         this.materialExportId = materialExportId;
         this.materialId = materialId;
