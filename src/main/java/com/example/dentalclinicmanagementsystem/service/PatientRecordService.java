@@ -229,9 +229,6 @@ public class PatientRecordService extends AbstractService {
         treatmentServiceMapRepository.deleteAllByStartRecordId(id);
         patientRecordServiceMapRepository.deleteAllByPatientRecordId(id);
 
-        saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
-
-
         List<MaterialExport> materialExports = materialExportRepository.findAllByPatientRecordId(id);
         List<Long> oldMaterialExportsIds = materialExports.stream().map(MaterialExport::getMaterialExportId).collect(Collectors.toList());
         List<Long> newMaterialExportsIds = patientRecordDTO.getMaterialExportDTOS().stream()
@@ -253,6 +250,8 @@ public class PatientRecordService extends AbstractService {
         if (!CollectionUtils.isEmpty(patientRecordDTO.getSpecimensDTOS())) {
             updateSpecimen(patientRecordDTO.getSpecimensDTOS(), id);
         }
+
+        saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
 
         return patientRecordMapper.toDto(patientRecord);
     }
