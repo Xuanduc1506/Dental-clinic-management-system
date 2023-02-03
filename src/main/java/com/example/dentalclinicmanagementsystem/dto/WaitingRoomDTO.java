@@ -31,12 +31,19 @@ public class WaitingRoomDTO {
     private String patientName;
     private String phone;
 
-    public WaitingRoomDTO(Long waitingRoomId, Long patientId, LocalDate date, String patientName, Integer status) {
+    private Long userId;
+
+    private String userName;
+
+
+    public WaitingRoomDTO(Long waitingRoomId, Long patientId, LocalDate date, String patientName, Integer status, Long userId, String userName) {
         this.waitingRoomId = waitingRoomId;
         this.patientId = patientId;
         this.date = date;
         this.status = status;
         this.patientName = patientName;
+        this.userId = userId;
+        this.userName = userName;
     }
 
 

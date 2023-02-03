@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +21,10 @@ public class ScheduleController {
     private ScheduleService scheduleService;
 
     @Scheduled(cron = "* * 9 * * *")
-    public ResponseEntity<Void> sentNotifyToPatient() {
+    public void sentNotifyToPatient() {
         scheduleService.sentNotify();
         System.out.println("hahaha");
-        return ResponseEntity.ok().build();
+        ResponseEntity.ok().build();
     }
 
 

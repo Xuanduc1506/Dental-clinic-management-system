@@ -43,12 +43,18 @@ public class ServiceDTO {
 
     private Boolean isDeleted;
 
-    public ServiceDTO(Long serviceId, String serviceName,Integer price, Integer discount, Integer status) {
+    private Long startRecordId;
+
+    private Integer amount;
+
+    public ServiceDTO(Long serviceId, String serviceName,Integer price, Integer discount, Integer status, Long startRecordId, Integer amount) {
         this.serviceId = serviceId;
         this.serviceName = serviceName;
         this.status = status;
         this.price = price;
         this.discount = discount;
+        this.startRecordId = startRecordId;
+        this.amount = amount;
     }
 
     public ServiceDTO(Long serviceId, String serviceName, Integer status) {

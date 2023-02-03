@@ -42,7 +42,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             "AND (:name is null or p.patientName like %:name%) ")
     List<Patient> findAllByPatientNameContaining(@Param("name") String name);
 
-    @Query("SELECT p FROM Patient p JOIN Treatment t ON p.patientId = t.treatmentId " +
+    @Query("SELECT p FROM Patient p JOIN Treatment t ON p.patientId = t.patientId " +
             "JOIN PatientRecord pr ON t.treatmentId = pr.treatmentId " +
             "WHERE pr.patientRecordId= :patientRecordId AND p.isDeleted = FALSE ")
     Patient findByPatientRecordId(@Param("patientRecordId") Long patientRecordId);

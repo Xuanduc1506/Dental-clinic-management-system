@@ -29,6 +29,9 @@ public class MaterialExport {
     @Column(name = "is_delete")
     private Boolean isDelete;
 
+    @Column(name = "is_show")
+    private Boolean isShow;
+
     @Column(name = "amount", insertable = false, updatable = false)
     private String amountTemp;
 

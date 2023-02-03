@@ -44,6 +44,7 @@ public class MessageConstant {
 
         public static final String SERVICE_NOT_FOUND = "service not found";
         public static final String SERVICE_NAME_ALREADY_EXIST = "service name already exist";
+        public static final String SERVICE_CAN_NOT_BE_EMPTY = "service can not be empty";
 
     }
 
@@ -85,6 +86,8 @@ public class MessageConstant {
 
         public static final String RECEIPT_NOT_FOUND = "bill not found";
         public static final String RECEIPT_OVER_DATE = "bill over date";
+
+        public static final String OVER_PAYMENT = "over payment";
     }
 
     public static class Timekeeping{
@@ -126,6 +129,7 @@ public class MessageConstant {
         public static final String WAITING_ROOM_NOT_FOUND = "waiting room not found";
         public static final String DATE_MUST_BE_AFTER_CURRENT_DAY = "date must be after current day";
         public static final String THIS_SCHEDULE_HAD_BEEN_CONFIRM = "this schedule had been confirm";
+        public static final String THIS_SCHEDULE_HAD_BOOKED = "this schedule had booked";
     }
 
     public static class Treatment {
@@ -133,5 +137,12 @@ public class MessageConstant {
         private Treatment(){}
 
         public static final String TREATMENT_NOT_FOUND = "treatment room not found";
+    }
+
+    public static class Notify {
+
+        private Notify(){}
+
+        public static final String Notify_NOT_FOUND = "notify room not found";
     }
 }

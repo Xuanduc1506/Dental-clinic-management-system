@@ -37,6 +37,10 @@ public class MaterialExportDTO {
 
     private Boolean isDelete;
 
+    private String statusChange;
+
+    private Boolean isShow;
+
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date) {
         this.materialExportId = materialExportId;
         this.materialId = materialId;
@@ -45,6 +49,16 @@ public class MaterialExportDTO {
         this.unitPrice = unitPrice;
         this.materialName = materialName;
         this.date = date;
+    }
+
+    public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, Boolean isShow) {
+        this.materialExportId = materialExportId;
+        this.materialId = materialId;
+        this.amount = amount;
+        this.patientRecordId = patientRecordId;
+        this.unitPrice = unitPrice;
+        this.materialName = materialName;
+        this.isShow = isShow;
     }
 
     public MaterialExportDTO(Long materialExportId, Long materialId, Integer amount, Long patientRecordId, Integer unitPrice, String materialName, LocalDate date, String patientName) {

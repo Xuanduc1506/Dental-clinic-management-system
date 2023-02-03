@@ -17,4 +17,7 @@ public class CategoryServiceEntity {
     @Column(name = "category_service_name")
     private String categoryServiceName;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
 }

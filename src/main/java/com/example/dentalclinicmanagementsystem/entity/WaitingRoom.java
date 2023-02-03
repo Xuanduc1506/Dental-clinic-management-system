@@ -32,4 +32,7 @@ public class WaitingRoom {
     @Column(name = "note")
     private String note;
 
+    @Column(name = "user_id")
+    private Long userId;
+
 }

@@ -30,7 +30,7 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
                                          @Param("endDate")LocalDate endDate);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.SpecimensDTO(s.specimenId, s.specimenName, " +
-            "s.receiveDate, s.deliveryDate, s.amount, s.unitPrice, s.laboId, pr.patientRecordId, p.patientName) " +
+            "s.receiveDate, s.deliveryDate, s.amount, s.unitPrice, s.laboId, pr.patientRecordId, p.patientName, s.status) " +
             "FROM Specimen s JOIN Labo l ON s.laboId = l.laboId " +
             "JOIN PatientRecord pr ON s.patientRecordId = pr.patientRecordId " +
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
@@ -101,6 +101,10 @@ public interface SpecimenRepository extends JpaRepository<Specimen, Long> {
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId " +
             "JOIN Service ser ON s.serviceId = ser.serviceId " +
             "JOIN Labo l ON s.laboId = l.laboId " +
-            "WHERE t.patientId = :patientId")
+            "WHERE t.patientId = :patientId AND s.isDeleted = FALSE ")
     List<SpecimensDTO> findAllByPatientId(@Param("patientId") Long patientId);
+
+    List<Specimen> findAllByPatientRecordIdAndIsDeleted(Long patientId, Boolean isDeleted);
+
+    List<Specimen> findAllBySpecimenIdInAndIsDeleted(List<Long> ids, Boolean isDeleted);
 }

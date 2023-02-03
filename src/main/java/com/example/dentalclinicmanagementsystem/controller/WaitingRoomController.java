@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -27,25 +25,16 @@ public class WaitingRoomController {
     private WaitingRoomService waitingRoomService;
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
-
-    @Autowired
     private SimpMessagingTemplate template;
 
     @PostMapping("call-patient/{id}")
-    public ResponseEntity<Void> callPatient(@PathVariable Long id) {
-        waitingRoomService.callPatient(id);
-        kafkaTemplate.send("waiting-room", id.toString());
-        return ResponseEntity.ok().build();
-    }
-
-    @KafkaListener(
-            topics = "waiting-room",
-            groupId = "dental"
-    )
-    public void listen(String id) {
+    public ResponseEntity<Void> callPatient(@RequestHeader("Authorization") String token
+            ,@PathVariable Long id) {
+        waitingRoomService.callPatient(id, token);
         System.out.println("sending via kafka listener..");
         template.convertAndSend("/topic/group", id);
+        return ResponseEntity.ok().build();
+
     }
 
     @MessageMapping("/call-patient")

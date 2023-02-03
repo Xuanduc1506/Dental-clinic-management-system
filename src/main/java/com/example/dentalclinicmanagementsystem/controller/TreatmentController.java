@@ -2,6 +2,7 @@ package com.example.dentalclinicmanagementsystem.controller;
 
 import com.example.dentalclinicmanagementsystem.constant.PermissionConstant;
 import com.example.dentalclinicmanagementsystem.dto.TreatmentDTO;
+import com.example.dentalclinicmanagementsystem.dto.TreatmentInterfaceDTO;
 import com.example.dentalclinicmanagementsystem.dto.TreatmentServiceMapDTO;
 import com.example.dentalclinicmanagementsystem.service.TreatmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,9 @@ public class TreatmentController {
 
     @PreAuthorize("hasAnyAuthority(\"" + PermissionConstant.BILL_READ + "\")")
     @GetMapping("get_list_bills")
-    public ResponseEntity<Page<TreatmentDTO>> getListBills(@RequestParam(required = false, defaultValue = "") String patientName,
-                                                           @RequestParam(required = false, defaultValue = "") String phone,
-                                                           Pageable pageable) {
+    public ResponseEntity<Page<TreatmentInterfaceDTO>> getListBills(@RequestParam(required = false, defaultValue = "") String patientName,
+                                                                    @RequestParam(required = false, defaultValue = "") String phone,
+                                                                    Pageable pageable) {
 
         return ResponseEntity.ok().body(treatmentService.getListBills(patientName, phone, pageable));
     }

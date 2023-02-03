@@ -114,4 +114,11 @@ public class EntityName {
         public static final String WAITING_ROOM = "waitingRoom";
         public static final String WAITING_ROOM_ID = "waitingRoomId";
     }
+
+    public static class Notify {
+        private Notify(){}
+
+        public static final String Notify = "notify";
+        public static final String Notify_ID = "notifyId";
+    }
 }

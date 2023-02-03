@@ -15,27 +15,30 @@ import java.util.List;
 @Repository
 public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> {
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status) " +
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status, u.userId, u.userName) " +
             "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId " +
+            "LEFT JOIN User u ON u.userId = wr.userId " +
             "WHERE (wr.status = 1 OR wr.status = 2) " +
             "AND wr.isDeleted = FALSE " +
             "AND (:patientName is null or p.patientName like %:patientName%) " +
             "AND wr.date = :date " +
-            "ORDER BY wr.isBooked DESC")
+            "ORDER BY wr.status ASC, wr.isBooked DESC")
     Page<WaitingRoomDTO> getListWaitingRoom(@Param("patientName") String patientName,
                                             @Param("date") LocalDate date,
                                             Pageable pageable);
 
     WaitingRoom findByWaitingRoomIdAndStatus(Long id, Integer status);
 
-    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status) " +
-            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId WHERE wr.status = 3 AND wr.isDeleted = FALSE ")
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId,wr.date, p.patientName, wr.status, u.userId, u.fullName) " +
+            "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId " +
+            "LEFT JOIN User u ON wr.userId = u.userId " +
+            "WHERE wr.status = 3 AND wr.isDeleted = FALSE ")
     List<WaitingRoomDTO> findAllListConfirm();
 
 
     WaitingRoom findByPatientIdAndDateAndIsDeleted(Long patientId, LocalDate date, Boolean isDeleted);
 
-    WaitingRoom findByWaitingRoomIdAndStatusAndAndIsDeleted(Long id, Integer status, Boolean isDelete);
+    WaitingRoom findByWaitingRoomIdAndStatusAndIsDeleted(Long id, Integer status, Boolean isDelete);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.WaitingRoomDTO(wr.waitingRoomId, wr.patientId, wr.date, wr.status, wr.note, p.patientName, p.phone) " +
             "FROM WaitingRoom wr JOIN Patient p ON wr.patientId = p.patientId WHERE wr.isDeleted = FALSE " +
@@ -62,4 +65,6 @@ public interface WaitingRoomRepository extends JpaRepository<WaitingRoom, Long> 
     List<Long> getListPatientIdInDay(@Param("date") LocalDate date);
 
     WaitingRoom findAllByWaitingRoomIdAndIsDeleted(Long id, Boolean isDelete);
+
+    WaitingRoom findAllByPatientIdAndDateAndIsBooked(Long patientId, LocalDate date, Boolean isBooked);
 }

@@ -11,7 +11,7 @@ import com.example.dentalclinicmanagementsystem.mapper.MaterialExportMapper;
 import com.example.dentalclinicmanagementsystem.mapper.PatientRecordMapper;
 import com.example.dentalclinicmanagementsystem.mapper.SpecimenMapper;
 import com.example.dentalclinicmanagementsystem.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,58 +20,52 @@ import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class PatientRecordService extends AbstractService {
 
-    @Autowired
-    private PatientRecordRepository patientRecordRepository;
+    private final PatientRecordRepository patientRecordRepository;
 
-    @Autowired
-    private PatientRecordMapper patientRecordMapper;
+    private final PatientRecordMapper patientRecordMapper;
 
-    @Autowired
-    private PatientRecordServiceMapRepository patientRecordServiceMapRepository;
+    private final PatientRecordServiceMapRepository patientRecordServiceMapRepository;
 
-    @Autowired
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
 
-    @Autowired
-    private TreatmentRepository treatmentRepository;
+    private final TreatmentRepository treatmentRepository;
 
-    @Autowired
-    private TreatmentServiceMapRepository treatmentServiceMapRepository;
+    private final TreatmentServiceMapRepository treatmentServiceMapRepository;
 
-    @Autowired
-    private MaterialExportRepository materialExportRepository;
+    private final MaterialExportRepository materialExportRepository;
 
-    @Autowired
-    private MaterialRepository materialRepository;
+    private final MaterialRepository materialRepository;
 
-    @Autowired
-    private ServiceRepository serviceRepository;
+    private final ServiceRepository serviceRepository;
 
-    @Autowired
-    private SpecimenRepository specimenRepository;
+    private final SpecimenRepository specimenRepository;
 
-    @Autowired
-    private WaitingRoomRepository waitingRoomRepository;
+    private final WaitingRoomRepository waitingRoomRepository;
 
-    @Autowired
-    private LaboRepository laboRepository;
+    private final LaboRepository laboRepository;
 
-    @Autowired
-    private MaterialExportMapper materialExportMapper;
+    private final MaterialExportMapper materialExportMapper;
 
-    @Autowired
-    private SpecimenMapper specimenMapper;
+    private final SpecimenMapper specimenMapper;
+
+    private final NotifyRepository notifyRepository;
+
+    private final ReceiptRepository receiptRepository;
+
+    private final String ADD = "add";
+
+    private final String EDIT = "edit";
 
 
     public Page<PatientRecordInterfaceDTO> getListPatientRecord(Long patientId, String reason, String diagnostic,
@@ -105,21 +99,20 @@ public class PatientRecordService extends AbstractService {
         patientRecordDTO.setLaboName(patientRecordInterfaceDTO.getLaboName());
         patientRecordDTO.setPrescription(patientRecordInterfaceDTO.getPrescription());
         patientRecordDTO.setServiceName(patientRecordInterfaceDTO.getServices());
+        patientRecordDTO.setTreatmentId(patientRecordInterfaceDTO.getTreatmentId());
+        List<ServiceDTO> serviceDTOS = serviceRepository.findAllByPatientRecordId(id);
 
-        List<PatientRecordServiceMap> patientRecordServiceMaps = patientRecordServiceMapRepository.findAllByPatientRecordId(id);
-        List<Long> serviceIds = patientRecordServiceMaps.stream().map(PatientRecordServiceMap::getServiceId).collect(Collectors.toList());
-        List<ServiceDTO> serviceDTOS = serviceRepository.findAllByServiceIdIn(serviceIds, id);
-
-        List<Long> serviceIdNew = treatmentServiceMapRepository.findAllServiceIdByPatientRecordId(id);
         serviceDTOS.forEach(serviceDTO -> {
-            if (serviceIdNew.contains(serviceDTO.getServiceId())) {
+            if (Objects.equals(serviceDTO.getStartRecordId(), id)){
                 serviceDTO.setIsNew(Boolean.TRUE);
             }
         });
 
         patientRecordDTO.setServiceDTOS(serviceDTOS);
-        return patientRecordDTO;
+        patientRecordDTO.setMaterialExportDTOS(materialExportRepository.findAllDTOByPatientRecordId(id));
+        patientRecordDTO.setSpecimensDTOS(specimenMapper.toDto(specimenRepository.findAllByPatientRecordIdAndIsDeleted(id, Boolean.FALSE)));
 
+        return patientRecordDTO;
     }
 
 
@@ -156,6 +149,10 @@ public class PatientRecordService extends AbstractService {
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
+        if (CollectionUtils.isEmpty(patientRecordDTO.getServiceDTOS())) {
+            throw new AccessDenyException(MessageConstant.Service.SERVICE_CAN_NOT_BE_EMPTY, EntityName.Service.SERVICE);
+        }
+
         saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
 
         WaitingRoom waitingRoom = waitingRoomRepository.findByPatientIdAndDateAndIsDeleted(patientId, LocalDate.now(), Boolean.FALSE);
@@ -172,34 +169,41 @@ public class PatientRecordService extends AbstractService {
             insertLabo(patientRecordDTO.getSpecimensDTOS(), patientRecord.getPatientRecordId());
         }
 
+        Notify notify = new Notify();
+        notify.setTreatmentId(patientRecord.getTreatmentId());
+        notify.setIsRead(Boolean.FALSE);
+        notify.setTime(LocalDateTime.now());
+
+        notifyRepository.save(notify);
 
         return patientRecordMapper.toDto(patientRecord);
     }
 
     private void insertLabo(List<SpecimensDTO> specimensDTOS, Long patientRecordId) {
-        List<Long> laboIds = specimensDTOS.stream().map(SpecimensDTO::getLaboId).collect(Collectors.toList());
+        Set<Long> laboIds = specimensDTOS.stream().map(SpecimensDTO::getLaboId).collect(Collectors.toSet());
 
-        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(laboIds, Boolean.FALSE);
+        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(new ArrayList<>(laboIds), Boolean.FALSE);
 
         if (labos.size() < laboIds.size()) {
             throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.Labo.LABO_ID);
         }
-        List<Specimen> specimens = new ArrayList<>();
-        specimensDTOS.forEach(specimensDTO -> {
+        List<Specimen> specimens = specimensDTOS.stream().map(specimensDTO -> {
             Specimen specimen = specimenMapper.toEntity(specimensDTO);
             specimen.setPatientRecordId(patientRecordId);
             specimen.setStatus(StatusConstant.PREPARE_SPECIMEN);
             specimen.setIsDeleted(Boolean.FALSE);
-            specimens.add(specimen);
-        });
+
+            return specimen;
+        }).collect(Collectors.toList());
 
         specimenRepository.saveAll(specimens);
     }
 
-    public PatientRecordDTO updateRecord(Long id, PatientRecordDTO patientRecordDTO) {
-
+    public PatientRecordDTO updateRecord(String token, Long id, PatientRecordDTO patientRecordDTO) {
+        Long userId = getUserId(token);
         patientRecordDTO.setPatientRecordId(id);
+        patientRecordDTO.setUserId(userId);
 
         Patient patient = patientRepository.findByPatientRecordId(id);
         if (Objects.isNull(patient)) {
@@ -218,31 +222,133 @@ public class PatientRecordService extends AbstractService {
                     EntityName.PatientRecord.PATIENT_RECORD);
         }
 
+        patientRecordDTO.setIsDeleted(Boolean.FALSE);
         PatientRecord patientRecord = patientRecordMapper.toEntity(patientRecordDTO);
         patientRecordRepository.save(patientRecord);
 
         treatmentServiceMapRepository.deleteAllByStartRecordId(id);
         patientRecordServiceMapRepository.deleteAllByPatientRecordId(id);
 
-        saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
-
         List<MaterialExport> materialExports = materialExportRepository.findAllByPatientRecordId(id);
-        List<Long> materialIds = materialExports.stream().map(MaterialExport::getMaterialId).collect(Collectors.toList());
-        List<Material> materials = materialRepository.findAllByMaterialIdIn(materialIds);
+        List<Long> oldMaterialExportsIds = materialExports.stream().map(MaterialExport::getMaterialExportId).collect(Collectors.toList());
+        List<Long> newMaterialExportsIds = patientRecordDTO.getMaterialExportDTOS().stream()
+                .map(MaterialExportDTO::getMaterialExportId).collect(Collectors.toList());
+        oldMaterialExportsIds.removeAll(newMaterialExportsIds);
+        materialExportRepository.deleteAllById(oldMaterialExportsIds);
 
-        materials.forEach(material -> {
-            Optional<MaterialExport> materialExportOptional = materialExports
-                    .stream().filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
-            materialExportOptional.ifPresent(materialExport ->
-                    material.setAmount(material.getAmount() + materialExport.getAmount()));
-        });
-        materialRepository.saveAll(materials);
-        materialExportRepository.deleteAll(materialExports);
         if (!CollectionUtils.isEmpty(patientRecordDTO.getMaterialExportDTOS())) {
-            insertMaterialExport(id, patientRecordDTO.getMaterialExportDTOS());
+            updateMaterialExport(patientRecordDTO.getMaterialExportDTOS(), id);
         }
 
+        List<Specimen> specimens = specimenRepository.findAllByPatientRecordIdAndIsDeleted(id, Boolean.FALSE);
+        List<Long> oldSpecimenIds = specimens.stream().map(Specimen::getSpecimenId).collect(Collectors.toList());
+        List<Long> newSpecimenIds = patientRecordDTO.getSpecimensDTOS().stream()
+                .map(SpecimensDTO::getSpecimenId).collect(Collectors.toList());
+        oldSpecimenIds.removeAll(newSpecimenIds);
+        specimenRepository.deleteAllById(oldSpecimenIds);
+
+        if (!CollectionUtils.isEmpty(patientRecordDTO.getSpecimensDTOS())) {
+            updateSpecimen(patientRecordDTO.getSpecimensDTOS(), id);
+        }
+
+        saveServiceToTreatmentAndRecord(patient, patientRecordDTO, patientRecord);
+
         return patientRecordMapper.toDto(patientRecord);
+    }
+
+    private void updateSpecimen(List<SpecimensDTO> specimensDTOS, Long recordId) {
+
+        Set<Long> laboIds = specimensDTOS.stream().filter(specimensDTO -> Objects.equals(ADD, specimensDTO.getStatusChange())
+                        || Objects.equals(EDIT, specimensDTO.getStatusChange()))
+                .map(SpecimensDTO::getLaboId).collect(Collectors.toSet());
+        List<Labo> labos = laboRepository.findAllByLaboIdInAndIsDeleted(new ArrayList<>(laboIds), Boolean.FALSE);
+
+        if (labos.size() < laboIds.size()) {
+            throw new EntityNotFoundException(MessageConstant.Labo.LABO_NOT_FOUND,
+                    EntityName.PatientRecord.PATIENT_RECORD, EntityName.Labo.LABO_ID);
+        }
+        List<Long> editIds = specimensDTOS.stream().filter(specimensDTO -> Objects.equals(EDIT, specimensDTO.getStatusChange()))
+                .map(SpecimensDTO::getSpecimenId).collect(Collectors.toList());
+        List<Specimen> specimenEdit = specimenRepository.findAllBySpecimenIdInAndIsDeleted(editIds, Boolean.FALSE);
+
+        if (specimenEdit.size() < editIds.size()) {
+            throw new EntityNotFoundException(MessageConstant.Specimen.SPECIMEN_NOT_FOUND,
+                    EntityName.Specimen.SPECIMEN, EntityName.Specimen.SPECIMEN_ID);
+        }
+
+        Map<Long, Specimen> mapSpecimen = specimenEdit.stream()
+                .collect(Collectors.toMap(Specimen::getSpecimenId, Function.identity()));
+        specimensDTOS.stream()
+                .filter(specimensDTO -> Objects.equals(ADD, specimensDTO.getStatusChange())
+                        || Objects.equals(EDIT, specimensDTO.getStatusChange()))
+                .forEach(specimensDTO -> {
+
+                    if (specimensDTO.getStatusChange().equals(ADD)) {
+                        specimensDTO.setSpecimenId(null);
+                        specimensDTO.setStatus(StatusConstant.PREPARE_SPECIMEN);
+                    }
+
+                    if (specimensDTO.getStatusChange().equals(EDIT)) {
+                        specimensDTO.setStatus(mapSpecimen.get(specimensDTO.getSpecimenId()).getStatus());
+                    }
+                    specimensDTO.setPatientRecordId(recordId);
+                    specimensDTO.setIsDeleted(Boolean.FALSE);
+        });
+        List<Specimen> specimen = specimenMapper.toEntity(specimensDTOS);
+        specimenRepository.saveAll(specimen);
+    }
+
+    private void updateMaterialExport(List<MaterialExportDTO> materialExportDTOS, Long recordId) {
+        List<Long> materialIds = materialExportDTOS.stream()
+                .filter(materialExportDTO -> Objects.equals(ADD, materialExportDTO.getStatusChange())
+                        || Objects.equals(EDIT, materialExportDTO.getStatusChange()))
+                .map(MaterialExportDTO::getMaterialId).collect(Collectors.toList());
+
+        Map<Long, Material> mapMaterial = materialRepository.findAllByMaterialIdIn(materialIds).stream()
+                .collect(Collectors.toMap(Material::getMaterialId, Function.identity()));
+
+        List<Long> exportEditIds = materialExportDTOS.stream()
+                .filter(materialExportDTO -> Objects.equals(EDIT, materialExportDTO.getStatusChange()))
+                .map(MaterialExportDTO::getMaterialExportId).collect(Collectors.toList());
+
+        List<MaterialExport> materialExportEdit = materialExportRepository.findAllByMaterialExportIdInAndIsDelete(exportEditIds, Boolean.FALSE);
+        if (exportEditIds.size() > materialExportEdit.size()) {
+            throw new EntityNotFoundException(MessageConstant.MaterialExport.MATERIAL_EXPORT_NOT_FOUND,
+                    EntityName.MaterialExport.MATERIAL_EXPORT, EntityName.MaterialExport.MATERIAL_EXPORT_ID);
+        }
+        Map<Long, MaterialExport> mapMaterialExport = materialExportEdit.stream()
+                .collect(Collectors.toMap(MaterialExport::getMaterialExportId, Function.identity()));
+
+        materialExportDTOS.stream()
+                .filter(materialExportDTO -> Objects.equals(ADD, materialExportDTO.getStatusChange())
+                        || Objects.equals(EDIT, materialExportDTO.getStatusChange()))
+                .forEach(materialExportDTO -> {
+
+                    if (materialExportDTO.getStatusChange().equals(ADD)) {
+                        materialExportDTO.setMaterialExportId(null);
+                        materialExportDTO.setIsShow(Boolean.FALSE);
+                        mapMaterial.get(materialExportDTO.getMaterialId())
+                                .setAmount(mapMaterial.get(materialExportDTO.getMaterialId()).getAmount() - materialExportDTO.getAmount());
+                    }
+
+                    if (materialExportDTO.getStatusChange().equals(EDIT)) {
+                        mapMaterial.get(materialExportDTO.getMaterialId())
+                                .setAmount(mapMaterial.get(materialExportDTO.getMaterialId()).getAmount()
+                                        + mapMaterialExport.get(materialExportDTO.getMaterialExportId()).getAmount()
+                                        - materialExportDTO.getAmount());
+                    }
+
+                    materialExportDTO.setIsDelete(Boolean.FALSE);
+                    materialExportDTO.setPatientRecordId(recordId);
+                });
+
+        List<Material> materialError = mapMaterial.values().stream().filter(material -> material.getAmount() < 0).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(materialError)) {
+            throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
+        }
+
+        materialRepository.saveAll(mapMaterial.values());
+        materialExportRepository.saveAll(materialExportMapper.toEntity(materialExportDTOS));
     }
 
     private void insertMaterialExport(Long patientRecordId, List<MaterialExportDTO> materialExportDTOS) {
@@ -255,24 +361,25 @@ public class PatientRecordService extends AbstractService {
                     EntityName.PatientRecord.PATIENT_RECORD, EntityName.Material.MATERIAL_ID);
         }
 
-        materials.forEach(material -> {
-            Optional<MaterialExportDTO> materialExportDTOOptional = materialExportDTOS
-                    .stream().filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId())).findFirst();
-            materialExportDTOOptional.ifPresent(materialExport -> {
-
+        materials.forEach(material ->
+            materialExportDTOS.stream()
+                    .filter(me -> Objects.equals(material.getMaterialId(), me.getMaterialId()))
+                    .findFirst()
+                    .ifPresent(materialExport -> {
                 if (material.getAmount() - materialExport.getAmount() >= 0) {
                     material.setAmount(material.getAmount() - materialExport.getAmount());
                 } else {
                     throw new AccessDenyException(MessageConstant.Material.NOT_ENOUGH_MATERIAL, EntityName.Material.MATERIAL);
                 }
-            });
-        });
+            })
+        );
         materialRepository.saveAll(materials);
 
         materialExportDTOS.forEach(materialExport -> {
             materialExport.setMaterialExportId(null);
             materialExport.setIsDelete(Boolean.FALSE);
             materialExport.setPatientRecordId(patientRecordId);
+            materialExport.setIsShow(Boolean.FALSE);
         });
         materialExportRepository.saveAll(materialExportMapper.toEntity(materialExportDTOS));
     }
@@ -282,6 +389,13 @@ public class PatientRecordService extends AbstractService {
         List<PatientRecordServiceMap> patientRecordServiceMaps = new ArrayList<>();
 
         patientRecordDTO.getServiceDTOS().forEach(serviceDTO -> {
+            PatientRecordServiceMap patientRecordServiceMap = new PatientRecordServiceMap();
+            patientRecordServiceMap.setStartRecordId(serviceDTO.getStartRecordId());
+            patientRecordServiceMap.setPatientRecordServiceMapId(null);
+            patientRecordServiceMap.setPatientRecordId(patientRecord.getPatientRecordId());
+            patientRecordServiceMap.setServiceId(serviceDTO.getServiceId());
+            patientRecordServiceMap.setStatus(serviceDTO.getStatus());
+
             if (Objects.equals(serviceDTO.getIsNew(), Boolean.TRUE)) {
                 TreatmentServiceMap treatmentServiceMap = new TreatmentServiceMap();
                 treatmentServiceMap.setTreatmentServiceMapId(null);
@@ -290,14 +404,12 @@ public class PatientRecordService extends AbstractService {
                 treatmentServiceMap.setDiscount(Objects.nonNull(serviceDTO.getDiscount()) ? serviceDTO.getDiscount() : 0);
                 treatmentServiceMap.setServiceId(serviceDTO.getServiceId());
                 treatmentServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
+                treatmentServiceMap.setAmount(Objects.nonNull(serviceDTO.getAmount()) ? serviceDTO.getAmount() : 1);
+                treatmentServiceMap.setIsShow(Boolean.FALSE);
                 treatmentServiceMaps.add(treatmentServiceMap);
-            }
 
-            PatientRecordServiceMap patientRecordServiceMap = new PatientRecordServiceMap();
-            patientRecordServiceMap.setPatientRecordServiceMapId(null);
-            patientRecordServiceMap.setPatientRecordId(patientRecord.getPatientRecordId());
-            patientRecordServiceMap.setServiceId(serviceDTO.getServiceId());
-            patientRecordServiceMap.setStatus(serviceDTO.getStatus());
+                patientRecordServiceMap.setStartRecordId(patientRecord.getPatientRecordId());
+            }
             patientRecordServiceMaps.add(patientRecordServiceMap);
         });
 
@@ -305,14 +417,13 @@ public class PatientRecordService extends AbstractService {
         List<ServiceDTO> listServiceNotDone = patientRecordDTO.getServiceDTOS().stream()
                 .filter(serviceDTO -> Objects.equals(serviceDTO.getStatus(), StatusConstant.TREATING)).collect(Collectors.toList());
 
-        if (CollectionUtils.isEmpty(listServiceNotDone)) {
+        Integer getDebit = receiptRepository.getDebit(patientRecordDTO.getTreatmentId()).stream().findFirst().orElse(0);
+        if (CollectionUtils.isEmpty(listServiceNotDone) && getDebit == 0) {
             patient.setStatus(StatusConstant.DONE);
         } else {
             patient.setStatus(StatusConstant.TREATING);
         }
 
-        patient.setBodyPrehistory(patientRecordDTO.getBodyPrehistory());
-        patient.setTeethPrehistory(patientRecordDTO.getTeethPrehistory());
         patientRepository.save(patient);
 
         patientRecordServiceMapRepository.saveAll(patientRecordServiceMaps);
@@ -325,9 +436,23 @@ public class PatientRecordService extends AbstractService {
 
         List<Long> startRecordIds = treatmentServiceMapRepository.findAllStartRecordByTreatmentIdAndListServiceId(patientRecord.getTreatmentId(), serviceIdsDone);
         List<Specimen> specimens = specimenRepository.findAllByPatientRecordIdInAndServiceIdInAndIsDeleted(startRecordIds, serviceIdsDone, Boolean.FALSE);
+
         specimens.forEach(specimen -> {
-            specimen.setStatus(StatusConstant.SPECIMEN_COMPLETED);
-            specimen.setUsedDate(LocalDate.now());
+            if (specimen.getStatus().equals(StatusConstant.LABO_RECEIVE)) {
+                specimen.setStatus(StatusConstant.SPECIMEN_COMPLETED);
+                specimen.setUsedDate(LocalDate.now());
+            }
+
+            if (specimen.getStatus().equals(StatusConstant.PREPARE_SPECIMEN)
+                    || specimen.getStatus().equals(StatusConstant.LABO_RECEIVE)
+                    || specimen.getStatus().equals(StatusConstant.SPECIMEN_ERROR)) {
+                specimen.setIsDeleted(Boolean.TRUE);
+            }
+
+            if (specimen.getStatus().equals(StatusConstant.PATIENT_USED)) {
+                specimen.setStatus(StatusConstant.SPECIMEN_COMPLETED);
+            }
+
         });
         specimenRepository.saveAll(specimens);
 
@@ -356,7 +481,7 @@ public class PatientRecordService extends AbstractService {
 
     public List<PatientRecordDTO> getAllRecord(Long patientId, String date) {
 
-        if (StringUtils.hasLength(date)) {
+        if (!StringUtils.hasLength(date)) {
             date = "";
         }
         return patientRecordMapper.toDto(patientRecordRepository.findRecordByPatientId(patientId, date));

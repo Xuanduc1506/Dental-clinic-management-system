@@ -39,6 +39,11 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
 
     MaterialExport findByMaterialExportIdAndIsDelete(Long id, Boolean isDelete);
 
+    @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO(me.materialExportId,m.materialId," +
+            " me.amount, me.patientRecordId, me.unitPrice, m.materialName, me.isShow) " +
+            "FROM MaterialExport me JOIN Material m ON me.materialId = m.materialId WHERE me.patientRecordId = :patientRecordId")
+    List<MaterialExportDTO> findAllDTOByPatientRecordId(Long patientRecordId);
+
     List<MaterialExport> findAllByPatientRecordId(Long patientRecordId);
 
     @Query("SELECT new com.example.dentalclinicmanagementsystem.dto.MaterialExportDTO(me.materialExportId, me.materialId, " +
@@ -63,4 +68,10 @@ public interface MaterialExportRepository extends JpaRepository<MaterialExport, 
             "JOIN Treatment t ON pr.treatmentId = t.treatmentId JOIN Material m ON me.materialId = m.materialId " +
             "WHERE t.patientId = :patientId")
     List<MaterialExportDTO> getListMaterialExportOfPatient(@Param("patientId") Long patientId);
+
+    List<MaterialExport> findAllByMaterialExportIdInAndIsDelete(List<Long> exportIds, Boolean isDeleted);
+
+    @Query("SELECT me FROM MaterialExport me JOIN PatientRecord pr ON me.patientRecordId = pr.patientRecordId " +
+            "WHERE pr.treatmentId = :treatmentId")
+    List<MaterialExport> findAllByTreatmentId(@Param("treatmentId")Long treatmentId);
 }
