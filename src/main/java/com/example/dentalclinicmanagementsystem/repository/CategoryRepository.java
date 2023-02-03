@@ -14,7 +14,7 @@ public interface CategoryRepository extends JpaRepository<CategoryServiceEntity,
     Page<CategoryServiceEntity> findAllByCategoryServiceNameContainingIgnoreCaseAndIsDeletedOrderByCategoryServiceIdDesc(
             String CategoryServiceName,Boolean isDeleted, Pageable pageable);
 
-    CategoryServiceEntity findByCategoryServiceName(String name);
+    CategoryServiceEntity findByCategoryServiceNameAndIsDeleted(String name, Boolean isDeleted);
 
     CategoryServiceEntity findByCategoryServiceIdAndIsDeleted(Long id, Boolean isDeleted);
 

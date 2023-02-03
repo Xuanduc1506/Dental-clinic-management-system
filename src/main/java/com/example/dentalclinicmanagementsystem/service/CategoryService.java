@@ -59,7 +59,7 @@ public class CategoryService {
         categoryServiceDTO.setCategoryServiceId(null);
 
         CategoryServiceEntity categoryServiceEntityDb = categoryRepository.
-                findByCategoryServiceName(categoryServiceDTO.getCategoryServiceName());
+                findByCategoryServiceNameAndIsDeleted(categoryServiceDTO.getCategoryServiceName(), Boolean.FALSE);
         if (Objects.nonNull(categoryServiceEntityDb)) {
             throw new DuplicateNameException(MessageConstant.CategoryService.CATEGORY_NAME_ALREADY_EXIST,
                     EntityName.CategoryService.CATEGORY_NAME);
@@ -116,7 +116,7 @@ public class CategoryService {
 
         if (!Objects.equals(categoryService.getCategoryServiceName(), categoryServiceDTO.getCategoryServiceName())) {
             CategoryServiceEntity categoryServiceEntityDb = categoryRepository.
-                    findByCategoryServiceName(categoryServiceDTO.getCategoryServiceName());
+                    findByCategoryServiceNameAndIsDeleted(categoryServiceDTO.getCategoryServiceName(), Boolean.FALSE);
             if (Objects.nonNull(categoryServiceEntityDb)) {
                 throw new DuplicateNameException(MessageConstant.CategoryService.CATEGORY_NAME_ALREADY_EXIST,
                         EntityName.CategoryService.CATEGORY_NAME);
