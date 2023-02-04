@@ -21,7 +21,7 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
             "from (select t.treatment_id, t.patient_id, p.patient_name, p.phone, tsm.current_price * tsm.amount as 'total', tsm.discount as 'discount' " +
             "from treatments t join patients p on t.patient_id = p.patient_id " +
             "join treatment_service_map tsm ON t.treatment_id = tsm.treatment_id " +
-            "union " +
+            "union all" +
             "select t.treatment_id, t.patient_id, p.patient_name, p.phone, me.unit_price * me.amount as 'total', 0 as 'discount' " +
             "from treatments t join patients p on t.patient_id = p.patient_id " +
             "join patient_records pr ON pr.treatment_id = t.treatment_id AND pr.is_deleted = FALSE " +
@@ -34,7 +34,7 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
             "from (select t.treatment_id, t.patient_id, p.patient_name, p.phone, tsm.current_price * tsm.amount as 'total', tsm.discount as 'discount' " +
             "from treatments t join patients p on t.patient_id = p.patient_id " +
             "join treatment_service_map tsm ON t.treatment_id = tsm.treatment_id " +
-            "union " +
+            "union all" +
             "select t.treatment_id, t.patient_id, p.patient_name, p.phone, me.unit_price * me.amount as 'total', 0 as 'discount' " +
             "from treatments t join patients p on t.patient_id = p.patient_id " +
             "join patient_records pr ON pr.treatment_id = t.treatment_id AND pr.is_deleted = FALSE " +
