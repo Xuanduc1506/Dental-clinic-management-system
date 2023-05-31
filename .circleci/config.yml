@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: "Say My pipeline id"
-          command: "echo My pipeline id is << pipeline.id >> and my git branch is << pipeline.git.branch >>"
+          command: "echo $MY_ENV_VAR"
   print_world:
     # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/configuration-reference/#executor-job
