@@ -5,35 +5,59 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
-  print_hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#executor-job
+#  print_hello:
+#    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+#    # See: https://circleci.com/docs/configuration-reference/#executor-job
+#    docker:
+#      - image: circleci/node:13.8.0
+#    # Add steps to the job
+#    # See: https://circleci.com/docs/configuration-reference/#steps
+#    steps:
+#      - checkout
+#      - run:
+#          name: "Say My pipeline id"
+#          command: "echo $MY_ENV_VAR"
+#  print_world:
+#    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+#    # See: https://circleci.com/docs/configuration-reference/#executor-job
+#    docker:
+#      - image: circleci/node:13.8.0
+#    # Add steps to the job
+#    # See: https://circleci.com/docs/configuration-reference/#steps
+#    steps:
+#      - checkout
+#      - run:
+#          name: "Say hello"
+#          command: "echo world"
+  save_hello_world_output:
     docker:
       - image: circleci/node:13.8.0
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
       - checkout
       - run:
-          name: "Say My pipeline id"
-          command: "echo $MY_ENV_VAR"
-  print_world:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/configuration-reference/#executor-job
+          name: "output to file"
+          command: echo "hello world haha" > output.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - output.txt
+
+  print_output_file:
     docker:
       - image: circleci/node:13.8.0
-    # Add steps to the job
-    # See: https://circleci.com/docs/configuration-reference/#steps
     steps:
       - checkout
+      - attach_workspace:
+            at: .
       - run:
-          name: "Say hello"
-          command: "echo world"
+          name: "output to file"
+          command: cat output.txt
+
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
   say-hello-workflow:
     jobs:
-      - print_hello
-      - print_world:
-          requires: [print_hello]
+      - save_hello_world_output
+      - print_output_file:
+          requires: [save_hello_world_output]
