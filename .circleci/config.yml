@@ -73,7 +73,8 @@ jobs:
   print_pipeline:
     <<: *defaults
     steps:
-      - print_pipeline_id
+      - print_pipeline_id:
+          workflow_id: << CIRCLE_WORKFLOW_ID >>
 
 
 # Orchestrate jobs using workflows
