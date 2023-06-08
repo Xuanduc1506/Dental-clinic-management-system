@@ -21,8 +21,6 @@ commands:
       - run: echo << parameters.workflow_id >>
 
 
-
-
 jobs:
 #  print_hello:
 #    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
@@ -76,6 +74,14 @@ jobs:
       - print_pipeline_id:
           workflow_id: $CIRCLE_WORKFLOW_ID
 
+  demo_fail:
+    <<: *defaults
+    steps:
+      - run: exit 1
+      - run:
+          name: erroe
+          command: echo "erorr sml"
+          when: on_fail
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -86,3 +92,4 @@ workflows:
       - print_output_file:
           requires: [save_hello_world_output]
       - print_pipeline
+      - demo_fail
