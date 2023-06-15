@@ -46,50 +46,58 @@ jobs:
 #      - run:
 #          name: "Say hello"
 #          command: "echo world"
-  save_hello_world_output:
-    <<: *defaults
+#  save_hello_world_output:
+#    <<: *defaults
+#    steps:
+#      - checkout
+#      - run:
+#          name: "output to file"
+#          command: echo "hello world haha" > output.txt
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - output.txt
+#
+#  print_output_file:
+#    <<: *defaults
+#    steps:
+#      - checkout
+#      - attach_workspace:
+#            at: .
+#      - run:
+#          name: "output to file"
+#          command: cat output.txt
+#
+#  print_pipeline:
+#    <<: *defaults
+#    steps:
+#      - print_pipeline_id:
+#          workflow_id: $CIRCLE_WORKFLOW_ID
+#
+#  demo_fail:
+#    <<: *defaults
+#    steps:
+#      - run: exit 1
+#      - run:
+#          name: erroe
+#          command: echo "erorr sml"
+#          when: on_fail
+  create_infrastructure:
+    docker:
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
-          name: "output to file"
-          command: echo "hello world haha" > output.txt
-      - persist_to_workspace:
-          root: .
-          paths:
-            - output.txt
-
-  print_output_file:
-    <<: *defaults
-    steps:
-      - checkout
-      - attach_workspace:
-            at: .
-      - run:
-          name: "output to file"
-          command: cat output.txt
-
-  print_pipeline:
-    <<: *defaults
-    steps:
-      - print_pipeline_id:
-          workflow_id: $CIRCLE_WORKFLOW_ID
-
-  demo_fail:
-    <<: *defaults
-    steps:
-      - run: exit 1
-      - run:
-          name: erroe
-          command: echo "erorr sml"
-          when: on_fail
+          name: Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy \
+              --template-file template.yml \
+              --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+              --region us-east-1
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
 workflows:
   say-hello-workflow:
     jobs:
-      - save_hello_world_output
-      - print_output_file:
-          requires: [save_hello_world_output]
-      - print_pipeline
-      - demo_fail
+      - create_infrastructure
