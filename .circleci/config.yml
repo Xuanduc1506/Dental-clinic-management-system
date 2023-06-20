@@ -20,6 +20,17 @@ commands:
       - checkout
       - run: echo << parameters.workflow_id >>
 
+  destroy_environment:
+    steps:
+      - run:
+          name: Destroy environment
+            # ${CIRCLE_WORKFLOW_ID} is a Built-in environment variable
+            # ${CIRCLE_WORKFLOW_ID:0:5} takes the first 5 chars of the variable CIRCLE_CI_WORKFLOW_ID
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5}
+
+
 
 jobs:
 #  print_hello:
@@ -95,6 +106,17 @@ jobs:
               --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region us-east-1
 
+  smoke_test:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - run:
+          name: Test job
+          # Fail the job intentionally to simulate an error.
+          command: return 1
+      - destroy_environment
+
+
   configure_infrastructure:
     docker:
       - image: python:3.7-alpine3.11
@@ -118,4 +140,6 @@ workflows:
   say-hello-workflow:
     jobs:
       - create_infrastructure
-      - configure_infrastructure
+      - smoke_test:
+          requires:
+            - create_infrastructure
