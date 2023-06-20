@@ -9,7 +9,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${MyBucketName}"
-      AccessControl: private
+      AccessControl: Private
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: error.html
